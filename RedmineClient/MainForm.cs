@@ -33,7 +33,9 @@ namespace RedmineClient
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            var dialogResult = MessageBox.Show("Are you sure you want to exit?", "Exiting", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dialogResult == DialogResult.Yes)
+                Application.Exit();
         }
 
         private void changeAPITokenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -58,10 +60,31 @@ namespace RedmineClient
             string projectInfo = "ID: " + project.ID + "\n"
                 + "Name: " + project.Name + "\n"
                 + "Identifier: " + project.Identifier + "\n"
-                + "Description: " + project.Description + "\n"
                 + "Status: " + project.Status + "\n"
+                + "Description: " + project.Description + "\n"
                 + "Created on: " + project.CreatedOn.Hour + ":" + project.CreatedOn.Minute + ", " + project.CreatedOn.Day + " " + Utils.GetMonthName(project.CreatedOn.Month) + " " + project.CreatedOn.Year;
             MessageBox.Show(projectInfo, "Info about project \"" + project.Name + "\"");
+        }
+
+        private void lvIssues_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && lvIssues.FocusedItem.Bounds.Contains(e.Location))
+                contextMenuStripIssue.Show(Cursor.Position);
+        }
+
+        private void issueInfotoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Issue issue = controller.GetIssue(long.Parse(lvIssues.FocusedItem.SubItems[0].Text));
+            string issueInfo = "Project: " + issue.Project.Name + "\n"
+                + "ID: " + issue.ID + "\n"
+                + "Subject: " + issue.Subject + "\n"
+                + "Tracker: " + issue.Tracker.Name + "\n"
+                + "Author: " + issue.Author.Name + "\n"
+                + "Status: " + issue.Status.Name + "\n"
+                + "Priority: " + issue.Priority.Name + "\n"
+                + "Description: " + issue.Description + "\n"
+                + "Created on: " + issue.CreatedOn.Hour + ":" + issue.CreatedOn.Minute + ", " + issue.CreatedOn.Day + " " + Utils.GetMonthName(issue.CreatedOn.Month) + " " + issue.CreatedOn.Year;
+            MessageBox.Show(issueInfo, "Info about issue \"" + issue.Subject + "\"");
         }
 
         private void controller_OnAPITokenChanged(ErrorTypes error, bool isChanged)
@@ -93,7 +116,7 @@ namespace RedmineClient
                                 cbSelectProject.Items.Add("#" + project.ID + ": " + project.Name);
                             break;
                         case ErrorTypes.NoInternetConnection:
-                            MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Cannot connect to Redmine services and load projects. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
                             if (Properties.Settings.Default.api_token.Length == 0)
@@ -121,13 +144,14 @@ namespace RedmineClient
                             {
                                 ListViewItem lvi = new ListViewItem(issue.ID + "");
                                 lvi.SubItems.Add(issue.Subject);
+                                lvi.SubItems.Add(issue.Tracker.Name);
                                 lvi.SubItems.Add(issue.Status.Name);
                                 lvi.SubItems.Add(issue.CreatedOn.Hour + ":" + issue.CreatedOn.Minute + ", " + issue.CreatedOn.Day + " " + Utils.GetMonthName(issue.CreatedOn.Month) + " " + issue.CreatedOn.Year);
                                 lvIssues.Items.Add(lvi);
                             }
                             break;
                         case ErrorTypes.NoInternetConnection:
-                            MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Cannot connect to Redmine services and load issues. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
                             if (Properties.Settings.Default.api_token.Length == 0)

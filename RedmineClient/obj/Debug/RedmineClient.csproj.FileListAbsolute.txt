@@ -8,3 +8,13 @@ C:\Users\6727149\Desktop\Проекты\RedmineClientFor\RedmineClient\bin\Debug
 C:\Users\6727149\Desktop\Проекты\RedmineClientFor\RedmineClient\bin\Debug\Redmine Client.pdb
 C:\Users\6727149\Desktop\Проекты\RedmineClientFor\RedmineClient\obj\Debug\Redmine Client.exe
 C:\Users\6727149\Desktop\Проекты\RedmineClientFor\RedmineClient\obj\Debug\Redmine Client.pdb
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\bin\Debug\Redmine Client.exe.config
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\Redmine Client.exe
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\Redmine Client.pdb
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\bin\Debug\Redmine Client.exe
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\bin\Debug\Redmine Client.pdb
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.csprojResolveAssemblyReference.cache
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.APITokenForm.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.MainForm.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.Properties.Resources.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.csproj.GenerateResource.Cache

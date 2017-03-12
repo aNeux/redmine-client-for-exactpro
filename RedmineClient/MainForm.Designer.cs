@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,7 +44,13 @@
             this.columnHeaderStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderCreatedOn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnProjectInfo = new System.Windows.Forms.Button();
+            this.newIssuetoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStripIssue = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.issueInfotoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.columnHeaderTracker = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip.SuspendLayout();
+            this.contextMenuStripIssue.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip
@@ -61,6 +68,8 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newProjectToolStripMenuItem,
+            this.newIssuetoolStripMenuItem,
+            this.refreshStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -69,13 +78,13 @@
             // newProjectToolStripMenuItem
             // 
             this.newProjectToolStripMenuItem.Name = "newProjectToolStripMenuItem";
-            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.newProjectToolStripMenuItem.Text = "New project";
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -118,6 +127,7 @@
             this.lvIssues.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeaderID,
             this.columnHeaderSubject,
+            this.columnHeaderTracker,
             this.columnHeaderStatus,
             this.columnHeaderCreatedOn});
             this.lvIssues.FullRowSelect = true;
@@ -129,6 +139,7 @@
             this.lvIssues.TabIndex = 4;
             this.lvIssues.UseCompatibleStateImageBehavior = false;
             this.lvIssues.View = System.Windows.Forms.View.Details;
+            this.lvIssues.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvIssues_MouseClick);
             // 
             // columnHeaderID
             // 
@@ -138,12 +149,12 @@
             // columnHeaderSubject
             // 
             this.columnHeaderSubject.Text = "Subject";
-            this.columnHeaderSubject.Width = 95;
+            this.columnHeaderSubject.Width = 108;
             // 
             // columnHeaderStatus
             // 
             this.columnHeaderStatus.Text = "Status";
-            this.columnHeaderStatus.Width = 74;
+            this.columnHeaderStatus.Width = 78;
             // 
             // columnHeaderCreatedOn
             // 
@@ -160,6 +171,38 @@
             this.btnProjectInfo.Text = "Project info";
             this.btnProjectInfo.UseVisualStyleBackColor = true;
             this.btnProjectInfo.Click += new System.EventHandler(this.btnProjectInfo_Click);
+            // 
+            // newIssuetoolStripMenuItem
+            // 
+            this.newIssuetoolStripMenuItem.Enabled = false;
+            this.newIssuetoolStripMenuItem.Name = "newIssuetoolStripMenuItem";
+            this.newIssuetoolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newIssuetoolStripMenuItem.Text = "New issue";
+            // 
+            // refreshStripMenuItem
+            // 
+            this.refreshStripMenuItem.Name = "refreshStripMenuItem";
+            this.refreshStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.refreshStripMenuItem.Text = "Refresh";
+            // 
+            // contextMenuStripIssue
+            // 
+            this.contextMenuStripIssue.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.issueInfotoolStripMenuItem});
+            this.contextMenuStripIssue.Name = "contextMenuStripIssue";
+            this.contextMenuStripIssue.Size = new System.Drawing.Size(125, 26);
+            // 
+            // issueInfotoolStripMenuItem
+            // 
+            this.issueInfotoolStripMenuItem.Name = "issueInfotoolStripMenuItem";
+            this.issueInfotoolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.issueInfotoolStripMenuItem.Text = "Issue info";
+            this.issueInfotoolStripMenuItem.Click += new System.EventHandler(this.issueInfotoolStripMenuItem_Click);
+            // 
+            // columnHeaderTracker
+            // 
+            this.columnHeaderTracker.Text = "Tracker";
+            this.columnHeaderTracker.Width = 72;
             // 
             // MainForm
             // 
@@ -179,6 +222,7 @@
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
+            this.contextMenuStripIssue.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -200,6 +244,11 @@
         private System.Windows.Forms.ColumnHeader columnHeaderCreatedOn;
         private System.Windows.Forms.Button btnProjectInfo;
         private System.Windows.Forms.ToolStripMenuItem newProjectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newIssuetoolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem refreshStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripIssue;
+        private System.Windows.Forms.ToolStripMenuItem issueInfotoolStripMenuItem;
+        private System.Windows.Forms.ColumnHeader columnHeaderTracker;
     }
 }
 
