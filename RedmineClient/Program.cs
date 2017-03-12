@@ -8,6 +8,7 @@ namespace RedmineClient
     static class Program
     {
         public static Controller controllerGlobal;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>

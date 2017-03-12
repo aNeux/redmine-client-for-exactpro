@@ -37,7 +37,10 @@ namespace RedmineClient
             if (tbAPIToken.Text.Length == 0)
                 MessageBox.Show("Please enter API token!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
+            {
+                btnSave.Enabled = false;
                 controller.ChangeApiToken(tbAPIToken.Text);
+            }
         }
 
         private void btnCacnel_Click(object sender, EventArgs e)
@@ -52,20 +55,28 @@ namespace RedmineClient
             }
         }
 
-        private void controller_OnAPITokenChanged(object sender, APITokenEventArgs e)
+        private void controller_OnAPITokenChanged(ErrorTypes error, bool isChanged)
         {
-            switch (e.Error)
-            {
-                case ErrorTypes.NoErrors:
-                    this.Close();
-                    break;
-                case ErrorTypes.NoInternetConnection:
-                    MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    break;
-                case ErrorTypes.UnathorizedAccess:
-                    MessageBox.Show("Wrong API token. Please check entered data and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    break;
-            }
+            Action action = () =>
+                {
+                    btnSave.Enabled = true;
+                    switch (error)
+                    {
+                        case ErrorTypes.NoErrors:
+                            this.Close();
+                            break;
+                        case ErrorTypes.NoInternetConnection:
+                            MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
+                        case ErrorTypes.UnathorizedAccess:
+                            MessageBox.Show("Wrong API token. Please check entered data and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
+                    }
+                };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
         }
     }
 }

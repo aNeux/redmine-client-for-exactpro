@@ -43,7 +43,6 @@
             this.columnHeaderStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderCreatedOn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnProjectInfo = new System.Windows.Forms.Button();
-            this.btnNewIssue = new System.Windows.Forms.Button();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -127,7 +126,7 @@
             this.lvIssues.MultiSelect = false;
             this.lvIssues.Name = "lvIssues";
             this.lvIssues.Size = new System.Drawing.Size(457, 202);
-            this.lvIssues.TabIndex = 5;
+            this.lvIssues.TabIndex = 4;
             this.lvIssues.UseCompatibleStateImageBehavior = false;
             this.lvIssues.View = System.Windows.Forms.View.Details;
             // 
@@ -162,23 +161,11 @@
             this.btnProjectInfo.UseVisualStyleBackColor = true;
             this.btnProjectInfo.Click += new System.EventHandler(this.btnProjectInfo_Click);
             // 
-            // btnNewIssue
-            // 
-            this.btnNewIssue.Enabled = false;
-            this.btnNewIssue.Location = new System.Drawing.Point(298, 44);
-            this.btnNewIssue.Name = "btnNewIssue";
-            this.btnNewIssue.Size = new System.Drawing.Size(85, 23);
-            this.btnNewIssue.TabIndex = 4;
-            this.btnNewIssue.Text = "New issue";
-            this.btnNewIssue.UseVisualStyleBackColor = true;
-            this.btnNewIssue.Visible = false;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(482, 289);
-            this.Controls.Add(this.btnNewIssue);
             this.Controls.Add(this.btnProjectInfo);
             this.Controls.Add(this.lvIssues);
             this.Controls.Add(this.cbSelectProject);
@@ -213,7 +200,6 @@
         private System.Windows.Forms.ColumnHeader columnHeaderCreatedOn;
         private System.Windows.Forms.Button btnProjectInfo;
         private System.Windows.Forms.ToolStripMenuItem newProjectToolStripMenuItem;
-        private System.Windows.Forms.Button btnNewIssue;
     }
 }
 
