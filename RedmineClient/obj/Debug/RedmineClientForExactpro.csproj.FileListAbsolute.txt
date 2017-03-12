@@ -1,0 +1,20 @@
+C:\Users\6727149\Desktop\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\RedmineClientForExactpro.csprojResolveAssemblyReference.cache
+C:\Users\6727149\Desktop\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\RedmineClientForExactpro.MainForm.resources
+C:\Users\6727149\Desktop\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\RedmineClientForExactpro.Properties.Resources.resources
+C:\Users\6727149\Desktop\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\RedmineClientForExactpro.csproj.GenerateResource.Cache
+C:\Users\6727149\Desktop\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\RedmineClientForExactpro.EnterAPITokenForm.resources
+C:\Users\6727149\Desktop\RedmineClientForExactpro\RedmineClientForExactpro\bin\Debug\Redmine Client For Exactpro.exe.config
+C:\Users\6727149\Desktop\RedmineClientForExactpro\RedmineClientForExactpro\bin\Debug\Redmine Client For Exactpro.exe
+C:\Users\6727149\Desktop\RedmineClientForExactpro\RedmineClientForExactpro\bin\Debug\Redmine Client For Exactpro.pdb
+C:\Users\6727149\Desktop\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\Redmine Client For Exactpro.exe
+C:\Users\6727149\Desktop\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\Redmine Client For Exactpro.pdb
+C:\Users\6727149\Desktop\Проекты\RedmineClientForExactpro\RedmineClientForExactpro\bin\Debug\Redmine Client For Exactpro.exe.config
+C:\Users\6727149\Desktop\Проекты\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\Redmine Client For Exactpro.exe
+C:\Users\6727149\Desktop\Проекты\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\Redmine Client For Exactpro.pdb
+C:\Users\6727149\Desktop\Проекты\RedmineClientForExactpro\RedmineClientForExactpro\bin\Debug\Redmine Client For Exactpro.exe
+C:\Users\6727149\Desktop\Проекты\RedmineClientForExactpro\RedmineClientForExactpro\bin\Debug\Redmine Client For Exactpro.pdb
+C:\Users\6727149\Desktop\Проекты\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\RedmineClientForExactpro.csprojResolveAssemblyReference.cache
+C:\Users\6727149\Desktop\Проекты\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\RedmineClientForExactpro.MainForm.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\RedmineClientForExactpro.Properties.Resources.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\RedmineClientForExactpro.csproj.GenerateResource.Cache
+C:\Users\6727149\Desktop\Проекты\RedmineClientForExactpro\RedmineClientForExactpro\obj\Debug\RedmineClientForExactpro.APITokenForm.resources
