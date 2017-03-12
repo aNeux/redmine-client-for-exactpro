@@ -14,7 +14,7 @@ namespace RedmineClient
         [STAThread]
         static void Main()
         {
-            MessageBoxManager.OK = "test";
+            MessageBoxManager.OK = "Ok";
             MessageBoxManager.Yes = "Yes";
             MessageBoxManager.No = "No";
             MessageBoxManager.Cancel = "Cancel";
