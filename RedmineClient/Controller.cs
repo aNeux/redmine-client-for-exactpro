@@ -14,8 +14,10 @@ namespace RedmineClient
 
     public class Controller
     {
-        List<Project> projects;
-        List<Issue> issues;
+        private string REDMINE_HOST = "http://student-rm.exactpro.com/";
+
+        private List<Project> projects;
+        private List<Issue> issues;
 
         public event Action<ErrorTypes, bool> OnAPITokenChanged;
         public event Action<ErrorTypes, List<Project>> OnProjectsUpdated;
@@ -29,7 +31,7 @@ namespace RedmineClient
                     {
                         try
                         {
-                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://exactprotest.plan.io/projects.json");
+                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json");
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", apiToken);
                             request.Accept = "application/json";
@@ -63,7 +65,7 @@ namespace RedmineClient
                     {
                         try
                         {
-                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://exactprotest.plan.io/projects.json");
+                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json");
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_token);
                             request.Accept = "application/json";
@@ -95,7 +97,7 @@ namespace RedmineClient
                     {
                         try
                         {
-                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://exactprotest.plan.io/issues.json");
+                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json");
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_token);
                             request.Accept = "application/json";
