@@ -10,6 +10,7 @@ namespace RedmineClient
     {
         private Controller controller;
         private long lastSelectedProjectID = -1;
+        private string selectedProjectRoles = null;
 
         public MainForm()
         {
@@ -70,7 +71,6 @@ namespace RedmineClient
         {
             if (cbProjects.SelectedIndex != 0)
             {
-                newIssueToolStripMenuItem.Enabled = true;
                 btnProjectInfo.Visible = true;
                 string projectName = cbProjects.SelectedItem.ToString();
                 long projectID = long.Parse(projectName.Substring(1, projectName.IndexOf(":") - 1));
@@ -81,8 +81,10 @@ namespace RedmineClient
             else
             {
                 lastSelectedProjectID = -1;
+                selectedProjectRoles = null;
                 newIssueToolStripMenuItem.Enabled = false;
                 btnProjectInfo.Visible = false;
+                labelProjectRoles.Text = "";
                 lvIssues.Items.Clear();
             }
         }
@@ -97,7 +99,7 @@ namespace RedmineClient
                 + "Identifier: " + project.Identifier + "\n"
                 + "Status: " + project.Status + "\n"
                 + "Description: " + project.Description + "\n"
-                + "Created on: " + project.CreatedOn.Hour + ":" + project.CreatedOn.Minute + ", " + project.CreatedOn.Day + " " + Utils.GetMonthName(project.CreatedOn.Month) + " " + project.CreatedOn.Year;
+                + "Created on: " + project.CreatedOn.Hour + ":" + project.CreatedOn.Minute + ", " + project.CreatedOn.Day + " " + project.CreatedOn.Month + " " + project.CreatedOn.Year;
             MessageBox.Show(projectInfo, "Info about project \"" + project.Name + "\"");
         }
 
@@ -118,7 +120,7 @@ namespace RedmineClient
                 + "Status: " + issue.Status.Name + "\n"
                 + "Priority: " + issue.Priority.Name + "\n"
                 + "Description: " + issue.Description + "\n"
-                + "Created on: " + issue.CreatedOn.Hour + ":" + issue.CreatedOn.Minute + ", " + issue.CreatedOn.Day + " " + Utils.GetMonthName(issue.CreatedOn.Month) + " " + issue.CreatedOn.Year;
+                + "Created on: " + issue.CreatedOn.Hour + ":" + issue.CreatedOn.Minute + ", " + issue.CreatedOn.Day + " " + issue.CreatedOn.Month + " " + issue.CreatedOn.Year;
             MessageBox.Show(issueInfo, "Info about issue \"" + issue.Subject + "\"");
         }
 
@@ -178,7 +180,7 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnIssuesUpdated(ErrorTypes error, List<Issue> issues)
+        private void controller_OnIssuesUpdated(ErrorTypes error, List<Issue> issues, string projectRoles)
         {
             Action action = () =>
                 {
@@ -195,6 +197,9 @@ namespace RedmineClient
                                 lvi.SubItems.Add(issue.CreatedOn.ToShortTimeString() + ", " + issue.CreatedOn.ToShortDateString());
                                 lvIssues.Items.Add(lvi);
                             }
+                            selectedProjectRoles = projectRoles;
+                            newIssueToolStripMenuItem.Enabled = selectedProjectRoles.Contains("Manager");
+                            labelProjectRoles.Text = "Roles: " + selectedProjectRoles;
                             toolStripStatusLabel.Text = "Issues was updated at " + DateTime.Now.ToShortTimeString();
                             break;
                         case ErrorTypes.NoInternetConnection:

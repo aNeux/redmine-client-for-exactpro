@@ -51,6 +51,7 @@
             this.issueInfotoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.labelProjectRoles = new System.Windows.Forms.Label();
             this.menuStrip.SuspendLayout();
             this.contextMenuStripIssue.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -63,7 +64,7 @@
             this.toolsToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(482, 24);
+            this.menuStrip.Size = new System.Drawing.Size(496, 24);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "Menu";
             // 
@@ -157,8 +158,8 @@
             this.lvIssues.Location = new System.Drawing.Point(13, 75);
             this.lvIssues.MultiSelect = false;
             this.lvIssues.Name = "lvIssues";
-            this.lvIssues.Size = new System.Drawing.Size(457, 203);
-            this.lvIssues.TabIndex = 4;
+            this.lvIssues.Size = new System.Drawing.Size(471, 203);
+            this.lvIssues.TabIndex = 5;
             this.lvIssues.UseCompatibleStateImageBehavior = false;
             this.lvIssues.View = System.Windows.Forms.View.Details;
             this.lvIssues.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvIssues_MouseClick);
@@ -219,20 +220,31 @@
             this.toolStripStatusLabel});
             this.statusStrip.Location = new System.Drawing.Point(0, 287);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(482, 22);
+            this.statusStrip.Size = new System.Drawing.Size(496, 22);
             this.statusStrip.SizingGrip = false;
-            this.statusStrip.TabIndex = 5;
+            this.statusStrip.TabIndex = 6;
             // 
             // toolStripStatusLabel
             // 
             this.toolStripStatusLabel.Name = "toolStripStatusLabel";
             this.toolStripStatusLabel.Size = new System.Drawing.Size(0, 17);
             // 
+            // labelProjectRoles
+            // 
+            this.labelProjectRoles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelProjectRoles.Location = new System.Drawing.Point(335, 45);
+            this.labelProjectRoles.Name = "labelProjectRoles";
+            this.labelProjectRoles.Size = new System.Drawing.Size(149, 23);
+            this.labelProjectRoles.TabIndex = 4;
+            this.labelProjectRoles.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(482, 309);
+            this.ClientSize = new System.Drawing.Size(496, 309);
+            this.Controls.Add(this.labelProjectRoles);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.btnProjectInfo);
             this.Controls.Add(this.lvIssues);
@@ -241,7 +253,7 @@
             this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip;
-            this.MinimumSize = new System.Drawing.Size(498, 348);
+            this.MinimumSize = new System.Drawing.Size(512, 348);
             this.Name = "MainForm";
             this.Text = "Redmine Client";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -279,6 +291,7 @@
         private System.Windows.Forms.ColumnHeader columnHeaderTracker;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
+        private System.Windows.Forms.Label labelProjectRoles;
     }
 }
 

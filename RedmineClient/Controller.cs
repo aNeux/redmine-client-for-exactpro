@@ -21,7 +21,7 @@ namespace RedmineClient
 
         public event Action<ErrorTypes, bool> OnAPITokenChanged;
         public event Action<ErrorTypes, List<Project>> OnProjectsUpdated;
-        public event Action<ErrorTypes, List<Issue>> OnIssuesUpdated;
+        public event Action<ErrorTypes, List<Issue>, string> OnIssuesUpdated;
 
         public void ChangeApiToken(string apiToken)
         {
@@ -31,20 +31,31 @@ namespace RedmineClient
                     {
                         try
                         {
-                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json");
+                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "users/current.json");
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", apiToken);
                             request.Accept = "application/json";
                             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                            if (OnAPITokenChanged != null)
-                                if (Properties.Settings.Default.api_token != apiToken)
-                                {
-                                    Properties.Settings.Default.api_token = apiToken;
-                                    Properties.Settings.Default.Save();
+                            StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            string jsonResult = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            User currentUserInfo = JsonConvert.DeserializeObject<UserObj>(jsonResult).User;
+                            Properties.Settings.Default.id = currentUserInfo.ID;
+                            Properties.Settings.Default.login = currentUserInfo.Login;
+                            Properties.Settings.Default.first_name = currentUserInfo.FirstName;
+                            Properties.Settings.Default.last_name = currentUserInfo.LastName;
+                            Properties.Settings.Default.email = currentUserInfo.Email;
+                            Properties.Settings.Default.created_on = currentUserInfo.CreatedOn;
+                            if (Properties.Settings.Default.api_token != apiToken)
+                            {
+                                Properties.Settings.Default.api_token = apiToken;
+                                if (OnAPITokenChanged != null)
                                     OnAPITokenChanged(ErrorTypes.NoErrors, true);
-                                }
-                                else
-                                    OnAPITokenChanged(ErrorTypes.NoErrors, false);
+                            }
+                            else if (OnAPITokenChanged != null)
+                                OnAPITokenChanged(ErrorTypes.NoErrors, false);
+                            Properties.Settings.Default.Save();
                         }
                         catch (Exception ex)
                         {
@@ -108,17 +119,32 @@ namespace RedmineClient
                             streamReader.Close();
                             issues = JsonConvert.DeserializeObject<Issues>(jsonResult).IssuesList;
                             issues.RemoveAll(temp => temp.Project.ID != projectID);
+
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json");
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_token);
+                            request.Accept = "application/json";
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResult = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            Membership membership = JsonConvert.DeserializeObject<Memberships>(jsonResult).MembershipsList.Single(temp => temp.Member.ID == Properties.Settings.Default.id);
+                            string roles = "";
+                            foreach (Role role in membership.Roles)
+                                roles += role.Name + ", ";
+                            roles = roles.Remove(roles.Length - 2);
                             if (OnIssuesUpdated != null)
-                                OnIssuesUpdated(ErrorTypes.NoErrors, issues);
+                                OnIssuesUpdated(ErrorTypes.NoErrors, issues, roles);
                         }
                         catch (Exception ex)
                         {
                             if (ex.Message.Contains("401") && OnIssuesUpdated != null)
-                                OnIssuesUpdated(ErrorTypes.UnathorizedAccess, issues);
+                                OnIssuesUpdated(ErrorTypes.UnathorizedAccess, issues, null);
                         }
                     }
                     else if (OnIssuesUpdated != null)
-                        OnIssuesUpdated(ErrorTypes.NoInternetConnection, issues);
+                        OnIssuesUpdated(ErrorTypes.NoInternetConnection, issues, null);
                 }).Start();
         }
 
