@@ -31,7 +31,7 @@ namespace RedmineClient
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.ApplicationExitCall)
+            if (Properties.Settings.Default.api_token.Length != 0 && (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.ApplicationExitCall))
             {
                 var dialogResult = MessageBox.Show("Are you sure you want to exit?", "Exiting", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
@@ -148,6 +148,7 @@ namespace RedmineClient
                     switch (error)
                     {
                         case ErrorTypes.NoErrors:
+                            this.Text = "Redmine Client ["+ Properties.Settings.Default.login +"]";
                             for (int i = cbProjects.Items.Count - 1; i >= 1; i--)
                                 cbProjects.Items.RemoveAt(i);
                             int indexToSelect = 0;

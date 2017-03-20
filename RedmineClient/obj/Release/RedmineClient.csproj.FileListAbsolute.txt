@@ -1,0 +1,5 @@
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\bin\Release\Redmine Client.exe.config
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Release\RedmineClient.APITokenForm.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Release\RedmineClient.MainForm.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Release\RedmineClient.Properties.Resources.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Release\RedmineClient.csproj.GenerateResource.Cache

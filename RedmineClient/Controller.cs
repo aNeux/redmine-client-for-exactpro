@@ -76,27 +76,35 @@ namespace RedmineClient
                     {
                         try
                         {
-                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json");
-                            request.Method = "GET";
-                            request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_token);
-                            request.Accept = "application/json";
-                            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                            StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                            string jsonResult = streamReader.ReadToEnd();
-                            response.Close();
-                            streamReader.Close();
-                            projects = JsonConvert.DeserializeObject<Projects>(jsonResult).ProjectsList;
+                            projects = new List<Project>();
+                            Projects tempProjects = new Projects();
+                            int offset = 0;
+                            do
+                            {
+                                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json?offset=" + offset);
+                                request.Method = "GET";
+                                request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_token);
+                                request.Accept = "application/json";
+                                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                                StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                                string jsonResult = streamReader.ReadToEnd();
+                                response.Close();
+                                streamReader.Close();
+                                tempProjects = JsonConvert.DeserializeObject<Projects>(jsonResult);
+                                projects.AddRange(tempProjects.ProjectsList);
+                                offset += tempProjects.Limit;
+                            } while (tempProjects.ProjectsList.Count != 0);
                             if (OnProjectsUpdated != null)
                                 OnProjectsUpdated(ErrorTypes.NoErrors, projects);
                         }
                         catch (Exception ex)
                         {
                             if (ex.Message.Contains("401") && OnProjectsUpdated != null)
-                                OnProjectsUpdated(ErrorTypes.UnathorizedAccess, projects);
+                                OnProjectsUpdated(ErrorTypes.UnathorizedAccess, null);
                         }
                     }
                     else if (OnProjectsUpdated != null)
-                        OnProjectsUpdated(ErrorTypes.NoInternetConnection, projects);
+                        OnProjectsUpdated(ErrorTypes.NoInternetConnection, null);
                 }).Start();
         }
 
@@ -108,43 +116,65 @@ namespace RedmineClient
                     {
                         try
                         {
-                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json");
-                            request.Method = "GET";
-                            request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_token);
-                            request.Accept = "application/json";
-                            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                            StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                            string jsonResult = streamReader.ReadToEnd();
-                            response.Close();
-                            streamReader.Close();
-                            issues = JsonConvert.DeserializeObject<Issues>(jsonResult).IssuesList;
+                            HttpWebRequest request;
+                            HttpWebResponse response;
+                            StreamReader streamReader;
+                            string jsonResult;
+                            issues = new List<Issue>();
+                            Issues tempIssues = new Issues();
+                            int offset = 0;
+                            do
+                            {
+                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?offset=" + offset);
+                                request.Method = "GET";
+                                request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_token);
+                                request.Accept = "application/json";
+                                response = (HttpWebResponse)request.GetResponse();
+                                streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                                jsonResult = streamReader.ReadToEnd();
+                                response.Close();
+                                streamReader.Close();
+                                tempIssues = JsonConvert.DeserializeObject<Issues>(jsonResult);
+                                issues.AddRange(tempIssues.IssuesList);
+                                offset += tempIssues.Limit;
+                            }
+                            while (tempIssues.IssuesList.Count != 0);
                             issues.RemoveAll(temp => temp.Project.ID != projectID);
 
-                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json");
-                            request.Method = "GET";
-                            request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_token);
-                            request.Accept = "application/json";
-                            response = (HttpWebResponse)request.GetResponse();
-                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                            jsonResult = streamReader.ReadToEnd();
-                            response.Close();
-                            streamReader.Close();
-                            Membership membership = JsonConvert.DeserializeObject<Memberships>(jsonResult).MembershipsList.Single(temp => temp.Member.ID == Properties.Settings.Default.id);
-                            string roles = "";
+                            List<Membership> memberships = new List<Membership>();
+                            Memberships tempMemberships = new Memberships();
+                            offset = 0;
+                            do
+                            {
+                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
+                                request.Method = "GET";
+                                request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_token);
+                                request.Accept = "application/json";
+                                response = (HttpWebResponse)request.GetResponse();
+                                streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                                jsonResult = streamReader.ReadToEnd();
+                                response.Close();
+                                streamReader.Close();
+                                tempMemberships = JsonConvert.DeserializeObject<Memberships>(jsonResult);
+                                memberships.AddRange(tempMemberships.MembershipsList);
+                                offset += tempMemberships.Limit;
+                            } while (tempMemberships.MembershipsList.FindIndex(temp => temp.Member.ID == Properties.Settings.Default.id) < 0 && tempMemberships.MembershipsList.Count != 0);
+                            Membership membership = memberships.Single(temp => temp.Member.ID == Properties.Settings.Default.id);
+                            string projectRoles = "";
                             foreach (Role role in membership.Roles)
-                                roles += role.Name + ", ";
-                            roles = roles.Remove(roles.Length - 2);
+                                projectRoles += role.Name + ", ";
+                            projectRoles = projectRoles.Remove(projectRoles.Length - 2);
                             if (OnIssuesUpdated != null)
-                                OnIssuesUpdated(ErrorTypes.NoErrors, issues, roles);
+                                OnIssuesUpdated(ErrorTypes.NoErrors, issues, projectRoles);
                         }
                         catch (Exception ex)
                         {
                             if (ex.Message.Contains("401") && OnIssuesUpdated != null)
-                                OnIssuesUpdated(ErrorTypes.UnathorizedAccess, issues, null);
+                                OnIssuesUpdated(ErrorTypes.UnathorizedAccess, null, null);
                         }
                     }
                     else if (OnIssuesUpdated != null)
-                        OnIssuesUpdated(ErrorTypes.NoInternetConnection, issues, null);
+                        OnIssuesUpdated(ErrorTypes.NoInternetConnection, null, null);
                 }).Start();
         }
 
