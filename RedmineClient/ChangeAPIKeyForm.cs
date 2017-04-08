@@ -6,11 +6,11 @@ using System.Windows.Forms;
 
 namespace RedmineClient
 {
-    public partial class APITokenForm : Form
+    public partial class ChangeAPIKeyForm : Form
     {
         Controller controller;
 
-        public APITokenForm()
+        public ChangeAPIKeyForm()
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterParent;
@@ -18,34 +18,34 @@ namespace RedmineClient
 
         private void APITokenForm_Shown(object sender, EventArgs e)
         {
-            tbAPIToken.Text = Properties.Settings.Default.api_token;
-            tbAPIToken.Select();
-            tbAPIToken.SelectAll();
+            tbAPIKey.Text = Properties.Settings.Default.api_key;
+            tbAPIKey.Select();
+            tbAPIKey.SelectAll();
             controller = Program.controllerGlobal;
-            controller.OnAPITokenChanged += controller_OnAPITokenChanged;
+            controller.OnAPIKeyChanged += controller_OnAPITokenChanged;
         }
 
         private void EnterAPITokenForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            controller.OnAPITokenChanged -= controller_OnAPITokenChanged;
-            if (Properties.Settings.Default.api_token.Length == 0)
+            controller.OnAPIKeyChanged -= controller_OnAPITokenChanged;
+            if (Properties.Settings.Default.api_key.Length == 0)
                 Application.Exit();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (tbAPIToken.Text.Length == 0)
-                MessageBox.Show("Please enter API token!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (tbAPIKey.Text.Length == 0)
+                MessageBox.Show("Please enter API key!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
             {
                 btnSave.Enabled = false;
-                controller.ChangeApiToken(tbAPIToken.Text);
+                controller.ChangeAPIKey(tbAPIKey.Text);
             }
         }
 
         private void btnCacnel_Click(object sender, EventArgs e)
         {
-            if (Properties.Settings.Default.api_token.Length != 0)
+            if (Properties.Settings.Default.api_key.Length != 0)
                 this.Close();
             else
             {
@@ -69,7 +69,7 @@ namespace RedmineClient
                             MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
-                            MessageBox.Show("Wrong API token. Please check entered data and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Wrong API key. Please check entered data and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                     }
                 };

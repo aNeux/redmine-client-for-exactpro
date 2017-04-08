@@ -20,7 +20,7 @@
     <Setting Name="created_on" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="api_token" Type="System.String" Scope="User">
+    <Setting Name="api_key" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

@@ -4,10 +4,13 @@ using Newtonsoft.Json;
 
 namespace RedmineClient.Models
 {
-    public class Projects
+    /// <summary>
+    /// Класс для парсера, представляющий информацию о проектах и некоторые другие данные.
+    /// </summary>
+    public class ProjectsJSONObject
     {
         [JsonProperty("projects")]
-        public List<Project> ProjectsList { set; get; }
+        public List<Projects> Projects { set; get; }
         [JsonProperty("total_count")]
         public int TotalCount { set; get; }
         [JsonProperty("offset")]
@@ -16,7 +19,10 @@ namespace RedmineClient.Models
         public int Limit { set; get; }
     }
 
-    public class Project
+    /// <summary>
+    /// Класс, представляющий информацию об определенном проекте.
+    /// </summary>
+    public class Projects
     {
         [JsonProperty("id")]
         public long ID { set; get; }

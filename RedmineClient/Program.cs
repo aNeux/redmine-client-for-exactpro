@@ -15,11 +15,13 @@ namespace RedmineClient
         [STAThread]
         static void Main()
         {
+            // Настройка дефолтных значений надписей на кнопках в MessageBox
             MessageBoxManager.OK = "Ok";
             MessageBoxManager.Yes = "Yes";
             MessageBoxManager.No = "No";
             MessageBoxManager.Cancel = "Cancel";
             MessageBoxManager.Register();
+            // Инициализация глобального контроллера
             controllerGlobal = new Controller();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

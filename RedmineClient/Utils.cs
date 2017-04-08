@@ -1,21 +1,23 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 
 namespace RedmineClient
 {
+    /// <summary>
+    /// Класс, содержащий различные полезные методы.
+    /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// Проверка наличия соединения с сетью Интернет.
+        /// </summary>
         public static bool IsNetworkAvailable()
         {
             try
             {
-                using (var client = new WebClient())
-                {
-                    using (var stream = client.OpenRead("http://www.google.com"))
-                    {
-                        return true;
-                    }
-                }
+                Stream stream = new WebClient().OpenRead("http://www.google.com");
+                return true;
             }
             catch
             {

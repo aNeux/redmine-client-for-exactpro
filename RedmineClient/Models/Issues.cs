@@ -4,10 +4,13 @@ using Newtonsoft.Json;
 
 namespace RedmineClient.Models
 {
-    public class Issues
+    /// <summary>
+    /// Класс для парсера, представляющий информацию о задачах и некоторые другие данные.
+    /// </summary>
+    public class IssuesJSONObject
     {
         [JsonProperty("issues")]
-        public List<Issue> IssuesList { set; get; }
+        public List<Issue> Issues { set; get; }
         [JsonProperty("total_count")]
         public int TotalCount { set; get; }
         [JsonProperty("offset")]
@@ -16,12 +19,15 @@ namespace RedmineClient.Models
         public int Limit { set; get; }
     }
 
+    /// <summary>
+    /// Класс, представляющий информацию о задаче.
+    /// </summary>
     public class Issue
     {
         [JsonProperty("id")]
         public long ID { set; get; }
         [JsonProperty("project")]
-        public Project Project { set; get; }
+        public Projects Project { set; get; }
         [JsonProperty("tracker")]
         public Tracker Tracker { set; get; }
         [JsonProperty("status")]
@@ -40,6 +46,9 @@ namespace RedmineClient.Models
         public DateTime UpdatedOn { set; get; }
     }
 
+    /// <summary>
+    /// Класс, представляющий информацию о типе задачи.
+    /// </summary>
     public class Tracker
     {
         [JsonProperty("id")]
@@ -48,6 +57,9 @@ namespace RedmineClient.Models
         public string Name { set; get; }
     }
 
+    /// <summary>
+    /// Класс, представляющий информацию о статусе задачи.
+    /// </summary>
     public class Status
     {
         [JsonProperty("id")]
@@ -56,6 +68,9 @@ namespace RedmineClient.Models
         public string Name { set; get; }
     }
 
+    /// <summary>
+    /// Класс, представляющий информацию о приоритете задачи.
+    /// </summary>
     public class Priority
     {
         [JsonProperty("id")]
@@ -64,6 +79,9 @@ namespace RedmineClient.Models
         public string Name { set; get; }
     }
 
+    /// <summary>
+    /// Класс, представляющий информацию об авторе задачи.
+    /// </summary>
     public class Author
     {
         [JsonProperty("id")]

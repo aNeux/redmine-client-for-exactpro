@@ -96,12 +96,12 @@ namespace RedmineClient.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string api_token {
+        public string api_key {
             get {
-                return ((string)(this["api_token"]));
+                return ((string)(this["api_key"]));
             }
             set {
-                this["api_token"] = value;
+                this["api_key"] = value;
             }
         }
     }

@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-
 namespace RedmineClient.Models
 {
-    
-    public class UserObj
+    /// <summary>
+    /// Класс для парсера, представляющий информацию об определенном пользователе.
+    /// </summary>
+    public class UserJSONObject
     {
         [JsonProperty("user")]
         public User User { set; get; }
     }
 
+    /// <summary>
+    /// Класс, представляющий информацию об определенном пользователе.
+    /// </summary>
     public class User
     {
         [JsonProperty("id")]
@@ -28,5 +32,7 @@ namespace RedmineClient.Models
         public DateTime CreatedOn { set; get; }
         [JsonProperty("last_login_on")]
         public DateTime LastLoginOn { set; get; }
+        [JsonProperty("api_key")]
+        public string APIKey { set; get; }
     }
 }

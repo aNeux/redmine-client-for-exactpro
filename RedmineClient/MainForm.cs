@@ -22,7 +22,7 @@ namespace RedmineClient
         {
             cbProjects.SelectedIndex = 0;
             controller = Program.controllerGlobal;
-            controller.OnAPITokenChanged += controller_OnAPITokenChanged;
+            controller.OnAPIKeyChanged += controller_OnAPIKeyChanged;
             controller.OnProjectsUpdated += controller_OnProjectsUpdated;
             controller.OnIssuesUpdated += controller_OnIssuesUpdated;
             controller.UpdateProjects();
@@ -31,12 +31,12 @@ namespace RedmineClient
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Properties.Settings.Default.api_token.Length != 0 && (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.ApplicationExitCall))
+            if (Properties.Settings.Default.api_key.Length != 0 && (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.ApplicationExitCall))
             {
                 var dialogResult = MessageBox.Show("Are you sure you want to exit?", "Exiting", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    controller.OnAPITokenChanged -= controller_OnAPITokenChanged;
+                    controller.OnAPIKeyChanged -= controller_OnAPIKeyChanged;
                     controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
                     controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
                 }
@@ -45,7 +45,7 @@ namespace RedmineClient
             }
             else
             {
-                controller.OnAPITokenChanged -= controller_OnAPITokenChanged;
+                controller.OnAPIKeyChanged -= controller_OnAPIKeyChanged;
                 controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
                 controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
             }
@@ -64,7 +64,12 @@ namespace RedmineClient
 
         private void changeAPITokenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new APITokenForm().ShowDialog();
+            new ChangeAPIKeyForm().ShowDialog();
+        }
+
+        private void exitFromNotifyIconToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
 
         private void cbSelectProject_SelectedIndexChanged(object sender, EventArgs e)
@@ -93,7 +98,7 @@ namespace RedmineClient
         {
             string projectName = cbProjects.SelectedItem.ToString();
             long projectID = long.Parse(projectName.Substring(1, projectName.IndexOf(":") - 1));
-            Project project = controller.GetProject(projectID);
+            Projects project = controller.GetProject(projectID);
             string projectInfo = "ID: " + project.ID + "\n"
                 + "Name: " + project.Name + "\n"
                 + "Identifier: " + project.Identifier + "\n"
@@ -106,7 +111,7 @@ namespace RedmineClient
         private void lvIssues_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right && lvIssues.FocusedItem.Bounds.Contains(e.Location))
-                contextMenuStripIssue.Show(Cursor.Position);
+                contextMenuIssue.Show(Cursor.Position);
         }
 
         private void issueInfotoolStripMenuItem_Click(object sender, EventArgs e)
@@ -124,7 +129,7 @@ namespace RedmineClient
             MessageBox.Show(issueInfo, "Info about issue \"" + issue.Subject + "\"");
         }
 
-        private void controller_OnAPITokenChanged(ErrorTypes error, bool isChanged)
+        private void controller_OnAPIKeyChanged(ErrorTypes error, bool isChanged)
         {
             Action action = () =>
                 {
@@ -141,7 +146,7 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnProjectsUpdated(ErrorTypes error, List<Project> projects)
+        private void controller_OnProjectsUpdated(ErrorTypes error, List<Projects> projects)
         {
             Action action = () =>
                 {
@@ -167,11 +172,11 @@ namespace RedmineClient
                             MessageBox.Show("Cannot connect to Redmine services and load projects. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
-                            toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (wrong API token)";
-                            if (Properties.Settings.Default.api_token.Length == 0)
-                                new APITokenForm().ShowDialog();
+                            toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (wrong API key)";
+                            if (Properties.Settings.Default.api_key.Length == 0)
+                                new ChangeAPIKeyForm().ShowDialog();
                             else
-                                MessageBox.Show("You have wrong API token. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("You have wrong API key. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                     }
                 };
@@ -208,11 +213,11 @@ namespace RedmineClient
                             MessageBox.Show("Cannot connect to Redmine services and load issues. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
-                            toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (wrong API token)";
-                            if (Properties.Settings.Default.api_token.Length == 0)
-                                new APITokenForm().ShowDialog();
+                            toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (wrong API key)";
+                            if (Properties.Settings.Default.api_key.Length == 0)
+                                new ChangeAPIKeyForm().ShowDialog();
                             else
-                                MessageBox.Show("You have wrong API token. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("You have wrong API key. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                     }
                 };

@@ -37,7 +37,9 @@
             this.refreshStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.changeAPITokenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeAPIKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.userInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutTheProductToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.labelSelectProject = new System.Windows.Forms.Label();
             this.cbProjects = new System.Windows.Forms.ComboBox();
             this.lvIssues = new System.Windows.Forms.ListView();
@@ -47,14 +49,18 @@
             this.columnHeaderStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderCreatedOn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnProjectInfo = new System.Windows.Forms.Button();
-            this.contextMenuStripIssue = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.issueInfotoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuIssue = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.issueInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.labelProjectRoles = new System.Windows.Forms.Label();
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.contextMenuNotifyIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.exitFromNotifyIconToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
-            this.contextMenuStripIssue.SuspendLayout();
+            this.contextMenuIssue.SuspendLayout();
             this.statusStrip.SuspendLayout();
+            this.contextMenuNotifyIcon.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip
@@ -109,17 +115,31 @@
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.changeAPITokenToolStripMenuItem});
+            this.changeAPIKeyToolStripMenuItem,
+            this.userInformationToolStripMenuItem,
+            this.aboutTheProductToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
-            // changeAPITokenToolStripMenuItem
+            // changeAPIKeyToolStripMenuItem
             // 
-            this.changeAPITokenToolStripMenuItem.Name = "changeAPITokenToolStripMenuItem";
-            this.changeAPITokenToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
-            this.changeAPITokenToolStripMenuItem.Text = "Change API token";
-            this.changeAPITokenToolStripMenuItem.Click += new System.EventHandler(this.changeAPITokenToolStripMenuItem_Click);
+            this.changeAPIKeyToolStripMenuItem.Name = "changeAPIKeyToolStripMenuItem";
+            this.changeAPIKeyToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.changeAPIKeyToolStripMenuItem.Text = "Change API key";
+            this.changeAPIKeyToolStripMenuItem.Click += new System.EventHandler(this.changeAPITokenToolStripMenuItem_Click);
+            // 
+            // userInformationToolStripMenuItem
+            // 
+            this.userInformationToolStripMenuItem.Name = "userInformationToolStripMenuItem";
+            this.userInformationToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.userInformationToolStripMenuItem.Text = "User information";
+            // 
+            // aboutTheProductToolStripMenuItem
+            // 
+            this.aboutTheProductToolStripMenuItem.Name = "aboutTheProductToolStripMenuItem";
+            this.aboutTheProductToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.aboutTheProductToolStripMenuItem.Text = "About the product";
             // 
             // labelSelectProject
             // 
@@ -200,19 +220,19 @@
             this.btnProjectInfo.Visible = false;
             this.btnProjectInfo.Click += new System.EventHandler(this.btnProjectInfo_Click);
             // 
-            // contextMenuStripIssue
+            // contextMenuIssue
             // 
-            this.contextMenuStripIssue.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.issueInfotoolStripMenuItem});
-            this.contextMenuStripIssue.Name = "contextMenuStripIssue";
-            this.contextMenuStripIssue.Size = new System.Drawing.Size(125, 26);
+            this.contextMenuIssue.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.issueInfoToolStripMenuItem});
+            this.contextMenuIssue.Name = "contextMenuStripIssue";
+            this.contextMenuIssue.Size = new System.Drawing.Size(125, 26);
             // 
-            // issueInfotoolStripMenuItem
+            // issueInfoToolStripMenuItem
             // 
-            this.issueInfotoolStripMenuItem.Name = "issueInfotoolStripMenuItem";
-            this.issueInfotoolStripMenuItem.Size = new System.Drawing.Size(124, 22);
-            this.issueInfotoolStripMenuItem.Text = "Issue info";
-            this.issueInfotoolStripMenuItem.Click += new System.EventHandler(this.issueInfotoolStripMenuItem_Click);
+            this.issueInfoToolStripMenuItem.Name = "issueInfoToolStripMenuItem";
+            this.issueInfoToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.issueInfoToolStripMenuItem.Text = "Issue info";
+            this.issueInfoToolStripMenuItem.Click += new System.EventHandler(this.issueInfotoolStripMenuItem_Click);
             // 
             // statusStrip
             // 
@@ -235,9 +255,30 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.labelProjectRoles.Location = new System.Drawing.Point(335, 45);
             this.labelProjectRoles.Name = "labelProjectRoles";
-            this.labelProjectRoles.Size = new System.Drawing.Size(149, 23);
+            this.labelProjectRoles.Size = new System.Drawing.Size(149, 21);
             this.labelProjectRoles.TabIndex = 4;
             this.labelProjectRoles.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // notifyIcon
+            // 
+            this.notifyIcon.ContextMenuStrip = this.contextMenuNotifyIcon;
+            this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
+            this.notifyIcon.Text = "Redmine Client";
+            this.notifyIcon.Visible = true;
+            // 
+            // contextMenuNotifyIcon
+            // 
+            this.contextMenuNotifyIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exitFromNotifyIconToolStripMenuItem});
+            this.contextMenuNotifyIcon.Name = "contextMenuNotifyIcon";
+            this.contextMenuNotifyIcon.Size = new System.Drawing.Size(153, 48);
+            // 
+            // exitFromNotifyIconToolStripMenuItem
+            // 
+            this.exitFromNotifyIconToolStripMenuItem.Name = "exitFromNotifyIconToolStripMenuItem";
+            this.exitFromNotifyIconToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitFromNotifyIconToolStripMenuItem.Text = "Exit";
+            this.exitFromNotifyIconToolStripMenuItem.Click += new System.EventHandler(this.exitFromNotifyIconToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -260,9 +301,10 @@
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
-            this.contextMenuStripIssue.ResumeLayout(false);
+            this.contextMenuIssue.ResumeLayout(false);
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
+            this.contextMenuNotifyIcon.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -274,7 +316,7 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem changeAPITokenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem changeAPIKeyToolStripMenuItem;
         private System.Windows.Forms.Label labelSelectProject;
         private System.Windows.Forms.ComboBox cbProjects;
         private System.Windows.Forms.ListView lvIssues;
@@ -286,12 +328,17 @@
         private System.Windows.Forms.ToolStripMenuItem newProjectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newIssueToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem refreshStripMenuItem;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStripIssue;
-        private System.Windows.Forms.ToolStripMenuItem issueInfotoolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip contextMenuIssue;
+        private System.Windows.Forms.ToolStripMenuItem issueInfoToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader columnHeaderTracker;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
         private System.Windows.Forms.Label labelProjectRoles;
+        private System.Windows.Forms.ToolStripMenuItem userInformationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutTheProductToolStripMenuItem;
+        private System.Windows.Forms.NotifyIcon notifyIcon;
+        private System.Windows.Forms.ContextMenuStrip contextMenuNotifyIcon;
+        private System.Windows.Forms.ToolStripMenuItem exitFromNotifyIconToolStripMenuItem;
     }
 }
 
