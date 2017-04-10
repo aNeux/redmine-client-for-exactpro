@@ -32,7 +32,7 @@
             this.labelAboutAPIKey = new System.Windows.Forms.Label();
             this.tbAPIKey = new System.Windows.Forms.TextBox();
             this.btnSave = new System.Windows.Forms.Button();
-            this.btnCacnel = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // labelAboutAPIKey
@@ -62,22 +62,22 @@
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
-            // btnCacnel
+            // btnCancel
             // 
-            this.btnCacnel.Location = new System.Drawing.Point(143, 96);
-            this.btnCacnel.Name = "btnCacnel";
-            this.btnCacnel.Size = new System.Drawing.Size(125, 23);
-            this.btnCacnel.TabIndex = 3;
-            this.btnCacnel.Text = "Cancel";
-            this.btnCacnel.UseVisualStyleBackColor = true;
-            this.btnCacnel.Click += new System.EventHandler(this.btnCacnel_Click);
+            this.btnCancel.Location = new System.Drawing.Point(143, 96);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(125, 23);
+            this.btnCancel.TabIndex = 3;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCacnel_Click);
             // 
             // ChangeAPIKeyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(280, 129);
-            this.Controls.Add(this.btnCacnel);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.tbAPIKey);
             this.Controls.Add(this.labelAboutAPIKey);
@@ -98,6 +98,6 @@
         private System.Windows.Forms.Label labelAboutAPIKey;
         private System.Windows.Forms.TextBox tbAPIKey;
         private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.Button btnCacnel;
+        private System.Windows.Forms.Button btnCancel;
     }
 }

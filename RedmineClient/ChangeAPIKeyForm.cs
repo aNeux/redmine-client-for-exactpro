@@ -35,10 +35,11 @@ namespace RedmineClient
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (tbAPIKey.Text.Length == 0)
-                MessageBox.Show("Please enter API key!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please, enter API key!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
             {
                 btnSave.Enabled = false;
+                btnCancel.Enabled = false;
                 controller.ChangeAPIKey(tbAPIKey.Text);
             }
         }
@@ -59,16 +60,19 @@ namespace RedmineClient
         {
             Action action = () =>
                 {
-                    btnSave.Enabled = true;
                     switch (error)
                     {
                         case ErrorTypes.NoErrors:
                             this.Close();
                             break;
                         case ErrorTypes.NoInternetConnection:
+                            btnSave.Enabled = true;
+                            btnCancel.Enabled = true;
                             MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
+                            btnSave.Enabled = true;
+                            btnCancel.Enabled = true;
                             MessageBox.Show("Wrong API key. Please check entered data and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                     }

@@ -9,11 +9,12 @@ namespace RedmineClient
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterParent;
-            labelLogin.Select();
+            labelInfo.Select();
         }
 
         private void UserInformationForm_Shown(object sender, EventArgs e)
         {
+            tbID.Text = Properties.Settings.Default.id.ToString();
             tbLogin.Text = Properties.Settings.Default.login;
             tbFirstName.Text = Properties.Settings.Default.first_name;
             tbLastName.Text = Properties.Settings.Default.last_name;
@@ -22,7 +23,7 @@ namespace RedmineClient
             tbAPIKey.Text = Properties.Settings.Default.api_key;
         }
 
-        private void btnOk_Click(object sender, EventArgs e)
+        private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
         }

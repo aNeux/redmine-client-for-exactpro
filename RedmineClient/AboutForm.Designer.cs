@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutForm));
             this.pbRedmineLogo = new System.Windows.Forms.PictureBox();
-            this.btnOk = new System.Windows.Forms.Button();
+            this.btnClose = new System.Windows.Forms.Button();
             this.labelAbout = new System.Windows.Forms.Label();
             this.labelPavelTropinov = new System.Windows.Forms.Label();
             this.linkLabelPavelTropinovVK = new System.Windows.Forms.LinkLabel();
@@ -49,15 +49,15 @@
             this.pbRedmineLogo.TabIndex = 0;
             this.pbRedmineLogo.TabStop = false;
             // 
-            // btnOk
+            // btnClose
             // 
-            this.btnOk.Location = new System.Drawing.Point(274, 221);
-            this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(75, 23);
-            this.btnOk.TabIndex = 6;
-            this.btnOk.Text = "Ok";
-            this.btnOk.UseVisualStyleBackColor = true;
-            this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
+            this.btnClose.Location = new System.Drawing.Point(274, 221);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 6;
+            this.btnClose.Text = "Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // labelAbout
             // 
@@ -116,7 +116,7 @@
             this.Controls.Add(this.labelIlyaIlichev);
             this.Controls.Add(this.linkLabelPavelTropinovVK);
             this.Controls.Add(this.labelPavelTropinov);
-            this.Controls.Add(this.btnOk);
+            this.Controls.Add(this.btnClose);
             this.Controls.Add(this.labelAbout);
             this.Controls.Add(this.pbRedmineLogo);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -133,7 +133,7 @@
         #endregion
 
         private System.Windows.Forms.PictureBox pbRedmineLogo;
-        private System.Windows.Forms.Button btnOk;
+        private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Label labelAbout;
         private System.Windows.Forms.Label labelPavelTropinov;
         private System.Windows.Forms.LinkLabel linkLabelPavelTropinovVK;

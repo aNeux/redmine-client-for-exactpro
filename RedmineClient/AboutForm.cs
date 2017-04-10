@@ -21,7 +21,7 @@ namespace RedmineClient
             System.Diagnostics.Process.Start(((LinkLabel)sender).Text);
         }
 
-        private void btnOk_Click(object sender, EventArgs e)
+        private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
         }
