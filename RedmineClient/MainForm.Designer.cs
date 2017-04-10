@@ -39,7 +39,7 @@
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changeAPIKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.userInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aboutTheProductToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.labelSelectProject = new System.Windows.Forms.Label();
             this.cbProjects = new System.Windows.Forms.ComboBox();
             this.lvIssues = new System.Windows.Forms.ListView();
@@ -117,7 +117,7 @@
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.changeAPIKeyToolStripMenuItem,
             this.userInformationToolStripMenuItem,
-            this.aboutTheProductToolStripMenuItem});
+            this.aboutToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -125,21 +125,24 @@
             // changeAPIKeyToolStripMenuItem
             // 
             this.changeAPIKeyToolStripMenuItem.Name = "changeAPIKeyToolStripMenuItem";
-            this.changeAPIKeyToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.changeAPIKeyToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.changeAPIKeyToolStripMenuItem.Text = "Change API key";
             this.changeAPIKeyToolStripMenuItem.Click += new System.EventHandler(this.changeAPITokenToolStripMenuItem_Click);
             // 
             // userInformationToolStripMenuItem
             // 
+            this.userInformationToolStripMenuItem.Enabled = false;
             this.userInformationToolStripMenuItem.Name = "userInformationToolStripMenuItem";
-            this.userInformationToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.userInformationToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.userInformationToolStripMenuItem.Text = "User information";
+            this.userInformationToolStripMenuItem.Click += new System.EventHandler(this.userInformationToolStripMenuItem_Click);
             // 
-            // aboutTheProductToolStripMenuItem
+            // aboutToolStripMenuItem
             // 
-            this.aboutTheProductToolStripMenuItem.Name = "aboutTheProductToolStripMenuItem";
-            this.aboutTheProductToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
-            this.aboutTheProductToolStripMenuItem.Text = "About the product";
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // labelSelectProject
             // 
@@ -271,12 +274,12 @@
             this.contextMenuNotifyIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.exitFromNotifyIconToolStripMenuItem});
             this.contextMenuNotifyIcon.Name = "contextMenuNotifyIcon";
-            this.contextMenuNotifyIcon.Size = new System.Drawing.Size(153, 48);
+            this.contextMenuNotifyIcon.Size = new System.Drawing.Size(93, 26);
             // 
             // exitFromNotifyIconToolStripMenuItem
             // 
             this.exitFromNotifyIconToolStripMenuItem.Name = "exitFromNotifyIconToolStripMenuItem";
-            this.exitFromNotifyIconToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitFromNotifyIconToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
             this.exitFromNotifyIconToolStripMenuItem.Text = "Exit";
             this.exitFromNotifyIconToolStripMenuItem.Click += new System.EventHandler(this.exitFromNotifyIconToolStripMenuItem_Click);
             // 
@@ -335,7 +338,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
         private System.Windows.Forms.Label labelProjectRoles;
         private System.Windows.Forms.ToolStripMenuItem userInformationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem aboutTheProductToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.NotifyIcon notifyIcon;
         private System.Windows.Forms.ContextMenuStrip contextMenuNotifyIcon;
         private System.Windows.Forms.ToolStripMenuItem exitFromNotifyIconToolStripMenuItem;

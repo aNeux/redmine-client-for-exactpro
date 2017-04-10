@@ -67,6 +67,16 @@ namespace RedmineClient
             new ChangeAPIKeyForm().ShowDialog();
         }
 
+        private void userInformationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new UserInformationForm().ShowDialog();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new AboutForm().ShowDialog();
+        }
+
         private void exitFromNotifyIconToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -154,6 +164,7 @@ namespace RedmineClient
                     {
                         case ErrorTypes.NoErrors:
                             this.Text = "Redmine Client ["+ Properties.Settings.Default.login +"]";
+                            userInformationToolStripMenuItem.Enabled = true;
                             for (int i = cbProjects.Items.Count - 1; i >= 1; i--)
                                 cbProjects.Items.RemoveAt(i);
                             int indexToSelect = 0;
