@@ -27,11 +27,11 @@ namespace RedmineClient.Models
         [JsonProperty("id")]
         public long ID { set; get; }
         [JsonProperty("project")]
-        public Projects Project { set; get; }
+        public Project Project { set; get; }
         [JsonProperty("tracker")]
         public Tracker Tracker { set; get; }
         [JsonProperty("status")]
-        public Status Status { set; get; }
+        public IssueStatus Status { set; get; }
         [JsonProperty("priority")]
         public Priority Priority { set; get; }
         [JsonProperty("author")]
@@ -44,28 +44,6 @@ namespace RedmineClient.Models
         public DateTime CreatedOn { set; get; }
         [JsonProperty("updated_on")]
         public DateTime UpdatedOn { set; get; }
-    }
-
-    /// <summary>
-    /// Класс, представляющий информацию о типе задачи.
-    /// </summary>
-    public class Tracker
-    {
-        [JsonProperty("id")]
-        public long ID { set; get; }
-        [JsonProperty("name")]
-        public string Name { set; get; }
-    }
-
-    /// <summary>
-    /// Класс, представляющий информацию о статусе задачи.
-    /// </summary>
-    public class Status
-    {
-        [JsonProperty("id")]
-        public long ID { set; get; }
-        [JsonProperty("name")]
-        public string Name { set; get; }
     }
 
     /// <summary>

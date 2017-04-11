@@ -10,7 +10,7 @@ namespace RedmineClient.Models
     public class ProjectsJSONObject
     {
         [JsonProperty("projects")]
-        public List<Projects> Projects { set; get; }
+        public List<Project> Projects { set; get; }
         [JsonProperty("total_count")]
         public int TotalCount { set; get; }
         [JsonProperty("offset")]
@@ -22,7 +22,7 @@ namespace RedmineClient.Models
     /// <summary>
     /// Класс, представляющий информацию об определенном проекте.
     /// </summary>
-    public class Projects
+    public class Project
     {
         [JsonProperty("id")]
         public long ID { set; get; }

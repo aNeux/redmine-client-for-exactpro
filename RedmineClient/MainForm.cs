@@ -25,6 +25,7 @@ namespace RedmineClient
             controller.OnAPIKeyChanged += controller_OnAPIKeyChanged;
             controller.OnProjectsUpdated += controller_OnProjectsUpdated;
             controller.OnIssuesUpdated += controller_OnIssuesUpdated;
+            controller.OnIssueCreated += controller_OnIssueCreated;
             controller.UpdateProjects();
             toolStripStatusLabel.Text = "Updating projects..";
         }
@@ -39,6 +40,7 @@ namespace RedmineClient
                     controller.OnAPIKeyChanged -= controller_OnAPIKeyChanged;
                     controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
                     controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
+                    controller.OnIssueCreated -= controller_OnIssueCreated;
                 }
                 else
                     e.Cancel = true;
@@ -48,7 +50,13 @@ namespace RedmineClient
                 controller.OnAPIKeyChanged -= controller_OnAPIKeyChanged;
                 controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
                 controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
+                controller.OnIssueCreated -= controller_OnIssueCreated;
             }
+        }
+
+        private void newIssueToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new CreateNewIssueForm(controller.GetProject(lastSelectedProjectID)).ShowDialog();
         }
 
         private void refreshStripMenuItem_Click(object sender, EventArgs e)
@@ -108,7 +116,7 @@ namespace RedmineClient
         {
             string projectName = cbProjects.SelectedItem.ToString();
             long projectID = long.Parse(projectName.Substring(1, projectName.IndexOf(":") - 1));
-            Projects project = controller.GetProject(projectID);
+            Project project = controller.GetProject(projectID);
             string projectInfo = "ID: " + project.ID + "\n"
                 + "Name: " + project.Name + "\n"
                 + "Identifier: " + project.Identifier + "\n"
@@ -156,7 +164,7 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnProjectsUpdated(ErrorTypes error, List<Projects> projects)
+        private void controller_OnProjectsUpdated(ErrorTypes error, List<Project> projects)
         {
             Action action = () =>
                 {
@@ -236,6 +244,11 @@ namespace RedmineClient
                 Invoke(action);
             else
                 action();
+        }
+
+        private void controller_OnIssueCreated(ErrorTypes error)
+        {
+            controller.UpdateIssues(lastSelectedProjectID);
         }
     }
 }

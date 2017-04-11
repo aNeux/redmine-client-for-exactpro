@@ -9,7 +9,6 @@ namespace RedmineClient
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterParent;
-            labelInfo.Select();
         }
 
         private void UserInformationForm_Shown(object sender, EventArgs e)
@@ -21,6 +20,7 @@ namespace RedmineClient
             tbEmail.Text = Properties.Settings.Default.email;
             tbCreationDate.Text = Properties.Settings.Default.created_on.ToShortTimeString() + ", " + Properties.Settings.Default.created_on.ToShortDateString();
             tbAPIKey.Text = Properties.Settings.Default.api_key;
+            labelInfo.Select();
         }
 
         private void btnClose_Click(object sender, EventArgs e)

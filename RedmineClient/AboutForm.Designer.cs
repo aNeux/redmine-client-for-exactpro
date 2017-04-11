@@ -85,7 +85,7 @@
             this.linkLabelPavelTropinovVK.TabIndex = 3;
             this.linkLabelPavelTropinovVK.TabStop = true;
             this.linkLabelPavelTropinovVK.Text = "https://vk.com/aneux";
-            this.linkLabelPavelTropinovVK.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelPavelTropinovVK_LinkClicked);
+            this.linkLabelPavelTropinovVK.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel_LinkClicked);
             // 
             // linkLabelIlyaIlichevVK
             // 
@@ -96,7 +96,7 @@
             this.linkLabelIlyaIlichevVK.TabIndex = 5;
             this.linkLabelIlyaIlichevVK.TabStop = true;
             this.linkLabelIlyaIlichevVK.Text = "https://vk.com/ilichev.ilya";
-            this.linkLabelIlyaIlichevVK.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelIlyaIlichevVK_LinkClicked);
+            this.linkLabelIlyaIlichevVK.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel_LinkClicked);
             // 
             // labelIlyaIlichev
             // 

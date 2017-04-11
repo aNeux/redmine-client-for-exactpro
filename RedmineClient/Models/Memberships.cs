@@ -27,7 +27,7 @@ namespace RedmineClient.Models
         [JsonProperty("id")]
         public long ID { set; get; }
         [JsonProperty("project")]
-        public Projects Project { set; get; }
+        public Project Project { set; get; }
         [JsonProperty("user")]
         public Member Member { set; get; }
         [JsonProperty("roles")]
