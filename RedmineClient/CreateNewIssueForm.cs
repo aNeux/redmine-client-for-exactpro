@@ -108,10 +108,11 @@ namespace RedmineClient
                         foreach (Tracker tracker in trackers)
                             cbTracker.Items.Add(tracker.Name);
                         foreach (Membership membership in memberships)
-                        {
-                            cbAssignee.Items.Add(membership.Member.Name);
-                            cblWatchers.Items.Add(membership.Member.Name);
-                        }
+                            if (membership.Member != null)
+                            {
+                                cbAssignee.Items.Add(membership.Member.Name);
+                                cblWatchers.Items.Add(membership.Member.Name);
+                            }
                         cbTracker.SelectedIndex = 0;
                         cbStatus.SelectedIndex = 0;
                         cbPriority.SelectedIndex = 0;

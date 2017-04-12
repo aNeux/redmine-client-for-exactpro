@@ -202,7 +202,7 @@
             this.cblWatchers.Location = new System.Drawing.Point(12, 242);
             this.cblWatchers.MultiColumn = true;
             this.cblWatchers.Name = "cblWatchers";
-            this.cblWatchers.Size = new System.Drawing.Size(373, 49);
+            this.cblWatchers.Size = new System.Drawing.Size(373, 64);
             this.cblWatchers.TabIndex = 20;
             // 
             // labelWatchers
@@ -274,7 +274,7 @@
             // btnCreateIssue
             // 
             this.btnCreateIssue.Enabled = false;
-            this.btnCreateIssue.Location = new System.Drawing.Point(82, 298);
+            this.btnCreateIssue.Location = new System.Drawing.Point(82, 312);
             this.btnCreateIssue.Name = "btnCreateIssue";
             this.btnCreateIssue.Size = new System.Drawing.Size(115, 23);
             this.btnCreateIssue.TabIndex = 21;
@@ -285,7 +285,7 @@
             // btnCancel
             // 
             this.btnCancel.Enabled = false;
-            this.btnCancel.Location = new System.Drawing.Point(203, 298);
+            this.btnCancel.Location = new System.Drawing.Point(203, 312);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(115, 23);
             this.btnCancel.TabIndex = 22;
@@ -297,7 +297,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(397, 330);
+            this.ClientSize = new System.Drawing.Size(397, 344);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnCreateIssue);
             this.Controls.Add(this.nudEstimatedTime);
