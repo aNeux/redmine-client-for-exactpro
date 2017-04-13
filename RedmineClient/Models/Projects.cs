@@ -33,10 +33,13 @@ namespace RedmineClient.Models
         [JsonProperty("description")]
         public string Description { set; get; }
         [JsonProperty("status")]
-        public long Status { set; get; }
+        public int Status { set; get; }
+        [JsonProperty("is_public")]
+        public bool IsPublic { set; get; }
         [JsonProperty("created_on")]
         public DateTime CreatedOn { set; get; }
         [JsonProperty("updated_on")]
         public DateTime UpdatedOn { set; get; }
+        public List<Membership> Memberships { set; get; }
     }
 }

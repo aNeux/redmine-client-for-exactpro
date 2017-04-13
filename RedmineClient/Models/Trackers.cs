@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace RedmineClient.Models
 {
     /// <summary>
-    /// Класс для парсера, представляющий информацию о всех возможных трекерах.
+    /// Класс для парсера, представляющий информацию о всех возможных трекерах задачи.
     /// </summary>
     public class TrackersJSONObject
     {

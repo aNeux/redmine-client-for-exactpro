@@ -21,3 +21,4 @@ C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\Re
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.AboutForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.UserInformationForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.CreateNewIssueForm.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.ProjectInformation.resources

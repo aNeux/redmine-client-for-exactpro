@@ -114,16 +114,7 @@ namespace RedmineClient
 
         private void btnProjectInfo_Click(object sender, EventArgs e)
         {
-            string projectName = cbProjects.SelectedItem.ToString();
-            long projectID = long.Parse(projectName.Substring(1, projectName.IndexOf(":") - 1));
-            Project project = controller.GetProject(projectID);
-            string projectInfo = "ID: " + project.ID + "\n"
-                + "Name: " + project.Name + "\n"
-                + "Identifier: " + project.Identifier + "\n"
-                + "Status: " + project.Status + "\n"
-                + "Description: " + project.Description + "\n"
-                + "Created on: " + project.CreatedOn.Hour + ":" + project.CreatedOn.Minute + ", " + project.CreatedOn.Day + " " + project.CreatedOn.Month + " " + project.CreatedOn.Year;
-            MessageBox.Show(projectInfo, "Info about project \"" + project.Name + "\"");
+            new ProjectInformation(controller.GetProject(lastSelectedProjectID)).ShowDialog();
         }
 
         private void lvIssues_MouseClick(object sender, MouseEventArgs e)
@@ -219,11 +210,12 @@ namespace RedmineClient
                                 lvi.SubItems.Add(issue.Subject);
                                 lvi.SubItems.Add(issue.Tracker.Name);
                                 lvi.SubItems.Add(issue.Status.Name);
-                                lvi.SubItems.Add(issue.CreatedOn.ToShortTimeString() + ", " + issue.CreatedOn.ToShortDateString());
+                                lvi.SubItems.Add(issue.Priority.Name);
+                                lvi.SubItems.Add(issue.UpdatedOn.ToShortTimeString() + ", " + issue.UpdatedOn.ToShortDateString());
                                 lvIssues.Items.Add(lvi);
                             }
                             selectedProjectRoles = projectRoles;
-                            newIssueToolStripMenuItem.Enabled = selectedProjectRoles.Contains("Manager");
+                            newIssueToolStripMenuItem.Enabled = selectedProjectRoles.Contains("Manager") && controller.GetProject(lastSelectedProjectID).Status == 1;
                             labelProjectRoles.Text = "Roles: " + selectedProjectRoles;
                             toolStripStatusLabel.Text = "Issues was updated at " + DateTime.Now.ToShortTimeString();
                             break;

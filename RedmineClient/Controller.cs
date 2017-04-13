@@ -35,7 +35,7 @@ namespace RedmineClient
         // Событие, возникающее после обновления списка задач для выбранного проекта
         public event Action<ErrorTypes, List<Issue>, string> OnIssuesUpdated;
         // Событие, информирующее о готовности к созданию новой задачи
-        public event Action<ErrorTypes, List<Tracker>, List<Membership>> OnPreparedToCreateNewIssue;
+        public event Action<ErrorTypes, List<Tracker>, List<IssuePriority>, List<Membership>> OnPreparedToCreateNewIssue;
         // Событие, возникающее после создания новой задачи
         public event Action<ErrorTypes> OnIssueCreated;
 
@@ -189,6 +189,7 @@ namespace RedmineClient
                                 memberships.AddRange(membershipsJSONObject.Memberships);
                                 offset += membershipsJSONObject.Limit;
                             } while (membershipsJSONObject.Memberships.FindIndex(temp => temp.Member.ID == Properties.Settings.Default.id) < 0 && membershipsJSONObject.Memberships.Count != 0);
+                            projects.Single(temp => temp.ID == projectID).Memberships = memberships;
                             Membership membership = null;
                             foreach (Membership currentMembership in memberships)
                                 if (currentMembership.Member.ID == Properties.Settings.Default.id)
@@ -242,6 +243,17 @@ namespace RedmineClient
                             response.Close();
                             streamReader.Close();
                             List<Tracker> trackers = JsonConvert.DeserializeObject<TrackersJSONObject>(jsonResponse).Trackers;
+                            // Получаем список приоритетов задачи
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "enumerations/issue_priorities.json");
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_key);
+                            request.Accept = "application/json";
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            List<IssuePriority> issuePriorities = JsonConvert.DeserializeObject<IssuePrioritiesJSONObject>(jsonResponse).IssuePriorities;
                             // Получаем список участников проекта
                             List<Membership> memberships = new List<Membership>();
                             MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
@@ -262,16 +274,16 @@ namespace RedmineClient
                                 offset += membershipsJSONObject.Limit;
                             } while (membershipsJSONObject.Memberships.FindIndex(temp => temp.Member.ID == Properties.Settings.Default.id) < 0 && membershipsJSONObject.Memberships.Count != 0);
                             if (OnPreparedToCreateNewIssue != null)
-                                OnPreparedToCreateNewIssue(ErrorTypes.NoErrors, trackers, memberships);
+                                OnPreparedToCreateNewIssue(ErrorTypes.NoErrors, trackers, issuePriorities, memberships);
                         }
                         catch (Exception ex)
                         {
                             if (ex.Message.Contains("401") && OnPreparedToCreateNewIssue != null)
-                                OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null);
+                                OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
                         }
                     }
                     else if (OnPreparedToCreateNewIssue != null)
-                        OnPreparedToCreateNewIssue(ErrorTypes.NoInternetConnection, null, null);
+                        OnPreparedToCreateNewIssue(ErrorTypes.NoInternetConnection, null, null, null);
                 }).Start();
         }
 

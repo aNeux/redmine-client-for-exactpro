@@ -95,7 +95,7 @@ namespace RedmineClient
             this.Close();
         }
 
-        private void controller_OnPreparedToCreateNewIssue(ErrorTypes error, List<Tracker> trackers, List<Membership> memberships)
+        private void controller_OnPreparedToCreateNewIssue(ErrorTypes error, List<Tracker> trackers, List<IssuePriority> issuePriorities, List<Membership> memberships)
         {
             Action action = () =>
             {
@@ -107,6 +107,8 @@ namespace RedmineClient
                         tbProject.Text = project.Name;
                         foreach (Tracker tracker in trackers)
                             cbTracker.Items.Add(tracker.Name);
+                        foreach (IssuePriority issuePriority in issuePriorities)
+                            cbPriority.Items.Add(issuePriority.Name);
                         foreach (Membership membership in memberships)
                             if (membership.Member != null)
                             {

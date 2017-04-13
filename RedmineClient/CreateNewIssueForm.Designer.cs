@@ -107,12 +107,6 @@
             this.cbPriority.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbPriority.Enabled = false;
             this.cbPriority.FormattingEnabled = true;
-            this.cbPriority.Items.AddRange(new object[] {
-            "Low",
-            "Normal",
-            "High",
-            "Urgent",
-            "Immediate"});
             this.cbPriority.Location = new System.Drawing.Point(264, 61);
             this.cbPriority.Name = "cbPriority";
             this.cbPriority.Size = new System.Drawing.Size(121, 21);

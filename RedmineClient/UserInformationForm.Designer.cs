@@ -51,7 +51,7 @@
             // 
             this.labelLogin.Location = new System.Drawing.Point(12, 58);
             this.labelLogin.Name = "labelLogin";
-            this.labelLogin.Size = new System.Drawing.Size(38, 20);
+            this.labelLogin.Size = new System.Drawing.Size(75, 20);
             this.labelLogin.TabIndex = 3;
             this.labelLogin.Text = "Login:";
             this.labelLogin.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -76,7 +76,7 @@
             // 
             this.labelFirstName.Location = new System.Drawing.Point(12, 84);
             this.labelFirstName.Name = "labelFirstName";
-            this.labelFirstName.Size = new System.Drawing.Size(62, 20);
+            this.labelFirstName.Size = new System.Drawing.Size(75, 20);
             this.labelFirstName.TabIndex = 5;
             this.labelFirstName.Text = "First name:";
             this.labelFirstName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -93,7 +93,7 @@
             // 
             this.labelLastName.Location = new System.Drawing.Point(12, 110);
             this.labelLastName.Name = "labelLastName";
-            this.labelLastName.Size = new System.Drawing.Size(62, 20);
+            this.labelLastName.Size = new System.Drawing.Size(75, 20);
             this.labelLastName.TabIndex = 7;
             this.labelLastName.Text = "Last name:";
             this.labelLastName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -110,7 +110,7 @@
             // 
             this.labelEmail.Location = new System.Drawing.Point(12, 136);
             this.labelEmail.Name = "labelEmail";
-            this.labelEmail.Size = new System.Drawing.Size(38, 20);
+            this.labelEmail.Size = new System.Drawing.Size(75, 20);
             this.labelEmail.TabIndex = 9;
             this.labelEmail.Text = "E-mail:";
             this.labelEmail.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -127,7 +127,7 @@
             // 
             this.labelCreationDate.Location = new System.Drawing.Point(12, 162);
             this.labelCreationDate.Name = "labelCreationDate";
-            this.labelCreationDate.Size = new System.Drawing.Size(76, 20);
+            this.labelCreationDate.Size = new System.Drawing.Size(75, 20);
             this.labelCreationDate.TabIndex = 11;
             this.labelCreationDate.Text = "Creation date:";
             this.labelCreationDate.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -144,7 +144,7 @@
             // 
             this.labelAPIKey.Location = new System.Drawing.Point(12, 188);
             this.labelAPIKey.Name = "labelAPIKey";
-            this.labelAPIKey.Size = new System.Drawing.Size(52, 20);
+            this.labelAPIKey.Size = new System.Drawing.Size(75, 20);
             this.labelAPIKey.TabIndex = 13;
             this.labelAPIKey.Text = "API key:";
             this.labelAPIKey.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -171,7 +171,7 @@
             // 
             this.labelID.Location = new System.Drawing.Point(12, 32);
             this.labelID.Name = "labelID";
-            this.labelID.Size = new System.Drawing.Size(22, 20);
+            this.labelID.Size = new System.Drawing.Size(75, 20);
             this.labelID.TabIndex = 1;
             this.labelID.Text = "ID:";
             this.labelID.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
