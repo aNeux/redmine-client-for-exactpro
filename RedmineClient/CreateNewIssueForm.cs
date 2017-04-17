@@ -150,6 +150,10 @@ namespace RedmineClient
                         MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         break;
+                    case ErrorTypes.UnknownError:
+                        MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Close();
+                        break;
                 }
             };
             if (InvokeRequired)
@@ -185,6 +189,21 @@ namespace RedmineClient
                         break;
                     case ErrorTypes.UnathorizedAccess:
                         MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        tbProject.Enabled = true;
+                        cbTracker.Enabled = true;
+                        tbSubject.Enabled = true;
+                        cbStatus.Enabled = true;
+                        cbPriority.Enabled = true;
+                        cbAssignee.Enabled = true;
+                        tbDescription.Enabled = true;
+                        cbIsPrivate.Enabled = true;
+                        nudEstimatedTime.Enabled = true;
+                        cblWatchers.Enabled = true;
+                        btnCreateIssue.Enabled = true;
+                        btnCancel.Enabled = true;
+                        break;
+                    case ErrorTypes.UnknownError:
+                        MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbProject.Enabled = true;
                         cbTracker.Enabled = true;
                         tbSubject.Enabled = true;

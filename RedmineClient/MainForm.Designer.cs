@@ -39,6 +39,7 @@
             this.reAuthenticateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.userInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.logOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.labelSelectProject = new System.Windows.Forms.Label();
             this.cbProjects = new System.Windows.Forms.ComboBox();
             this.lvIssues = new System.Windows.Forms.ListView();
@@ -57,7 +58,6 @@
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuNotifyIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.exitFromNotifyIconToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.logOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.contextMenuIssue.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -140,6 +140,13 @@
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
+            // logOutToolStripMenuItem
+            // 
+            this.logOutToolStripMenuItem.Name = "logOutToolStripMenuItem";
+            this.logOutToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
+            this.logOutToolStripMenuItem.Text = "Log out";
+            this.logOutToolStripMenuItem.Click += new System.EventHandler(this.logOutToolStripMenuItem_Click);
+            // 
             // labelSelectProject
             // 
             this.labelSelectProject.AutoSize = true;
@@ -202,7 +209,7 @@
             // columnHeaderStatus
             // 
             this.columnHeaderStatus.Text = "Status";
-            this.columnHeaderStatus.Width = 62;
+            this.columnHeaderStatus.Width = 70;
             // 
             // columnHeaderPriority
             // 
@@ -212,7 +219,7 @@
             // columnHeaderLastUpdate
             // 
             this.columnHeaderLastUpdate.Text = "Last update";
-            this.columnHeaderLastUpdate.Width = 130;
+            this.columnHeaderLastUpdate.Width = 122;
             // 
             // btnProjectInfo
             // 
@@ -284,13 +291,6 @@
             this.exitFromNotifyIconToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
             this.exitFromNotifyIconToolStripMenuItem.Text = "Exit";
             this.exitFromNotifyIconToolStripMenuItem.Click += new System.EventHandler(this.exitFromNotifyIconToolStripMenuItem_Click);
-            // 
-            // logOutToolStripMenuItem
-            // 
-            this.logOutToolStripMenuItem.Name = "logOutToolStripMenuItem";
-            this.logOutToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
-            this.logOutToolStripMenuItem.Text = "Log out";
-            this.logOutToolStripMenuItem.Click += new System.EventHandler(this.logOutToolStripMenuItem_Click);
             // 
             // MainForm
             // 

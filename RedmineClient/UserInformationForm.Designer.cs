@@ -206,7 +206,9 @@
             this.Controls.Add(this.labelFirstName);
             this.Controls.Add(this.tbLogin);
             this.Controls.Add(this.labelLogin);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "UserInformationForm";
             this.ShowInTaskbar = false;

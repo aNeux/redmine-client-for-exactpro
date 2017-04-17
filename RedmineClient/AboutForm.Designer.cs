@@ -119,7 +119,9 @@
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.labelAbout);
             this.Controls.Add(this.pbRedmineLogo);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AboutForm";
             this.ShowInTaskbar = false;

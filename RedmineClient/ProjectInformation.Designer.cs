@@ -218,9 +218,10 @@
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.tbID);
             this.Controls.Add(this.labelID);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ProjectInformation";
             this.Text = "Project Information";
             this.Shown += new System.EventHandler(this.ProjectInformation_Shown);

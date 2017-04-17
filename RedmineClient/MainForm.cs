@@ -22,7 +22,7 @@ namespace RedmineClient
         {
             cbProjects.SelectedIndex = 0;
             controller = Program.controllerGlobal;
-            controller.OnUserAuthenticated += controller_OnAPIKeyChanged;
+            controller.OnUserAuthenticated += controller_OnUserAuthenticated;
             controller.OnProjectsUpdated += controller_OnProjectsUpdated;
             controller.OnIssuesUpdated += controller_OnIssuesUpdated;
             controller.OnIssueCreated += controller_OnIssueCreated;
@@ -37,7 +37,7 @@ namespace RedmineClient
                 var dialogResult = MessageBox.Show("Are you sure you want to exit?", "Exiting", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    controller.OnUserAuthenticated -= controller_OnAPIKeyChanged;
+                    controller.OnUserAuthenticated -= controller_OnUserAuthenticated;
                     controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
                     controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
                     controller.OnIssueCreated -= controller_OnIssueCreated;
@@ -47,7 +47,7 @@ namespace RedmineClient
             }
             else
             {
-                controller.OnUserAuthenticated -= controller_OnAPIKeyChanged;
+                controller.OnUserAuthenticated -= controller_OnUserAuthenticated;
                 controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
                 controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
                 controller.OnIssueCreated -= controller_OnIssueCreated;
@@ -149,11 +149,11 @@ namespace RedmineClient
             MessageBox.Show(issueInfo, "Info about issue \"" + issue.Subject + "\"");
         }
 
-        private void controller_OnAPIKeyChanged(ErrorTypes error, bool isChanged)
+        private void controller_OnUserAuthenticated(ErrorTypes error, bool isUserChanged)
         {
             Action action = () =>
                 {
-                    if (error == ErrorTypes.NoErrors && isChanged)
+                    if (error == ErrorTypes.NoErrors && isUserChanged)
                     {
                         cbProjects.SelectedIndex = 0;
                         controller.UpdateProjects();
@@ -199,6 +199,10 @@ namespace RedmineClient
                             else
                                 MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
+                        case ErrorTypes.UnknownError:
+                            toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (unknown error)";
+                            MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
                     }
                 };
             if (InvokeRequired)
@@ -241,6 +245,10 @@ namespace RedmineClient
                                 new AuthorizationForm().ShowDialog();
                             else
                                 MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
+                        case ErrorTypes.UnknownError:
+                            toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (unknown error)";
+                            MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                     }
                 };

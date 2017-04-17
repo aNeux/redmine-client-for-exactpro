@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Linq;
 using System.Threading;
 using System.IO;
@@ -13,7 +14,7 @@ namespace RedmineClient
     /// <summary>
     /// Перечисление возможных ошибок, возникающих в резульате запроса к серверу.
     /// </summary>
-    public enum ErrorTypes { NoErrors, NetworkError, UnathorizedAccess }
+    public enum ErrorTypes { NoErrors, NetworkError, UnathorizedAccess, UnknownError }
 
     /// <summary>
     /// Класс, представляющий собой контроллер для взаимодействия с данными (реализация паттерна MVC).
@@ -101,10 +102,14 @@ namespace RedmineClient
                     }
                     catch (Exception ex)
                     {
-                        if (ex.Message.Contains("401") && OnUserAuthenticated != null)
-                            OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
-                        else if (ex.Message.Contains("student-rm.exactpro.com"))
-                            OnUserAuthenticated(ErrorTypes.NetworkError, false);
+                        if (OnUserAuthenticated != null)
+                            if (ex.Message.Contains("401"))
+                                OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
+                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
+                                OnUserAuthenticated(ErrorTypes.NetworkError, false);
+                            else
+                                OnUserAuthenticated(ErrorTypes.UnknownError, false);
+                        
                     }
                 }).Start();
         }
@@ -145,10 +150,13 @@ namespace RedmineClient
                     }
                     catch (Exception ex)
                     {
-                        if (ex.Message.Contains("401") && OnProjectsUpdated != null)
-                            OnProjectsUpdated(ErrorTypes.UnathorizedAccess, null);
-                        else if (ex.Message.Contains("student-rm.exactpro.com"))
-                            OnProjectsUpdated(ErrorTypes.NetworkError, null);
+                        if (OnProjectsUpdated != null)
+                            if (ex.Message.Contains("401"))
+                                OnProjectsUpdated(ErrorTypes.UnathorizedAccess, null);
+                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
+                                OnProjectsUpdated(ErrorTypes.NetworkError, null);
+                            else
+                                OnProjectsUpdated(ErrorTypes.UnknownError, null);
                     }
                 }).Start();
         }
@@ -221,10 +229,13 @@ namespace RedmineClient
                     }
                     catch (Exception ex)
                     {
-                        if (ex.Message.Contains("401") && OnIssuesUpdated != null)
-                            OnIssuesUpdated(ErrorTypes.UnathorizedAccess, null, null);
-                        else if (ex.Message.Contains("student-rm.exactpro.com"))
-                            OnIssuesUpdated(ErrorTypes.NetworkError, null, null);
+                        if (OnIssuesUpdated != null)
+                            if (ex.Message.Contains("401"))
+                                OnIssuesUpdated(ErrorTypes.UnathorizedAccess, null, null);
+                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
+                                OnIssuesUpdated(ErrorTypes.NetworkError, null, null);
+                            else
+                                OnIssuesUpdated(ErrorTypes.UnknownError, null, null);
                     }
                 }).Start();
         }
@@ -290,10 +301,13 @@ namespace RedmineClient
                     }
                     catch (Exception ex)
                     {
-                        if (ex.Message.Contains("401") && OnPreparedToCreateNewIssue != null)
-                            OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
-                        else if (ex.Message.Contains("student-rm.exactpro.com"))
-                            OnPreparedToCreateNewIssue(ErrorTypes.NetworkError, null, null, null);
+                        if (OnPreparedToCreateNewIssue != null)
+                            if (ex.Message.Contains("401"))
+                                OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
+                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
+                                OnPreparedToCreateNewIssue(ErrorTypes.NetworkError, null, null, null);
+                            else
+                                OnPreparedToCreateNewIssue(ErrorTypes.UnknownError, null, null, null);
                     }
                 }).Start();
         }
@@ -324,10 +338,13 @@ namespace RedmineClient
                     }
                     catch (Exception ex)
                     {
-                        if (ex.Message.Contains("401") && OnIssueCreated != null)
-                            OnIssueCreated(ErrorTypes.UnathorizedAccess);
-                        else if (ex.Message.Contains("student-rm.exactpro.com"))
-                            OnIssueCreated(ErrorTypes.NetworkError);
+                        if (OnIssueCreated != null)
+                            if (ex.Message.Contains("401"))
+                                OnIssueCreated(ErrorTypes.UnathorizedAccess);
+                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
+                                OnIssueCreated(ErrorTypes.NetworkError);
+                            else
+                                OnIssueCreated(ErrorTypes.UnknownError);
                     }
                 }).Start();
         }

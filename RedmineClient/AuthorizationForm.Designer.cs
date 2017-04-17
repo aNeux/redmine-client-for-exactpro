@@ -146,7 +146,9 @@
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.tbAPIKey);
             this.Controls.Add(this.labelInfo);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AuthorizationForm";
             this.ShowInTaskbar = false;

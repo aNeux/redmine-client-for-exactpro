@@ -138,6 +138,18 @@ namespace RedmineClient
                             btnSave.Enabled = true;
                             btnCancel.Enabled = true;
                             break;
+                        case ErrorTypes.UnknownError:
+                            MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            labelLogin.Enabled = !cbUseAPIKeyInstead.Checked;
+                            tbLogin.Enabled = !cbUseAPIKeyInstead.Checked;
+                            labelPassword.Enabled = !cbUseAPIKeyInstead.Checked;
+                            tbPassword.Enabled = !cbUseAPIKeyInstead.Checked;
+                            labelAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
+                            tbAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
+                            cbUseAPIKeyInstead.Enabled = true;
+                            btnSave.Enabled = true;
+                            btnCancel.Enabled = true;
+                            break;
                     }
                 };
             if (InvokeRequired)
