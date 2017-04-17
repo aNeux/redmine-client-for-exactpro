@@ -13,7 +13,7 @@ namespace RedmineClient
     /// <summary>
     /// Перечисление возможных ошибок, возникающих в резульате запроса к серверу.
     /// </summary>
-    public enum ErrorTypes { NoErrors, NoInternetConnection, UnathorizedAccess }
+    public enum ErrorTypes { NoErrors, NetworkError, UnathorizedAccess }
 
     /// <summary>
     /// Класс, представляющий собой контроллер для взаимодействия с данными (реализация паттерна MVC).
@@ -58,57 +58,54 @@ namespace RedmineClient
         {
             new Thread(delegate()
                 {
-                    if (Utils.IsNetworkAvailable())
+                    try
                     {
-                        try
+                        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "users/current.json");
+                        request.Method = "GET";
+                        if (isAuthBasic)
+                            request.Headers.Add("Authorization", "Basic " + data);
+                        else
+                            request.Headers.Add("X-Redmine-API-Key", data);
+                        request.Accept = "application/json";
+                        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                        StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                        string jsonResponse = streamReader.ReadToEnd();
+                        response.Close();
+                        streamReader.Close();
+                        User currentUser = JsonConvert.DeserializeObject<UserJSONObject>(jsonResponse).User;
+                        if (Properties.Settings.Default.api_key.Length == 0 || currentUser.ID != Properties.Settings.Default.id)
                         {
-                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "users/current.json");
-                            request.Method = "GET";
-                            if (isAuthBasic)
-                                request.Headers.Add("Authorization", "Basic " + data);
-                            else
-                                request.Headers.Add("X-Redmine-API-Key", data);
-                            request.Accept = "application/json";
-                            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                            StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                            string jsonResponse = streamReader.ReadToEnd();
-                            response.Close();
-                            streamReader.Close();
-                            User currentUser = JsonConvert.DeserializeObject<UserJSONObject>(jsonResponse).User;
-                            if (Properties.Settings.Default.api_key.Length == 0 || currentUser.ID != Properties.Settings.Default.id)
-                            {
-                                Properties.Settings.Default.id = currentUser.ID;
-                                Properties.Settings.Default.login = currentUser.Login;
-                                Properties.Settings.Default.first_name = currentUser.FirstName;
-                                Properties.Settings.Default.last_name = currentUser.LastName;
-                                Properties.Settings.Default.email = currentUser.Email;
-                                Properties.Settings.Default.created_on = currentUser.CreatedOn;
-                                Properties.Settings.Default.api_key = Utils.EncodeXOR(currentUser.APIKey);
-                                Properties.Settings.Default.Save();
-                                currentAPIKey = currentUser.APIKey;
-                                if (OnUserAuthenticated != null)
-                                    OnUserAuthenticated(ErrorTypes.NoErrors, true);
-                            }
-                            else
-                            {
-                                Properties.Settings.Default.first_name = currentUser.FirstName;
-                                Properties.Settings.Default.last_name = currentUser.LastName;
-                                Properties.Settings.Default.email = currentUser.Email;
-                                Properties.Settings.Default.api_key = Utils.EncodeXOR(currentUser.APIKey);
-                                Properties.Settings.Default.Save();
-                                currentAPIKey = currentUser.APIKey;
-                                if (OnUserAuthenticated != null)
-                                    OnUserAuthenticated(ErrorTypes.NoErrors, false);
-                            }
+                            Properties.Settings.Default.id = currentUser.ID;
+                            Properties.Settings.Default.login = currentUser.Login;
+                            Properties.Settings.Default.first_name = currentUser.FirstName;
+                            Properties.Settings.Default.last_name = currentUser.LastName;
+                            Properties.Settings.Default.email = currentUser.Email;
+                            Properties.Settings.Default.created_on = currentUser.CreatedOn;
+                            Properties.Settings.Default.api_key = Utils.EncodeXOR(currentUser.APIKey);
+                            Properties.Settings.Default.Save();
+                            currentAPIKey = currentUser.APIKey;
+                            if (OnUserAuthenticated != null)
+                                OnUserAuthenticated(ErrorTypes.NoErrors, true);
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            if (ex.Message.Contains("401") && OnUserAuthenticated != null)
-                                OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
+                            Properties.Settings.Default.first_name = currentUser.FirstName;
+                            Properties.Settings.Default.last_name = currentUser.LastName;
+                            Properties.Settings.Default.email = currentUser.Email;
+                            Properties.Settings.Default.api_key = Utils.EncodeXOR(currentUser.APIKey);
+                            Properties.Settings.Default.Save();
+                            currentAPIKey = currentUser.APIKey;
+                            if (OnUserAuthenticated != null)
+                                OnUserAuthenticated(ErrorTypes.NoErrors, false);
                         }
                     }
-                    else if (OnUserAuthenticated != null)
-                        OnUserAuthenticated(ErrorTypes.NoInternetConnection, false);
+                    catch (Exception ex)
+                    {
+                        if (ex.Message.Contains("401") && OnUserAuthenticated != null)
+                            OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
+                        else if (ex.Message.Contains("student-rm.exactpro.com"))
+                            OnUserAuthenticated(ErrorTypes.NetworkError, false);
+                    }
                 }).Start();
         }
 
@@ -119,43 +116,40 @@ namespace RedmineClient
         {
             new Thread(delegate()
                 {
-                    if (Utils.IsNetworkAvailable())
+                    try
                     {
-                        try
+                        HttpWebRequest request;
+                        HttpWebResponse response;
+                        StreamReader streamReader;
+                        string jsonResponse;
+                        projects = new List<Project>();
+                        ProjectsJSONObject projectsJSONObject = new ProjectsJSONObject();
+                        int offset = 0;
+                        do
                         {
-                            HttpWebRequest request;
-                            HttpWebResponse response;
-                            StreamReader streamReader;
-                            string jsonResponse;
-                            projects = new List<Project>();
-                            ProjectsJSONObject projectsJSONObject = new ProjectsJSONObject();
-                            int offset = 0;
-                            do
-                            {
-                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json?offset=" + offset);
-                                request.Method = "GET";
-                                request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
-                                request.Accept = "application/json";
-                                response = (HttpWebResponse)request.GetResponse();
-                                streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                                jsonResponse = streamReader.ReadToEnd();
-                                response.Close();
-                                streamReader.Close();
-                                projectsJSONObject = JsonConvert.DeserializeObject<ProjectsJSONObject>(jsonResponse);
-                                projects.AddRange(projectsJSONObject.Projects);
-                                offset += projectsJSONObject.Limit;
-                            } while (projectsJSONObject.Projects.Count != 0);
-                            if (OnProjectsUpdated != null)
-                                OnProjectsUpdated(ErrorTypes.NoErrors, projects);
-                        }
-                        catch (Exception ex)
-                        {
-                            if (ex.Message.Contains("401") && OnProjectsUpdated != null)
-                                OnProjectsUpdated(ErrorTypes.UnathorizedAccess, null);
-                        }
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json?offset=" + offset);
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                            request.Accept = "application/json";
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            projectsJSONObject = JsonConvert.DeserializeObject<ProjectsJSONObject>(jsonResponse);
+                            projects.AddRange(projectsJSONObject.Projects);
+                            offset += projectsJSONObject.Limit;
+                        } while (projectsJSONObject.Projects.Count != 0);
+                        if (OnProjectsUpdated != null)
+                            OnProjectsUpdated(ErrorTypes.NoErrors, projects);
                     }
-                    else if (OnProjectsUpdated != null)
-                        OnProjectsUpdated(ErrorTypes.NoInternetConnection, null);
+                    catch (Exception ex)
+                    {
+                        if (ex.Message.Contains("401") && OnProjectsUpdated != null)
+                            OnProjectsUpdated(ErrorTypes.UnathorizedAccess, null);
+                        else if (ex.Message.Contains("student-rm.exactpro.com"))
+                            OnProjectsUpdated(ErrorTypes.NetworkError, null);
+                    }
                 }).Start();
         }
 
@@ -167,74 +161,71 @@ namespace RedmineClient
         {
             new Thread(delegate()
                 {
-                    if (Utils.IsNetworkAvailable())
+                    try
                     {
-                        try
+                        HttpWebRequest request;
+                        HttpWebResponse response;
+                        StreamReader streamReader;
+                        string jsonResponse;
+                        issues = new List<Issue>();
+                        IssuesJSONObject issuesJSONObject = new IssuesJSONObject();
+                        int offset = 0;
+                        do
                         {
-                            HttpWebRequest request;
-                            HttpWebResponse response;
-                            StreamReader streamReader;
-                            string jsonResponse;
-                            issues = new List<Issue>();
-                            IssuesJSONObject issuesJSONObject = new IssuesJSONObject();
-                            int offset = 0;
-                            do
-                            {
-                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?project_id=" + projectID + "&offset=" + offset);
-                                request.Method = "GET";
-                                request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
-                                request.Accept = "application/json";
-                                response = (HttpWebResponse)request.GetResponse();
-                                streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                                jsonResponse = streamReader.ReadToEnd();
-                                response.Close();
-                                streamReader.Close();
-                                issuesJSONObject = JsonConvert.DeserializeObject<IssuesJSONObject>(jsonResponse);
-                                issues.AddRange(issuesJSONObject.Issues);
-                                offset += issuesJSONObject.Limit;
-                            } while (issuesJSONObject.Issues.Count != 0);
-                            // Получаем также список участников проекта для последующего вычисления ролей в нем текущего пользователя
-                            List<Membership> memberships = new List<Membership>();
-                            MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
-                            offset = 0;
-                            do
-                            {
-                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
-                                request.Method = "GET";
-                                request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
-                                request.Accept = "application/json";
-                                response = (HttpWebResponse)request.GetResponse();
-                                streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                                jsonResponse = streamReader.ReadToEnd();
-                                response.Close();
-                                streamReader.Close();
-                                membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
-                                memberships.AddRange(membershipsJSONObject.Memberships);
-                                offset += membershipsJSONObject.Limit;
-                            } while (membershipsJSONObject.Memberships.FindIndex(temp => temp.Member.ID == Properties.Settings.Default.id) < 0 && membershipsJSONObject.Memberships.Count != 0);
-                            projects.Single(temp => temp.ID == projectID).Memberships = memberships;
-                            Membership membership = null;
-                            foreach (Membership currentMembership in memberships)
-                                if (currentMembership.Member.ID == Properties.Settings.Default.id)
-                                {
-                                    membership = currentMembership;
-                                    break;
-                                }
-                            string projectRoles = "";
-                            foreach (Role role in membership.Roles)
-                                projectRoles += role.Name + ", ";
-                            projectRoles = projectRoles.Remove(projectRoles.Length - 2);
-                            if (OnIssuesUpdated != null)
-                                OnIssuesUpdated(ErrorTypes.NoErrors, issues, projectRoles);
-                        }
-                        catch (Exception ex)
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?project_id=" + projectID + "&offset=" + offset);
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                            request.Accept = "application/json";
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            issuesJSONObject = JsonConvert.DeserializeObject<IssuesJSONObject>(jsonResponse);
+                            issues.AddRange(issuesJSONObject.Issues);
+                            offset += issuesJSONObject.Limit;
+                        } while (issuesJSONObject.Issues.Count != 0);
+                        // Получаем также список участников проекта для последующего вычисления ролей в нем текущего пользователя
+                        List<Membership> memberships = new List<Membership>();
+                        MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
+                        offset = 0;
+                        do
                         {
-                            if (ex.Message.Contains("401") && OnIssuesUpdated != null)
-                                OnIssuesUpdated(ErrorTypes.UnathorizedAccess, null, null);
-                        }
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                            request.Accept = "application/json";
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
+                            memberships.AddRange(membershipsJSONObject.Memberships);
+                            offset += membershipsJSONObject.Limit;
+                        } while (membershipsJSONObject.Memberships.FindIndex(temp => temp.Member.ID == Properties.Settings.Default.id) < 0 && membershipsJSONObject.Memberships.Count != 0);
+                        projects.Single(temp => temp.ID == projectID).Memberships = memberships;
+                        Membership membership = null;
+                        foreach (Membership currentMembership in memberships)
+                            if (currentMembership.Member.ID == Properties.Settings.Default.id)
+                            {
+                                membership = currentMembership;
+                                break;
+                            }
+                        string projectRoles = "";
+                        foreach (Role role in membership.Roles)
+                            projectRoles += role.Name + ", ";
+                        projectRoles = projectRoles.Remove(projectRoles.Length - 2);
+                        if (OnIssuesUpdated != null)
+                            OnIssuesUpdated(ErrorTypes.NoErrors, issues, projectRoles);
                     }
-                    else if (OnIssuesUpdated != null)
-                        OnIssuesUpdated(ErrorTypes.NoInternetConnection, null, null);
+                    catch (Exception ex)
+                    {
+                        if (ex.Message.Contains("401") && OnIssuesUpdated != null)
+                            OnIssuesUpdated(ErrorTypes.UnathorizedAccess, null, null);
+                        else if (ex.Message.Contains("student-rm.exactpro.com"))
+                            OnIssuesUpdated(ErrorTypes.NetworkError, null, null);
+                    }
                 }).Start();
         }
 
@@ -247,16 +238,41 @@ namespace RedmineClient
             new Thread(
                 delegate()
                 {
-                    if (Utils.IsNetworkAvailable())
+                    try
                     {
-                        try
+                        HttpWebRequest request;
+                        HttpWebResponse response;
+                        StreamReader streamReader;
+                        string jsonResponse;
+                        // Получаем список трекеров (типов задачи)
+                        request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "trackers.json");
+                        request.Method = "GET";
+                        request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                        request.Accept = "application/json";
+                        response = (HttpWebResponse)request.GetResponse();
+                        streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                        jsonResponse = streamReader.ReadToEnd();
+                        response.Close();
+                        streamReader.Close();
+                        List<Tracker> trackers = JsonConvert.DeserializeObject<TrackersJSONObject>(jsonResponse).Trackers;
+                        // Получаем список приоритетов задачи
+                        request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "enumerations/issue_priorities.json");
+                        request.Method = "GET";
+                        request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                        request.Accept = "application/json";
+                        response = (HttpWebResponse)request.GetResponse();
+                        streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                        jsonResponse = streamReader.ReadToEnd();
+                        response.Close();
+                        streamReader.Close();
+                        List<IssuePriority> issuePriorities = JsonConvert.DeserializeObject<IssuePrioritiesJSONObject>(jsonResponse).IssuePriorities;
+                        // Получаем список участников проекта
+                        List<Membership> memberships = new List<Membership>();
+                        MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
+                        int offset = 0;
+                        do
                         {
-                            HttpWebRequest request;
-                            HttpWebResponse response;
-                            StreamReader streamReader;
-                            string jsonResponse;
-                            // Получаем список трекеров (типов задачи)
-                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "trackers.json");
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                             request.Accept = "application/json";
@@ -265,48 +281,20 @@ namespace RedmineClient
                             jsonResponse = streamReader.ReadToEnd();
                             response.Close();
                             streamReader.Close();
-                            List<Tracker> trackers = JsonConvert.DeserializeObject<TrackersJSONObject>(jsonResponse).Trackers;
-                            // Получаем список приоритетов задачи
-                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "enumerations/issue_priorities.json");
-                            request.Method = "GET";
-                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
-                            request.Accept = "application/json";
-                            response = (HttpWebResponse)request.GetResponse();
-                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                            jsonResponse = streamReader.ReadToEnd();
-                            response.Close();
-                            streamReader.Close();
-                            List<IssuePriority> issuePriorities = JsonConvert.DeserializeObject<IssuePrioritiesJSONObject>(jsonResponse).IssuePriorities;
-                            // Получаем список участников проекта
-                            List<Membership> memberships = new List<Membership>();
-                            MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
-                            int offset = 0;
-                            do
-                            {
-                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
-                                request.Method = "GET";
-                                request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
-                                request.Accept = "application/json";
-                                response = (HttpWebResponse)request.GetResponse();
-                                streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                                jsonResponse = streamReader.ReadToEnd();
-                                response.Close();
-                                streamReader.Close();
-                                membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
-                                memberships.AddRange(membershipsJSONObject.Memberships);
-                                offset += membershipsJSONObject.Limit;
-                            } while (membershipsJSONObject.Memberships.FindIndex(temp => temp.Member.ID == Properties.Settings.Default.id) < 0 && membershipsJSONObject.Memberships.Count != 0);
-                            if (OnPreparedToCreateNewIssue != null)
-                                OnPreparedToCreateNewIssue(ErrorTypes.NoErrors, trackers, issuePriorities, memberships);
-                        }
-                        catch (Exception ex)
-                        {
-                            if (ex.Message.Contains("401") && OnPreparedToCreateNewIssue != null)
-                                OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
-                        }
+                            membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
+                            memberships.AddRange(membershipsJSONObject.Memberships);
+                            offset += membershipsJSONObject.Limit;
+                        } while (membershipsJSONObject.Memberships.FindIndex(temp => temp.Member.ID == Properties.Settings.Default.id) < 0 && membershipsJSONObject.Memberships.Count != 0);
+                        if (OnPreparedToCreateNewIssue != null)
+                            OnPreparedToCreateNewIssue(ErrorTypes.NoErrors, trackers, issuePriorities, memberships);
                     }
-                    else if (OnPreparedToCreateNewIssue != null)
-                        OnPreparedToCreateNewIssue(ErrorTypes.NoInternetConnection, null, null, null);
+                    catch (Exception ex)
+                    {
+                        if (ex.Message.Contains("401") && OnPreparedToCreateNewIssue != null)
+                            OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
+                        else if (ex.Message.Contains("student-rm.exactpro.com"))
+                            OnPreparedToCreateNewIssue(ErrorTypes.NetworkError, null, null, null);
+                    }
                 }).Start();
         }
 
@@ -319,31 +307,28 @@ namespace RedmineClient
             new Thread(
                 delegate()
                 {
-                    if (Utils.IsNetworkAvailable())
+                    try
                     {
-                        try
-                        {
-                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json");
-                            request.Method = "POST";
-                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
-                            request.ContentType = "application/json";
-                            StreamWriter streamWriter = new StreamWriter(request.GetRequestStream());
-                            streamWriter.Write(jsonRequest);
-                            streamWriter.Flush();
-                            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                            streamWriter.Close();
-                            response.Close();
-                            if (OnIssueCreated != null)
-                                OnIssueCreated(ErrorTypes.NoErrors);
-                        }
-                        catch (Exception ex)
-                        {
-                            if (ex.Message.Contains("401") && OnIssueCreated != null)
-                                OnIssueCreated(ErrorTypes.UnathorizedAccess);
-                        }
+                        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json");
+                        request.Method = "POST";
+                        request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                        request.ContentType = "application/json";
+                        StreamWriter streamWriter = new StreamWriter(request.GetRequestStream());
+                        streamWriter.Write(jsonRequest);
+                        streamWriter.Flush();
+                        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                        streamWriter.Close();
+                        response.Close();
+                        if (OnIssueCreated != null)
+                            OnIssueCreated(ErrorTypes.NoErrors);
                     }
-                    else if (OnIssueCreated != null)
-                        OnIssueCreated(ErrorTypes.NoInternetConnection);
+                    catch (Exception ex)
+                    {
+                        if (ex.Message.Contains("401") && OnIssueCreated != null)
+                            OnIssueCreated(ErrorTypes.UnathorizedAccess);
+                        else if (ex.Message.Contains("student-rm.exactpro.com"))
+                            OnIssueCreated(ErrorTypes.NetworkError);
+                    }
                 }).Start();
         }
 

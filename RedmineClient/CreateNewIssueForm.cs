@@ -142,7 +142,7 @@ namespace RedmineClient
                         btnCancel.Enabled = true;
                         this.Text = "Create new issue";
                         break;
-                    case ErrorTypes.NoInternetConnection:
+                    case ErrorTypes.NetworkError:
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         break;
@@ -168,7 +168,7 @@ namespace RedmineClient
                         isIssueCreated = true;
                         this.Close();
                         break;
-                    case ErrorTypes.NoInternetConnection:
+                    case ErrorTypes.NetworkError:
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbProject.Enabled = true;
                         cbTracker.Enabled = true;

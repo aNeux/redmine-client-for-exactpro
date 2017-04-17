@@ -188,7 +188,7 @@ namespace RedmineClient
                                 toolStripStatusLabel.Text = "Projects was updated at " + DateTime.Now.ToShortTimeString();
                             cbProjects.SelectedIndex = indexToSelect;
                             break;
-                        case ErrorTypes.NoInternetConnection:
+                        case ErrorTypes.NetworkError:
                             toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
                             MessageBox.Show("Cannot connect to Redmine services and load projects. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
@@ -231,7 +231,7 @@ namespace RedmineClient
                             labelProjectRoles.Text = "Roles: " + selectedProjectRoles;
                             toolStripStatusLabel.Text = "Issues was updated at " + DateTime.Now.ToShortTimeString();
                             break;
-                        case ErrorTypes.NoInternetConnection:
+                        case ErrorTypes.NetworkError:
                             toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
                             MessageBox.Show("Cannot connect to Redmine services and load issues. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;

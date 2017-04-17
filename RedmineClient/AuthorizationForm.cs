@@ -46,6 +46,19 @@ namespace RedmineClient
             tbPassword.Enabled = !cbUseAPIKeyInstead.Checked;
             labelAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
             tbAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
+            if (!cbUseAPIKeyInstead.Checked)
+                if (tbLogin.Text.Length == 0)
+                    tbLogin.Select();
+                else
+                {
+                    tbPassword.Select();
+                    tbPassword.SelectionStart = tbPassword.Text.Length;
+                }
+            else
+            {
+                tbAPIKey.Select();
+                tbAPIKey.SelectionStart = tbAPIKey.Text.Length;
+            }
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -101,7 +114,7 @@ namespace RedmineClient
                         case ErrorTypes.NoErrors:
                             this.Close();
                             break;
-                        case ErrorTypes.NoInternetConnection:
+                        case ErrorTypes.NetworkError:
                             MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             labelLogin.Enabled = !cbUseAPIKeyInstead.Checked;
                             tbLogin.Enabled = !cbUseAPIKeyInstead.Checked;
