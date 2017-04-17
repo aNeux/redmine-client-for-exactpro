@@ -17,8 +17,8 @@ C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\Re
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.MainForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.Properties.Resources.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.csproj.GenerateResource.Cache
-C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.ChangeAPIKeyForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.AboutForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.UserInformationForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.CreateNewIssueForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.ProjectInformation.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.AuthorizationForm.resources

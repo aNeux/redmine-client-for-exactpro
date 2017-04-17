@@ -19,7 +19,7 @@ namespace RedmineClient
             tbLastName.Text = Properties.Settings.Default.last_name;
             tbEmail.Text = Properties.Settings.Default.email;
             tbCreationDate.Text = Properties.Settings.Default.created_on.ToShortTimeString() + ", " + Properties.Settings.Default.created_on.ToShortDateString();
-            tbAPIKey.Text = Properties.Settings.Default.api_key;
+            tbAPIKey.Text = Utils.DecodeXOR(Properties.Settings.Default.api_key);
             labelInfo.Select();
         }
 

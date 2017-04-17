@@ -11,9 +11,8 @@ namespace RedmineClient
     {
         private Controller controller;
         private Project project;
-        public List<Tracker> trackers;
-        public List<Membership> memberships;
-
+        private List<Tracker> trackers;
+        private List<Membership> memberships;
         private bool isIssueCreated = false;
 
         public CreateNewIssueForm(Project project)
@@ -84,6 +83,16 @@ namespace RedmineClient
                     catch { }
                 newIssue.WatcherUserIDs = watcherUserIDs;
                 string jsonRequest = JsonConvert.SerializeObject(new NewIssueJSONObject() { NewIssue = newIssue }, Formatting.Indented);
+                tbProject.Enabled = false;
+                cbTracker.Enabled = false;
+                tbSubject.Enabled = false;
+                cbStatus.Enabled = false;
+                cbPriority.Enabled = false;
+                cbAssignee.Enabled = false;
+                tbDescription.Enabled = false;
+                cbIsPrivate.Enabled = false;
+                nudEstimatedTime.Enabled = false;
+                cblWatchers.Enabled = false;
                 btnCreateIssue.Enabled = false;
                 btnCancel.Enabled = false;
                 controller.CreateIssue(jsonRequest);
@@ -138,7 +147,7 @@ namespace RedmineClient
                         this.Close();
                         break;
                     case ErrorTypes.UnathorizedAccess:
-                        MessageBox.Show("Wrong API key. Please check entered data and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         break;
                 }
@@ -161,11 +170,33 @@ namespace RedmineClient
                         break;
                     case ErrorTypes.NoInternetConnection:
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        this.Close();
+                        tbProject.Enabled = true;
+                        cbTracker.Enabled = true;
+                        tbSubject.Enabled = true;
+                        cbStatus.Enabled = true;
+                        cbPriority.Enabled = true;
+                        cbAssignee.Enabled = true;
+                        tbDescription.Enabled = true;
+                        cbIsPrivate.Enabled = true;
+                        nudEstimatedTime.Enabled = true;
+                        cblWatchers.Enabled = true;
+                        btnCreateIssue.Enabled = true;
+                        btnCancel.Enabled = true;
                         break;
                     case ErrorTypes.UnathorizedAccess:
-                        MessageBox.Show("Wrong API key. Please check entered data and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        this.Close();
+                        MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        tbProject.Enabled = true;
+                        cbTracker.Enabled = true;
+                        tbSubject.Enabled = true;
+                        cbStatus.Enabled = true;
+                        cbPriority.Enabled = true;
+                        cbAssignee.Enabled = true;
+                        tbDescription.Enabled = true;
+                        cbIsPrivate.Enabled = true;
+                        nudEstimatedTime.Enabled = true;
+                        cblWatchers.Enabled = true;
+                        btnCreateIssue.Enabled = true;
+                        btnCancel.Enabled = true;
                         break;
                 }
             };

@@ -22,14 +22,16 @@ namespace RedmineClient
     {
         // URL-адрес Redmine сервера
         private string REDMINE_HOST = "http://student-rm.exactpro.com/";
+        // api-ключ для текущего пользователя
+        private string currentAPIKey;
 
         // Список проектов, в которых участвует текущий пользователь
         private List<Project> projects;
         // Список задач для выбранного проекта
         private List<Issue> issues;
 
-        // Событие, возникающее при изменении api-ключа
-        public event Action<ErrorTypes, bool> OnAPIKeyChanged;
+        // Событие, возникающее при авторизации пользователя
+        public event Action<ErrorTypes, bool> OnUserAuthenticated;
         // Событие, возникающее после обновления списка проектов, в которых участвует текущий пользователь
         public event Action<ErrorTypes, List<Project>> OnProjectsUpdated;
         // Событие, возникающее после обновления списка задач для выбранного проекта
@@ -39,11 +41,20 @@ namespace RedmineClient
         // Событие, возникающее после создания новой задачи
         public event Action<ErrorTypes> OnIssueCreated;
 
+        public Controller()
+        {
+            if (Properties.Settings.Default.api_key.Length != 0)
+                currentAPIKey = Utils.DecodeXOR(Properties.Settings.Default.api_key);
+            else
+                currentAPIKey = "";
+        }
+
         /// <summary>
-        /// Проверку заданного api-ключа на валидность с последующим сохранением его локально.
+        /// Авторизация пользователя в системе по логину и паролю или api-ключу.
         /// </summary>
-        /// <param name="APIKey">api-ключ текущего пользователя.</param>
-        public void ChangeAPIKey(string APIKey)
+        /// <param name="isAuthBasic">Тип авторизации.</param>
+        /// <param name="data">Подготовленная строка для Authorization Basic или api-ключ.</param>
+        public void Authorize(bool isAuthBasic, string data)
         {
             new Thread(delegate()
                 {
@@ -53,7 +64,10 @@ namespace RedmineClient
                         {
                             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "users/current.json");
                             request.Method = "GET";
-                            request.Headers.Add("X-Redmine-API-Key", APIKey);
+                            if (isAuthBasic)
+                                request.Headers.Add("Authorization", "Basic " + data);
+                            else
+                                request.Headers.Add("X-Redmine-API-Key", data);
                             request.Accept = "application/json";
                             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                             StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
@@ -61,30 +75,40 @@ namespace RedmineClient
                             response.Close();
                             streamReader.Close();
                             User currentUser = JsonConvert.DeserializeObject<UserJSONObject>(jsonResponse).User;
-                            Properties.Settings.Default.id = currentUser.ID;
-                            Properties.Settings.Default.login = currentUser.Login;
-                            Properties.Settings.Default.first_name = currentUser.FirstName;
-                            Properties.Settings.Default.last_name = currentUser.LastName;
-                            Properties.Settings.Default.email = currentUser.Email;
-                            Properties.Settings.Default.created_on = currentUser.CreatedOn;
-                            if (Properties.Settings.Default.api_key != APIKey)
+                            if (Properties.Settings.Default.api_key.Length == 0 || currentUser.ID != Properties.Settings.Default.id)
                             {
-                                Properties.Settings.Default.api_key = APIKey;
-                                if (OnAPIKeyChanged != null)
-                                    OnAPIKeyChanged(ErrorTypes.NoErrors, true);
+                                Properties.Settings.Default.id = currentUser.ID;
+                                Properties.Settings.Default.login = currentUser.Login;
+                                Properties.Settings.Default.first_name = currentUser.FirstName;
+                                Properties.Settings.Default.last_name = currentUser.LastName;
+                                Properties.Settings.Default.email = currentUser.Email;
+                                Properties.Settings.Default.created_on = currentUser.CreatedOn;
+                                Properties.Settings.Default.api_key = Utils.EncodeXOR(currentUser.APIKey);
+                                Properties.Settings.Default.Save();
+                                currentAPIKey = currentUser.APIKey;
+                                if (OnUserAuthenticated != null)
+                                    OnUserAuthenticated(ErrorTypes.NoErrors, true);
                             }
-                            else if (OnAPIKeyChanged != null)
-                                OnAPIKeyChanged(ErrorTypes.NoErrors, false);
-                            Properties.Settings.Default.Save();
+                            else
+                            {
+                                Properties.Settings.Default.first_name = currentUser.FirstName;
+                                Properties.Settings.Default.last_name = currentUser.LastName;
+                                Properties.Settings.Default.email = currentUser.Email;
+                                Properties.Settings.Default.api_key = Utils.EncodeXOR(currentUser.APIKey);
+                                Properties.Settings.Default.Save();
+                                currentAPIKey = currentUser.APIKey;
+                                if (OnUserAuthenticated != null)
+                                    OnUserAuthenticated(ErrorTypes.NoErrors, false);
+                            }
                         }
                         catch (Exception ex)
                         {
-                            if (ex.Message.Contains("401") && OnAPIKeyChanged != null)
-                                OnAPIKeyChanged(ErrorTypes.UnathorizedAccess, false);
+                            if (ex.Message.Contains("401") && OnUserAuthenticated != null)
+                                OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
                         }
                     }
-                    else if (OnAPIKeyChanged != null)
-                        OnAPIKeyChanged(ErrorTypes.NoInternetConnection, false);
+                    else if (OnUserAuthenticated != null)
+                        OnUserAuthenticated(ErrorTypes.NoInternetConnection, false);
                 }).Start();
         }
 
@@ -110,7 +134,7 @@ namespace RedmineClient
                             {
                                 request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json?offset=" + offset);
                                 request.Method = "GET";
-                                request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_key);
+                                request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                                 request.Accept = "application/json";
                                 response = (HttpWebResponse)request.GetResponse();
                                 streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
@@ -156,9 +180,9 @@ namespace RedmineClient
                             int offset = 0;
                             do
                             {
-                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?offset=" + offset);
+                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?project_id=" + projectID + "&offset=" + offset);
                                 request.Method = "GET";
-                                request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_key);
+                                request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                                 request.Accept = "application/json";
                                 response = (HttpWebResponse)request.GetResponse();
                                 streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
@@ -169,7 +193,6 @@ namespace RedmineClient
                                 issues.AddRange(issuesJSONObject.Issues);
                                 offset += issuesJSONObject.Limit;
                             } while (issuesJSONObject.Issues.Count != 0);
-                            issues.RemoveAll(temp => temp.Project.ID != projectID);
                             // Получаем также список участников проекта для последующего вычисления ролей в нем текущего пользователя
                             List<Membership> memberships = new List<Membership>();
                             MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
@@ -178,7 +201,7 @@ namespace RedmineClient
                             {
                                 request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
                                 request.Method = "GET";
-                                request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_key);
+                                request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                                 request.Accept = "application/json";
                                 response = (HttpWebResponse)request.GetResponse();
                                 streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
@@ -235,7 +258,7 @@ namespace RedmineClient
                             // Получаем список трекеров (типов задачи)
                             request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "trackers.json");
                             request.Method = "GET";
-                            request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_key);
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                             request.Accept = "application/json";
                             response = (HttpWebResponse)request.GetResponse();
                             streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
@@ -246,7 +269,7 @@ namespace RedmineClient
                             // Получаем список приоритетов задачи
                             request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "enumerations/issue_priorities.json");
                             request.Method = "GET";
-                            request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_key);
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                             request.Accept = "application/json";
                             response = (HttpWebResponse)request.GetResponse();
                             streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
@@ -262,7 +285,7 @@ namespace RedmineClient
                             {
                                 request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
                                 request.Method = "GET";
-                                request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_key);
+                                request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                                 request.Accept = "application/json";
                                 response = (HttpWebResponse)request.GetResponse();
                                 streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
@@ -302,7 +325,7 @@ namespace RedmineClient
                         {
                             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json");
                             request.Method = "POST";
-                            request.Headers.Add("X-Redmine-API-Key", Properties.Settings.Default.api_key);
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                             request.ContentType = "application/json";
                             StreamWriter streamWriter = new StreamWriter(request.GetRequestStream());
                             streamWriter.Write(jsonRequest);

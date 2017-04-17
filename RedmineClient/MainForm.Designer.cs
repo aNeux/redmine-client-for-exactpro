@@ -36,7 +36,7 @@
             this.refreshStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.changeAPIKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reAuthenticateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.userInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.labelSelectProject = new System.Windows.Forms.Label();
@@ -46,6 +46,7 @@
             this.columnHeaderSubject = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderTracker = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderLastUpdate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnProjectInfo = new System.Windows.Forms.Button();
             this.contextMenuIssue = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -56,7 +57,7 @@
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuNotifyIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.exitFromNotifyIconToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.columnHeaderPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.logOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.contextMenuIssue.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -67,7 +68,8 @@
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.toolsToolStripMenuItem});
+            this.toolsToolStripMenuItem,
+            this.logOutToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size(496, 24);
@@ -109,19 +111,19 @@
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.changeAPIKeyToolStripMenuItem,
+            this.reAuthenticateToolStripMenuItem,
             this.userInformationToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
-            // changeAPIKeyToolStripMenuItem
+            // reAuthenticateToolStripMenuItem
             // 
-            this.changeAPIKeyToolStripMenuItem.Name = "changeAPIKeyToolStripMenuItem";
-            this.changeAPIKeyToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
-            this.changeAPIKeyToolStripMenuItem.Text = "Change API key";
-            this.changeAPIKeyToolStripMenuItem.Click += new System.EventHandler(this.changeAPITokenToolStripMenuItem_Click);
+            this.reAuthenticateToolStripMenuItem.Name = "reAuthenticateToolStripMenuItem";
+            this.reAuthenticateToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.reAuthenticateToolStripMenuItem.Text = "Re-authenticate";
+            this.reAuthenticateToolStripMenuItem.Click += new System.EventHandler(this.changeAPITokenToolStripMenuItem_Click);
             // 
             // userInformationToolStripMenuItem
             // 
@@ -202,6 +204,11 @@
             this.columnHeaderStatus.Text = "Status";
             this.columnHeaderStatus.Width = 62;
             // 
+            // columnHeaderPriority
+            // 
+            this.columnHeaderPriority.Text = "Priority";
+            this.columnHeaderPriority.Width = 62;
+            // 
             // columnHeaderLastUpdate
             // 
             this.columnHeaderLastUpdate.Text = "Last update";
@@ -278,10 +285,12 @@
             this.exitFromNotifyIconToolStripMenuItem.Text = "Exit";
             this.exitFromNotifyIconToolStripMenuItem.Click += new System.EventHandler(this.exitFromNotifyIconToolStripMenuItem_Click);
             // 
-            // columnHeaderPriority
+            // logOutToolStripMenuItem
             // 
-            this.columnHeaderPriority.Text = "Priority";
-            this.columnHeaderPriority.Width = 62;
+            this.logOutToolStripMenuItem.Name = "logOutToolStripMenuItem";
+            this.logOutToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
+            this.logOutToolStripMenuItem.Text = "Log out";
+            this.logOutToolStripMenuItem.Click += new System.EventHandler(this.logOutToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -319,7 +328,7 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem changeAPIKeyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem reAuthenticateToolStripMenuItem;
         private System.Windows.Forms.Label labelSelectProject;
         private System.Windows.Forms.ComboBox cbProjects;
         private System.Windows.Forms.ListView lvIssues;
@@ -342,6 +351,7 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuNotifyIcon;
         private System.Windows.Forms.ToolStripMenuItem exitFromNotifyIconToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader columnHeaderPriority;
+        private System.Windows.Forms.ToolStripMenuItem logOutToolStripMenuItem;
     }
 }
 

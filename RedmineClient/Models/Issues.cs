@@ -40,6 +40,10 @@ namespace RedmineClient.Models
         public string Subject { set; get; }
         [JsonProperty("description")]
         public string Description { set; get; }
+        [JsonProperty("start_date")]
+        public DateTime StartDate { set; get; }
+        [JsonProperty("done_ratio")]
+        public int DoneRatio { set; get; }
         [JsonProperty("created_on")]
         public DateTime CreatedOn { set; get; }
         [JsonProperty("updated_on")]

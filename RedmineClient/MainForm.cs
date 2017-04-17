@@ -22,7 +22,7 @@ namespace RedmineClient
         {
             cbProjects.SelectedIndex = 0;
             controller = Program.controllerGlobal;
-            controller.OnAPIKeyChanged += controller_OnAPIKeyChanged;
+            controller.OnUserAuthenticated += controller_OnAPIKeyChanged;
             controller.OnProjectsUpdated += controller_OnProjectsUpdated;
             controller.OnIssuesUpdated += controller_OnIssuesUpdated;
             controller.OnIssueCreated += controller_OnIssueCreated;
@@ -37,7 +37,7 @@ namespace RedmineClient
                 var dialogResult = MessageBox.Show("Are you sure you want to exit?", "Exiting", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    controller.OnAPIKeyChanged -= controller_OnAPIKeyChanged;
+                    controller.OnUserAuthenticated -= controller_OnAPIKeyChanged;
                     controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
                     controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
                     controller.OnIssueCreated -= controller_OnIssueCreated;
@@ -47,7 +47,7 @@ namespace RedmineClient
             }
             else
             {
-                controller.OnAPIKeyChanged -= controller_OnAPIKeyChanged;
+                controller.OnUserAuthenticated -= controller_OnAPIKeyChanged;
                 controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
                 controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
                 controller.OnIssueCreated -= controller_OnIssueCreated;
@@ -72,7 +72,7 @@ namespace RedmineClient
 
         private void changeAPITokenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new ChangeAPIKeyForm().ShowDialog();
+            new AuthorizationForm().ShowDialog();
         }
 
         private void userInformationToolStripMenuItem_Click(object sender, EventArgs e)
@@ -85,6 +85,16 @@ namespace RedmineClient
             new AboutForm().ShowDialog();
         }
 
+        private void logOutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dialogResult = MessageBox.Show("Do you really want to log out and exit the program?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dialogResult == DialogResult.Yes)
+            {
+                Properties.Settings.Default.Reset();
+                Application.Exit();
+            }
+        }
+
         private void exitFromNotifyIconToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -92,6 +102,7 @@ namespace RedmineClient
 
         private void cbSelectProject_SelectedIndexChanged(object sender, EventArgs e)
         {
+            btnProjectInfo.Enabled = false;
             if (cbProjects.SelectedIndex != 0)
             {
                 btnProjectInfo.Visible = true;
@@ -182,11 +193,11 @@ namespace RedmineClient
                             MessageBox.Show("Cannot connect to Redmine services and load projects. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
-                            toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (wrong API key)";
+                            toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                             if (Properties.Settings.Default.api_key.Length == 0)
-                                new ChangeAPIKeyForm().ShowDialog();
+                                new AuthorizationForm().ShowDialog();
                             else
-                                MessageBox.Show("You have wrong API key. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                     }
                 };
@@ -216,6 +227,7 @@ namespace RedmineClient
                             }
                             selectedProjectRoles = projectRoles;
                             newIssueToolStripMenuItem.Enabled = selectedProjectRoles.Contains("Manager") && controller.GetProject(lastSelectedProjectID).Status == 1;
+                            btnProjectInfo.Enabled = true;
                             labelProjectRoles.Text = "Roles: " + selectedProjectRoles;
                             toolStripStatusLabel.Text = "Issues was updated at " + DateTime.Now.ToShortTimeString();
                             break;
@@ -224,11 +236,11 @@ namespace RedmineClient
                             MessageBox.Show("Cannot connect to Redmine services and load issues. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
-                            toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (wrong API key)";
+                            toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                             if (Properties.Settings.Default.api_key.Length == 0)
-                                new ChangeAPIKeyForm().ShowDialog();
+                                new AuthorizationForm().ShowDialog();
                             else
-                                MessageBox.Show("You have wrong API key. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                     }
                 };
