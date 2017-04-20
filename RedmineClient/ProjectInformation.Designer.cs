@@ -46,6 +46,9 @@
             this.tbLastUpdate = new System.Windows.Forms.TextBox();
             this.lbMembers = new System.Windows.Forms.ListBox();
             this.btnClose = new System.Windows.Forms.Button();
+            this.tbHomepage = new System.Windows.Forms.TextBox();
+            this.labelHomepage = new System.Windows.Forms.Label();
+            this.cbIsPublic = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // labelID
@@ -88,34 +91,34 @@
             this.labelDescription.Location = new System.Drawing.Point(240, 11);
             this.labelDescription.Name = "labelDescription";
             this.labelDescription.Size = new System.Drawing.Size(81, 20);
-            this.labelDescription.TabIndex = 12;
+            this.labelDescription.TabIndex = 14;
             this.labelDescription.Text = "Description:";
             this.labelDescription.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // labelStatus
             // 
-            this.labelStatus.Location = new System.Drawing.Point(12, 89);
+            this.labelStatus.Location = new System.Drawing.Point(12, 115);
             this.labelStatus.Name = "labelStatus";
             this.labelStatus.Size = new System.Drawing.Size(74, 20);
-            this.labelStatus.TabIndex = 6;
+            this.labelStatus.TabIndex = 8;
             this.labelStatus.Text = "Status:";
             this.labelStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // labelCreatingDate
             // 
-            this.labelCreatingDate.Location = new System.Drawing.Point(12, 115);
+            this.labelCreatingDate.Location = new System.Drawing.Point(12, 141);
             this.labelCreatingDate.Name = "labelCreatingDate";
             this.labelCreatingDate.Size = new System.Drawing.Size(73, 20);
-            this.labelCreatingDate.TabIndex = 8;
+            this.labelCreatingDate.TabIndex = 10;
             this.labelCreatingDate.Text = "Creation date:";
             this.labelCreatingDate.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // labelLastUpdate
             // 
-            this.labelLastUpdate.Location = new System.Drawing.Point(12, 140);
+            this.labelLastUpdate.Location = new System.Drawing.Point(12, 166);
             this.labelLastUpdate.Name = "labelLastUpdate";
             this.labelLastUpdate.Size = new System.Drawing.Size(73, 20);
-            this.labelLastUpdate.TabIndex = 10;
+            this.labelLastUpdate.TabIndex = 12;
             this.labelLastUpdate.Text = "Last update:";
             this.labelLastUpdate.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -124,7 +127,7 @@
             this.labelMembers.Location = new System.Drawing.Point(241, 81);
             this.labelMembers.Name = "labelMembers";
             this.labelMembers.Size = new System.Drawing.Size(81, 20);
-            this.labelMembers.TabIndex = 14;
+            this.labelMembers.TabIndex = 16;
             this.labelMembers.Text = "Members:";
             this.labelMembers.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -152,55 +155,88 @@
             this.tbDescription.ReadOnly = true;
             this.tbDescription.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.tbDescription.Size = new System.Drawing.Size(167, 46);
-            this.tbDescription.TabIndex = 13;
+            this.tbDescription.TabIndex = 15;
             // 
             // tbStatus
             // 
-            this.tbStatus.Location = new System.Drawing.Point(92, 89);
+            this.tbStatus.Location = new System.Drawing.Point(92, 115);
             this.tbStatus.Name = "tbStatus";
             this.tbStatus.ReadOnly = true;
             this.tbStatus.Size = new System.Drawing.Size(125, 20);
-            this.tbStatus.TabIndex = 7;
+            this.tbStatus.TabIndex = 9;
             // 
             // tbCreationDate
             // 
-            this.tbCreationDate.Location = new System.Drawing.Point(91, 115);
+            this.tbCreationDate.Location = new System.Drawing.Point(91, 141);
             this.tbCreationDate.Name = "tbCreationDate";
             this.tbCreationDate.ReadOnly = true;
             this.tbCreationDate.Size = new System.Drawing.Size(125, 20);
-            this.tbCreationDate.TabIndex = 9;
+            this.tbCreationDate.TabIndex = 11;
             // 
             // tbLastUpdate
             // 
-            this.tbLastUpdate.Location = new System.Drawing.Point(91, 141);
+            this.tbLastUpdate.Location = new System.Drawing.Point(91, 167);
             this.tbLastUpdate.Name = "tbLastUpdate";
             this.tbLastUpdate.ReadOnly = true;
             this.tbLastUpdate.Size = new System.Drawing.Size(125, 20);
-            this.tbLastUpdate.TabIndex = 11;
+            this.tbLastUpdate.TabIndex = 13;
             // 
             // lbMembers
             // 
+            this.lbMembers.Enabled = false;
             this.lbMembers.FormattingEnabled = true;
             this.lbMembers.Location = new System.Drawing.Point(235, 102);
             this.lbMembers.Name = "lbMembers";
             this.lbMembers.Size = new System.Drawing.Size(167, 56);
-            this.lbMembers.TabIndex = 15;
+            this.lbMembers.TabIndex = 17;
             // 
             // btnClose
             // 
-            this.btnClose.Location = new System.Drawing.Point(145, 168);
+            this.btnClose.Enabled = false;
+            this.btnClose.Location = new System.Drawing.Point(145, 195);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(129, 23);
-            this.btnClose.TabIndex = 16;
+            this.btnClose.TabIndex = 19;
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
+            // tbHomepage
+            // 
+            this.tbHomepage.Location = new System.Drawing.Point(92, 89);
+            this.tbHomepage.Name = "tbHomepage";
+            this.tbHomepage.ReadOnly = true;
+            this.tbHomepage.Size = new System.Drawing.Size(125, 20);
+            this.tbHomepage.TabIndex = 7;
+            // 
+            // labelHomepage
+            // 
+            this.labelHomepage.Location = new System.Drawing.Point(12, 89);
+            this.labelHomepage.Name = "labelHomepage";
+            this.labelHomepage.Size = new System.Drawing.Size(74, 20);
+            this.labelHomepage.TabIndex = 6;
+            this.labelHomepage.Text = "Homepage:";
+            this.labelHomepage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // cbIsPublic
+            // 
+            this.cbIsPublic.AutoSize = true;
+            this.cbIsPublic.Enabled = false;
+            this.cbIsPublic.Location = new System.Drawing.Point(235, 169);
+            this.cbIsPublic.Name = "cbIsPublic";
+            this.cbIsPublic.Size = new System.Drawing.Size(65, 17);
+            this.cbIsPublic.TabIndex = 18;
+            this.cbIsPublic.Text = "Is public";
+            this.cbIsPublic.UseVisualStyleBackColor = true;
             // 
             // ProjectInformation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(414, 200);
+            this.ClientSize = new System.Drawing.Size(414, 227);
+            this.Controls.Add(this.cbIsPublic);
+            this.Controls.Add(this.tbHomepage);
+            this.Controls.Add(this.labelHomepage);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.lbMembers);
             this.Controls.Add(this.tbLastUpdate);
@@ -219,11 +255,13 @@
             this.Controls.Add(this.tbID);
             this.Controls.Add(this.labelID);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ProjectInformation";
-            this.Text = "Project Information";
+            this.ShowInTaskbar = false;
+            this.Text = "Project Information [please, wait..]";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ProjectInformation_FormClosing);
             this.Shown += new System.EventHandler(this.ProjectInformation_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -249,5 +287,8 @@
         private System.Windows.Forms.TextBox tbLastUpdate;
         private System.Windows.Forms.ListBox lbMembers;
         private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.TextBox tbHomepage;
+        private System.Windows.Forms.Label labelHomepage;
+        private System.Windows.Forms.CheckBox cbIsPublic;
     }
 }

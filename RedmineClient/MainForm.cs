@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using RedmineClient.Models;
@@ -10,7 +11,7 @@ namespace RedmineClient
     {
         private Controller controller;
         private long lastSelectedProjectID = -1;
-        private string selectedProjectRoles = null;
+        private int lastSortedColumn = -1;
 
         public MainForm()
         {
@@ -26,6 +27,7 @@ namespace RedmineClient
             controller.OnProjectsUpdated += controller_OnProjectsUpdated;
             controller.OnIssuesUpdated += controller_OnIssuesUpdated;
             controller.OnIssueCreated += controller_OnIssueCreated;
+            controller.OnIssueRemoved += controller_OnIssueRemoved;
             controller.UpdateProjects();
             toolStripStatusLabel.Text = "Updating projects..";
         }
@@ -41,6 +43,7 @@ namespace RedmineClient
                     controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
                     controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
                     controller.OnIssueCreated -= controller_OnIssueCreated;
+                    controller.OnIssueRemoved += controller_OnIssueRemoved;
                 }
                 else
                     e.Cancel = true;
@@ -51,6 +54,7 @@ namespace RedmineClient
                 controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
                 controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
                 controller.OnIssueCreated -= controller_OnIssueCreated;
+                controller.OnIssueRemoved += controller_OnIssueRemoved;
             }
         }
 
@@ -102,21 +106,24 @@ namespace RedmineClient
 
         private void cbSelectProject_SelectedIndexChanged(object sender, EventArgs e)
         {
-            btnProjectInfo.Enabled = false;
             if (cbProjects.SelectedIndex != 0)
             {
                 btnProjectInfo.Visible = true;
-                string projectName = cbProjects.SelectedItem.ToString();
-                long projectID = long.Parse(projectName.Substring(1, projectName.IndexOf(":") - 1));
-                lastSelectedProjectID = projectID;
-                controller.UpdateIssues(projectID);
+                if (lastSelectedProjectID != (long)(cbProjects.SelectedItem as TextAndValueItem).Value)
+                {
+                    lastSelectedProjectID = (long)(cbProjects.SelectedItem as TextAndValueItem).Value;
+                    lvIssues.Items.Clear();
+                }
+                Project currentProject = controller.GetProject(lastSelectedProjectID);
+                createNewIssueToolStripMenuItem.Enabled = currentProject.Roles.Contains("Manager") && currentProject.Status == 1;
+                labelProjectRoles.Text = "Roles: " + currentProject.Roles;
+                controller.UpdateIssues(lastSelectedProjectID);
                 toolStripStatusLabel.Text = "Updating issues..";
             }
             else
             {
                 lastSelectedProjectID = -1;
-                selectedProjectRoles = null;
-                newIssueToolStripMenuItem.Enabled = false;
+                createNewIssueToolStripMenuItem.Enabled = false;
                 btnProjectInfo.Visible = false;
                 labelProjectRoles.Text = "";
                 lvIssues.Items.Clear();
@@ -125,7 +132,12 @@ namespace RedmineClient
 
         private void btnProjectInfo_Click(object sender, EventArgs e)
         {
-            new ProjectInformation(controller.GetProject(lastSelectedProjectID)).ShowDialog();
+            new ProjectInformation(lastSelectedProjectID).ShowDialog();
+        }
+
+        private void lvIssues_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            
         }
 
         private void lvIssues_MouseClick(object sender, MouseEventArgs e)
@@ -136,17 +148,7 @@ namespace RedmineClient
 
         private void issueInfotoolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Issue issue = controller.GetIssue(long.Parse(lvIssues.FocusedItem.SubItems[0].Text));
-            string issueInfo = "Project: " + issue.Project.Name + "\n"
-                + "ID: " + issue.ID + "\n"
-                + "Subject: " + issue.Subject + "\n"
-                + "Tracker: " + issue.Tracker.Name + "\n"
-                + "Author: " + issue.Author.Name + "\n"
-                + "Status: " + issue.Status.Name + "\n"
-                + "Priority: " + issue.Priority.Name + "\n"
-                + "Description: " + issue.Description + "\n"
-                + "Created on: " + issue.CreatedOn.Hour + ":" + issue.CreatedOn.Minute + ", " + issue.CreatedOn.Day + " " + issue.CreatedOn.Month + " " + issue.CreatedOn.Year;
-            MessageBox.Show(issueInfo, "Info about issue \"" + issue.Subject + "\"");
+            new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProject(lastSelectedProjectID).Roles).ShowDialog();
         }
 
         private void controller_OnUserAuthenticated(ErrorTypes error, bool isUserChanged)
@@ -180,7 +182,10 @@ namespace RedmineClient
                             int indexToSelect = 0;
                             for (int i = 0; i < projects.Count; i++)
                             {
-                                cbProjects.Items.Add("#" + projects[i].ID + ": " + projects[i].Name);
+                                if (projects[i].Parent == null)
+                                    cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name, Value = projects[i].ID });
+                                else
+                                    cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name, Value = projects[i].ID });
                                 if (lastSelectedProjectID == projects[i].ID)
                                     indexToSelect = i + 1;
                             }
@@ -211,14 +216,14 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnIssuesUpdated(ErrorTypes error, List<Issue> issues, string projectRoles)
+        private void controller_OnIssuesUpdated(ErrorTypes error, List<Issue> issues)
         {
             Action action = () =>
                 {
+                    lvIssues.Items.Clear();
                     switch (error)
                     {
                         case ErrorTypes.NoErrors:
-                            lvIssues.Items.Clear();
                             foreach (Issue issue in issues)
                             {
                                 ListViewItem lvi = new ListViewItem(issue.ID + "");
@@ -229,10 +234,6 @@ namespace RedmineClient
                                 lvi.SubItems.Add(issue.UpdatedOn.ToShortTimeString() + ", " + issue.UpdatedOn.ToShortDateString());
                                 lvIssues.Items.Add(lvi);
                             }
-                            selectedProjectRoles = projectRoles;
-                            newIssueToolStripMenuItem.Enabled = selectedProjectRoles.Contains("Manager") && controller.GetProject(lastSelectedProjectID).Status == 1;
-                            btnProjectInfo.Enabled = true;
-                            labelProjectRoles.Text = "Roles: " + selectedProjectRoles;
                             toolStripStatusLabel.Text = "Issues was updated at " + DateTime.Now.ToShortTimeString();
                             break;
                         case ErrorTypes.NetworkError:
@@ -260,7 +261,31 @@ namespace RedmineClient
 
         private void controller_OnIssueCreated(ErrorTypes error)
         {
-            controller.UpdateIssues(lastSelectedProjectID);
+            if (error == ErrorTypes.NoErrors)
+                controller.UpdateIssues(lastSelectedProjectID);
+        }
+
+        private void controller_OnIssueRemoved(ErrorTypes error)
+        {
+            if (error == ErrorTypes.NoErrors)
+                controller.UpdateIssues(lastSelectedProjectID);
+        }
+    }
+
+    class ListViewItemComparer : IComparer
+    {
+        private int column;
+        private SortOrder sortOrder;
+
+        public ListViewItemComparer(int column, SortOrder sortOrder)
+        {
+            this.column = column;
+            this.sortOrder = sortOrder;
+        }
+
+        public int Compare(object x, object y)
+        {
+            return 0;
         }
     }
 }

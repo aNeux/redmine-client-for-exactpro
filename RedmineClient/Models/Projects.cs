@@ -20,6 +20,15 @@ namespace RedmineClient.Models
     }
 
     /// <summary>
+    /// Класс для парсера, представляющий информацию об одном определенном проекте.
+    /// </summary>
+    public class ProjectJSONObject
+    {
+        [JsonProperty("project")]
+        public Project Project { set; get; }
+    }
+
+    /// <summary>
     /// Класс, представляющий информацию об определенном проекте.
     /// </summary>
     public class Project
@@ -32,6 +41,10 @@ namespace RedmineClient.Models
         public string Identifier { set; get; }
         [JsonProperty("description")]
         public string Description { set; get; }
+        [JsonProperty("parent")]
+        public Project Parent { set; get; }
+        [JsonProperty("homepage")]
+        public string Homepage { set; get; }
         [JsonProperty("status")]
         public int Status { set; get; }
         [JsonProperty("is_public")]
@@ -40,6 +53,6 @@ namespace RedmineClient.Models
         public DateTime CreatedOn { set; get; }
         [JsonProperty("updated_on")]
         public DateTime UpdatedOn { set; get; }
-        public List<Membership> Memberships { set; get; }
+        public string Roles { set; get; }
     }
 }

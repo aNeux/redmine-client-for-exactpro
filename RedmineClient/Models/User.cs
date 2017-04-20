@@ -19,6 +19,8 @@ namespace RedmineClient.Models
     {
         [JsonProperty("id")]
         public long ID { set; get; }
+        [JsonProperty("name")]
+        public string Name { set; get; }
         [JsonProperty("login")]
         public string Login { set; get; }
         [JsonProperty("firstname")]

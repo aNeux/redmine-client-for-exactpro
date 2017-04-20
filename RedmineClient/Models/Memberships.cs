@@ -29,20 +29,9 @@ namespace RedmineClient.Models
         [JsonProperty("project")]
         public Project Project { set; get; }
         [JsonProperty("user")]
-        public Member Member { set; get; }
+        public User User { set; get; }
         [JsonProperty("roles")]
         public List<Role> Roles { set; get; }
-    }
-
-    /// <summary>
-    /// Класс, представляющий информацию о пользователе, участвующем в определенном проекте.
-    /// </summary>
-    public class Member
-    {
-        [JsonProperty("id")]
-        public long ID { set; get; }
-        [JsonProperty("name")]
-        public string Name { set; get; }
     }
 
     /// <summary>

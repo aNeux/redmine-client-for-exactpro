@@ -11,8 +11,6 @@ namespace RedmineClient
     {
         private Controller controller;
         private Project project;
-        private List<Tracker> trackers;
-        private List<Membership> memberships;
         private bool isIssueCreated = false;
 
         public CreateNewIssueForm(Project project)
@@ -59,34 +57,22 @@ namespace RedmineClient
             {
                 NewIssue newIssue = new NewIssue();
                 newIssue.ProjectID = project.ID;
-                newIssue.TrackerID = trackers.Single(temp => temp.Name == cbTracker.SelectedItem.ToString()).ID;
+                newIssue.TrackerID = (int)(cbTracker.SelectedItem as TextAndValueItem).Value;
                 newIssue.Subject = tbSubject.Text;
                 newIssue.StatusID = 1;
-                newIssue.PriorityID = cbPriority.SelectedIndex + 1;
-                try
-                {
-                    newIssue.AssignedToID = memberships.Single(temp => temp.Member.Name == cbAssignee.SelectedItem.ToString()).Member.ID;
-                }
-                catch
-                {
-                    newIssue.AssignedToID = -1;
-                }
+                newIssue.PriorityID = (int)(cbPriority.SelectedItem as TextAndValueItem).Value;
+                newIssue.AssignedToID = cbAssignee.SelectedIndex > 0 ? (long)(cbAssignee.SelectedItem as TextAndValueItem).Value : -1;
                 newIssue.Description = tbDescription.Text;
                 newIssue.IsPrivate = cbIsPrivate.Checked;
                 newIssue.EstimatedHours = (int)nudEstimatedTime.Value;
                 List<long> watcherUserIDs = new List<long>();
                 foreach (var currentUser in cblWatchers.CheckedItems)
-                    try
-                    {
-                        watcherUserIDs.Add(memberships.Single(temp => temp.Member.Name == currentUser.ToString()).Member.ID);
-                    }
-                    catch { }
+                    watcherUserIDs.Add((long)(currentUser as TextAndValueItem).Value);
                 newIssue.WatcherUserIDs = watcherUserIDs;
                 string jsonRequest = JsonConvert.SerializeObject(new NewIssueJSONObject() { NewIssue = newIssue }, Formatting.Indented);
                 tbProject.Enabled = false;
                 cbTracker.Enabled = false;
                 tbSubject.Enabled = false;
-                cbStatus.Enabled = false;
                 cbPriority.Enabled = false;
                 cbAssignee.Enabled = false;
                 tbDescription.Enabled = false;
@@ -95,6 +81,7 @@ namespace RedmineClient
                 cblWatchers.Enabled = false;
                 btnCreateIssue.Enabled = false;
                 btnCancel.Enabled = false;
+                this.Text = "Create new issue [please, wait..]";
                 controller.CreateIssue(jsonRequest);
             }
         }
@@ -104,26 +91,23 @@ namespace RedmineClient
             this.Close();
         }
 
-        private void controller_OnPreparedToCreateNewIssue(ErrorTypes error, List<Tracker> trackers, List<IssuePriority> issuePriorities, List<Membership> memberships)
+        private void controller_OnPreparedToCreateNewIssue(ErrorTypes error, List<IssueTracker> issueTrackers, List<IssuePriority> issuePriorities, List<Membership> memberships)
         {
             Action action = () =>
             {
                 switch (error)
                 {
                     case ErrorTypes.NoErrors:
-                        this.trackers = trackers;
-                        this.memberships = memberships;
                         tbProject.Text = project.Name;
-                        foreach (Tracker tracker in trackers)
-                            cbTracker.Items.Add(tracker.Name);
-                        foreach (IssuePriority issuePriority in issuePriorities)
-                            cbPriority.Items.Add(issuePriority.Name);
+                        foreach (IssueTracker tracker in issueTrackers)
+                            cbTracker.Items.Add(new TextAndValueItem { Text = tracker.Name, Value = tracker.ID });
+                        foreach (IssuePriority priority in issuePriorities)
+                            cbPriority.Items.Add(new TextAndValueItem { Text = priority.Name, Value = priority.ID });
                         foreach (Membership membership in memberships)
-                            if (membership.Member != null)
-                            {
-                                cbAssignee.Items.Add(membership.Member.Name);
-                                cblWatchers.Items.Add(membership.Member.Name);
-                            }
+                        {
+                            cbAssignee.Items.Add(new TextAndValueItem { Text = membership.User.Name, Value = membership.User.ID });
+                            cblWatchers.Items.Add(new TextAndValueItem { Text = membership.User.Name, Value = membership.User.ID });
+                        }
                         cbTracker.SelectedIndex = 0;
                         cbStatus.SelectedIndex = 0;
                         cbPriority.SelectedIndex = 0;
@@ -131,7 +115,6 @@ namespace RedmineClient
                         tbProject.Enabled = true;
                         cbTracker.Enabled = true;
                         tbSubject.Enabled = true;
-                        cbStatus.Enabled = true;
                         cbPriority.Enabled = true;
                         cbAssignee.Enabled = true;
                         tbDescription.Enabled = true;
@@ -177,7 +160,6 @@ namespace RedmineClient
                         tbProject.Enabled = true;
                         cbTracker.Enabled = true;
                         tbSubject.Enabled = true;
-                        cbStatus.Enabled = true;
                         cbPriority.Enabled = true;
                         cbAssignee.Enabled = true;
                         tbDescription.Enabled = true;
@@ -186,13 +168,13 @@ namespace RedmineClient
                         cblWatchers.Enabled = true;
                         btnCreateIssue.Enabled = true;
                         btnCancel.Enabled = true;
+                        this.Text = "Create new issue";
                         break;
                     case ErrorTypes.UnathorizedAccess:
                         MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbProject.Enabled = true;
                         cbTracker.Enabled = true;
                         tbSubject.Enabled = true;
-                        cbStatus.Enabled = true;
                         cbPriority.Enabled = true;
                         cbAssignee.Enabled = true;
                         tbDescription.Enabled = true;
@@ -201,13 +183,13 @@ namespace RedmineClient
                         cblWatchers.Enabled = true;
                         btnCreateIssue.Enabled = true;
                         btnCancel.Enabled = true;
+                        this.Text = "Create new issue";
                         break;
                     case ErrorTypes.UnknownError:
                         MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbProject.Enabled = true;
                         cbTracker.Enabled = true;
                         tbSubject.Enabled = true;
-                        cbStatus.Enabled = true;
                         cbPriority.Enabled = true;
                         cbAssignee.Enabled = true;
                         tbDescription.Enabled = true;
@@ -216,6 +198,7 @@ namespace RedmineClient
                         cblWatchers.Enabled = true;
                         btnCreateIssue.Enabled = true;
                         btnCancel.Enabled = true;
+                        this.Text = "Create new issue";
                         break;
                 }
             };

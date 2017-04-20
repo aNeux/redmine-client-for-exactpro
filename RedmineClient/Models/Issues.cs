@@ -20,6 +20,15 @@ namespace RedmineClient.Models
     }
 
     /// <summary>
+    /// Класс для парсера, представляющий информацию об одной определенной задаче.
+    /// </summary>
+    public class IssueJSONObject
+    {
+        [JsonProperty("issue")]
+        public Issue Issue { set; get; }
+    }
+
+    /// <summary>
     /// Класс, представляющий информацию о задаче.
     /// </summary>
     public class Issue
@@ -29,13 +38,15 @@ namespace RedmineClient.Models
         [JsonProperty("project")]
         public Project Project { set; get; }
         [JsonProperty("tracker")]
-        public Tracker Tracker { set; get; }
+        public IssueTracker Tracker { set; get; }
         [JsonProperty("status")]
         public IssueStatus Status { set; get; }
         [JsonProperty("priority")]
-        public Priority Priority { set; get; }
+        public IssuePriority Priority { set; get; }
         [JsonProperty("author")]
-        public Author Author { set; get; }
+        public User Author { set; get; }
+        [JsonProperty("assigned_to")]
+        public User AssignedTo { set; get; }
         [JsonProperty("subject")]
         public string Subject { set; get; }
         [JsonProperty("description")]
@@ -48,27 +59,41 @@ namespace RedmineClient.Models
         public DateTime CreatedOn { set; get; }
         [JsonProperty("updated_on")]
         public DateTime UpdatedOn { set; get; }
+        [JsonProperty("closed_on")]
+        public DateTime ClosedOn { set; get; }
+        [JsonProperty("journals")]
+        public List<Journal> Journals { set; get; }
     }
 
     /// <summary>
-    /// Класс, представляющий информацию о приоритете задачи.
+    /// Класс, представляющий один элемент истории изменения задачи.
     /// </summary>
-    public class Priority
+    public class Journal
     {
         [JsonProperty("id")]
         public long ID { set; get; }
-        [JsonProperty("name")]
-        public string Name { set; get; }
+        [JsonProperty("user")]
+        public User User { set; get; }
+        [JsonProperty("notes")]
+        public string Notes { set; get; }
+        [JsonProperty("created_on")]
+        public DateTime CreatedOn { set; get; }
+        [JsonProperty("details")]
+        public List<JournalDetail> Details { set; get; }
     }
 
     /// <summary>
-    /// Класс, представляющий информацию об авторе задачи.
+    /// Класс, представляющий один элемент из деталей истории изменения задачи.
     /// </summary>
-    public class Author
+    public class JournalDetail
     {
-        [JsonProperty("id")]
-        public long ID { set; get; }
+        [JsonProperty("property")]
+        public string Property { set; get; }
         [JsonProperty("name")]
         public string Name { set; get; }
+        [JsonProperty("old_value")]
+        public string OldValue { set; get; }
+        [JsonProperty("new_value")]
+        public string NewValue { set; get; }
     }
 }

@@ -32,7 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.newIssueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createNewIssueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.refreshStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -79,32 +79,32 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newIssueToolStripMenuItem,
+            this.createNewIssueToolStripMenuItem,
             this.refreshStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
-            // newIssueToolStripMenuItem
+            // createNewIssueToolStripMenuItem
             // 
-            this.newIssueToolStripMenuItem.Enabled = false;
-            this.newIssueToolStripMenuItem.Name = "newIssueToolStripMenuItem";
-            this.newIssueToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
-            this.newIssueToolStripMenuItem.Text = "New issue";
-            this.newIssueToolStripMenuItem.Click += new System.EventHandler(this.newIssueToolStripMenuItem_Click);
+            this.createNewIssueToolStripMenuItem.Enabled = false;
+            this.createNewIssueToolStripMenuItem.Name = "createNewIssueToolStripMenuItem";
+            this.createNewIssueToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.createNewIssueToolStripMenuItem.Text = "Create new issue";
+            this.createNewIssueToolStripMenuItem.Click += new System.EventHandler(this.newIssueToolStripMenuItem_Click);
             // 
             // refreshStripMenuItem
             // 
             this.refreshStripMenuItem.Name = "refreshStripMenuItem";
-            this.refreshStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.refreshStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.refreshStripMenuItem.Text = "Refresh";
             this.refreshStripMenuItem.Click += new System.EventHandler(this.refreshStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -189,6 +189,7 @@
             this.lvIssues.TabIndex = 5;
             this.lvIssues.UseCompatibleStateImageBehavior = false;
             this.lvIssues.View = System.Windows.Forms.View.Details;
+            this.lvIssues.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvIssues_ColumnClick);
             this.lvIssues.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvIssues_MouseClick);
             // 
             // columnHeaderID
@@ -337,7 +338,7 @@
         private System.Windows.Forms.ColumnHeader columnHeaderStatus;
         private System.Windows.Forms.ColumnHeader columnHeaderLastUpdate;
         private System.Windows.Forms.Button btnProjectInfo;
-        private System.Windows.Forms.ToolStripMenuItem newIssueToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createNewIssueToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem refreshStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenuIssue;
         private System.Windows.Forms.ToolStripMenuItem issueInfoToolStripMenuItem;
