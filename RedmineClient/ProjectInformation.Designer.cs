@@ -35,7 +35,7 @@
             this.labelIdentifier = new System.Windows.Forms.Label();
             this.labelDescription = new System.Windows.Forms.Label();
             this.labelStatus = new System.Windows.Forms.Label();
-            this.labelCreatingDate = new System.Windows.Forms.Label();
+            this.labelCreationDate = new System.Windows.Forms.Label();
             this.labelLastUpdate = new System.Windows.Forms.Label();
             this.labelMembers = new System.Windows.Forms.Label();
             this.tbName = new System.Windows.Forms.TextBox();
@@ -104,14 +104,14 @@
             this.labelStatus.Text = "Status:";
             this.labelStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // labelCreatingDate
+            // labelCreationDate
             // 
-            this.labelCreatingDate.Location = new System.Drawing.Point(12, 141);
-            this.labelCreatingDate.Name = "labelCreatingDate";
-            this.labelCreatingDate.Size = new System.Drawing.Size(73, 20);
-            this.labelCreatingDate.TabIndex = 10;
-            this.labelCreatingDate.Text = "Creation date:";
-            this.labelCreatingDate.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.labelCreationDate.Location = new System.Drawing.Point(12, 141);
+            this.labelCreationDate.Name = "labelCreationDate";
+            this.labelCreationDate.Size = new System.Drawing.Size(73, 20);
+            this.labelCreationDate.TabIndex = 10;
+            this.labelCreationDate.Text = "Creation date:";
+            this.labelCreationDate.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // labelLastUpdate
             // 
@@ -247,7 +247,7 @@
             this.Controls.Add(this.tbName);
             this.Controls.Add(this.labelMembers);
             this.Controls.Add(this.labelLastUpdate);
-            this.Controls.Add(this.labelCreatingDate);
+            this.Controls.Add(this.labelCreationDate);
             this.Controls.Add(this.labelStatus);
             this.Controls.Add(this.labelDescription);
             this.Controls.Add(this.labelIdentifier);
@@ -276,7 +276,7 @@
         private System.Windows.Forms.Label labelIdentifier;
         private System.Windows.Forms.Label labelDescription;
         private System.Windows.Forms.Label labelStatus;
-        private System.Windows.Forms.Label labelCreatingDate;
+        private System.Windows.Forms.Label labelCreationDate;
         private System.Windows.Forms.Label labelLastUpdate;
         private System.Windows.Forms.Label labelMembers;
         private System.Windows.Forms.TextBox tbName;

@@ -45,8 +45,10 @@ namespace RedmineClient
         public event Action<ErrorTypes, Project, List<Membership>> OnProjectInformationLoaded;
         // Событие, возникающее после загрузки информации о выбранной задаче
         public event Action<ErrorTypes, Issue, List<IssueTracker>, List<IssueStatus>, List<IssuePriority>, List<Membership>> OnIssueInformationLoaded;
+        // Событие, возникающее после изменения информации о задаче
+        public event Action<ErrorTypes> OnIssueUpdated;
         // Событие, возникающее после удаления задачи
-        public event Action<ErrorTypes> OnIssueRemoved;
+        public event Action<ErrorTypes, long> OnIssueRemoved;
 
         public Controller()
         {
@@ -519,6 +521,44 @@ namespace RedmineClient
         }
 
         /// <summary>
+        /// Обновление информации о задаче.
+        /// </summary>
+        /// <param name="issueID">Идентификатор задачи.</param>
+        /// <param name="jsonRequest">Набор параметров в виде JSON для изменяемой задачи.</param>
+        public void UpdateIssue(long issueID, string jsonRequest)
+        {
+            new Thread(
+                delegate()
+                {
+                    try
+                    {
+                        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues/" + issueID + ".json");
+                        request.Method = "PUT";
+                        request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                        request.ContentType = "application/json";
+                        StreamWriter streamWriter = new StreamWriter(request.GetRequestStream());
+                        streamWriter.Write(jsonRequest);
+                        streamWriter.Flush();
+                        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                        streamWriter.Close();
+                        response.Close();
+                        if (OnIssueUpdated != null)
+                            OnIssueUpdated(ErrorTypes.NoErrors);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (OnIssueUpdated != null)
+                            if (ex.Message.Contains("401"))
+                                OnIssueUpdated(ErrorTypes.UnathorizedAccess);
+                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
+                                OnIssueUpdated(ErrorTypes.NetworkError);
+                            else
+                                OnIssueUpdated(ErrorTypes.UnknownError);
+                    }
+                }).Start();
+        }
+
+        /// <summary>
         /// Удаление задачи по ее идентификатору.
         /// </summary>
         /// <param name="issueID">Идентификатор задачи.</param>
@@ -535,17 +575,17 @@ namespace RedmineClient
                         request.Accept = "application/json";
                         HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                         if (OnIssueRemoved != null)
-                            OnIssueRemoved(ErrorTypes.NoErrors);
+                            OnIssueRemoved(ErrorTypes.NoErrors, issueID);
                     }
                     catch (Exception ex)
                     {
                         if (OnIssueRemoved != null)
                             if (ex.Message.Contains("401"))
-                                OnIssueRemoved(ErrorTypes.UnathorizedAccess);
+                                OnIssueRemoved(ErrorTypes.UnathorizedAccess, issueID);
                             else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
-                                OnIssueRemoved(ErrorTypes.NetworkError);
+                                OnIssueRemoved(ErrorTypes.NetworkError, issueID);
                             else
-                                OnIssueRemoved(ErrorTypes.UnknownError);
+                                OnIssueRemoved(ErrorTypes.UnknownError, issueID);
                     }
                 }).Start();
         }

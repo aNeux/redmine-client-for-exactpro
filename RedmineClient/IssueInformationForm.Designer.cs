@@ -58,16 +58,18 @@
             this.labelClosesDate = new System.Windows.Forms.Label();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnRemoveIssue = new System.Windows.Forms.Button();
-            this.btnClose = new System.Windows.Forms.Button();
             this.btnShowHistory = new System.Windows.Forms.Button();
+            this.btnClose = new System.Windows.Forms.Button();
+            this.cbAddNote = new System.Windows.Forms.CheckBox();
+            this.tbAddNote = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudDoneRatio)).BeginInit();
             this.SuspendLayout();
             // 
             // tbSubject
             // 
+            this.tbSubject.Enabled = false;
             this.tbSubject.Location = new System.Drawing.Point(92, 42);
             this.tbSubject.Name = "tbSubject";
-            this.tbSubject.ReadOnly = true;
             this.tbSubject.Size = new System.Drawing.Size(125, 20);
             this.tbSubject.TabIndex = 3;
             // 
@@ -82,6 +84,7 @@
             // 
             // tbID
             // 
+            this.tbID.Enabled = false;
             this.tbID.Location = new System.Drawing.Point(92, 16);
             this.tbID.Name = "tbID";
             this.tbID.ReadOnly = true;
@@ -132,8 +135,6 @@
             this.cbAssignedTo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbAssignedTo.Enabled = false;
             this.cbAssignedTo.FormattingEnabled = true;
-            this.cbAssignedTo.Items.AddRange(new object[] {
-            "< none >"});
             this.cbAssignedTo.Location = new System.Drawing.Point(92, 150);
             this.cbAssignedTo.Name = "cbAssignedTo";
             this.cbAssignedTo.Size = new System.Drawing.Size(125, 21);
@@ -177,6 +178,7 @@
             // 
             // tbLastUpdate
             // 
+            this.tbLastUpdate.Enabled = false;
             this.tbLastUpdate.Location = new System.Drawing.Point(317, 125);
             this.tbLastUpdate.Name = "tbLastUpdate";
             this.tbLastUpdate.ReadOnly = true;
@@ -194,10 +196,10 @@
             // 
             // tbDescription
             // 
+            this.tbDescription.Enabled = false;
             this.tbDescription.Location = new System.Drawing.Point(237, 26);
             this.tbDescription.Multiline = true;
             this.tbDescription.Name = "tbDescription";
-            this.tbDescription.ReadOnly = true;
             this.tbDescription.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.tbDescription.Size = new System.Drawing.Size(205, 41);
             this.tbDescription.TabIndex = 15;
@@ -222,6 +224,7 @@
             // 
             // tbCreationDate
             // 
+            this.tbCreationDate.Enabled = false;
             this.tbCreationDate.Location = new System.Drawing.Point(317, 99);
             this.tbCreationDate.Name = "tbCreationDate";
             this.tbCreationDate.ReadOnly = true;
@@ -230,6 +233,7 @@
             // 
             // tbAuthor
             // 
+            this.tbAuthor.Enabled = false;
             this.tbAuthor.Location = new System.Drawing.Point(92, 177);
             this.tbAuthor.Name = "tbAuthor";
             this.tbAuthor.ReadOnly = true;
@@ -247,6 +251,7 @@
             // 
             // tbStartDate
             // 
+            this.tbStartDate.Enabled = false;
             this.tbStartDate.Location = new System.Drawing.Point(317, 73);
             this.tbStartDate.Name = "tbStartDate";
             this.tbStartDate.ReadOnly = true;
@@ -296,6 +301,7 @@
             // 
             // tbClosedDate
             // 
+            this.tbClosedDate.Enabled = false;
             this.tbClosedDate.Location = new System.Drawing.Point(317, 177);
             this.tbClosedDate.Name = "tbClosedDate";
             this.tbClosedDate.ReadOnly = true;
@@ -316,10 +322,10 @@
             // btnSave
             // 
             this.btnSave.Enabled = false;
-            this.btnSave.Location = new System.Drawing.Point(30, 207);
+            this.btnSave.Location = new System.Drawing.Point(30, 249);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(96, 23);
-            this.btnSave.TabIndex = 27;
+            this.btnSave.TabIndex = 29;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
@@ -327,41 +333,63 @@
             // btnRemoveIssue
             // 
             this.btnRemoveIssue.Enabled = false;
-            this.btnRemoveIssue.Location = new System.Drawing.Point(132, 207);
+            this.btnRemoveIssue.Location = new System.Drawing.Point(132, 249);
             this.btnRemoveIssue.Name = "btnRemoveIssue";
             this.btnRemoveIssue.Size = new System.Drawing.Size(94, 23);
-            this.btnRemoveIssue.TabIndex = 28;
+            this.btnRemoveIssue.TabIndex = 30;
             this.btnRemoveIssue.Text = "Remove issue";
             this.btnRemoveIssue.UseVisualStyleBackColor = true;
             this.btnRemoveIssue.Click += new System.EventHandler(this.btnRemoveIssue_Click);
             // 
+            // btnShowHistory
+            // 
+            this.btnShowHistory.Enabled = false;
+            this.btnShowHistory.Location = new System.Drawing.Point(232, 249);
+            this.btnShowHistory.Name = "btnShowHistory";
+            this.btnShowHistory.Size = new System.Drawing.Size(94, 23);
+            this.btnShowHistory.TabIndex = 31;
+            this.btnShowHistory.Text = "Show history";
+            this.btnShowHistory.UseVisualStyleBackColor = true;
+            this.btnShowHistory.Click += new System.EventHandler(this.btnShowHistory_Click);
+            // 
             // btnClose
             // 
             this.btnClose.Enabled = false;
-            this.btnClose.Location = new System.Drawing.Point(332, 207);
+            this.btnClose.Location = new System.Drawing.Point(332, 249);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(94, 23);
-            this.btnClose.TabIndex = 30;
+            this.btnClose.TabIndex = 32;
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // btnShowHistory
+            // cbAddNote
             // 
-            this.btnShowHistory.Enabled = false;
-            this.btnShowHistory.Location = new System.Drawing.Point(232, 207);
-            this.btnShowHistory.Name = "btnShowHistory";
-            this.btnShowHistory.Size = new System.Drawing.Size(94, 23);
-            this.btnShowHistory.TabIndex = 29;
-            this.btnShowHistory.Text = "Show history";
-            this.btnShowHistory.UseVisualStyleBackColor = true;
-            this.btnShowHistory.Click += new System.EventHandler(this.btnShowHistory_Click);
+            this.cbAddNote.AutoSize = true;
+            this.cbAddNote.Enabled = false;
+            this.cbAddNote.Location = new System.Drawing.Point(18, 204);
+            this.cbAddNote.Name = "cbAddNote";
+            this.cbAddNote.Size = new System.Drawing.Size(78, 17);
+            this.cbAddNote.TabIndex = 27;
+            this.cbAddNote.Text = "Add a note";
+            this.cbAddNote.UseVisualStyleBackColor = true;
+            this.cbAddNote.CheckedChanged += new System.EventHandler(this.cbAddNote_CheckedChanged);
+            // 
+            // tbAddNote
+            // 
+            this.tbAddNote.Enabled = false;
+            this.tbAddNote.Location = new System.Drawing.Point(13, 222);
+            this.tbAddNote.Name = "tbAddNote";
+            this.tbAddNote.Size = new System.Drawing.Size(429, 20);
+            this.tbAddNote.TabIndex = 28;
             // 
             // IssueInformationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(454, 240);
+            this.ClientSize = new System.Drawing.Size(454, 281);
+            this.Controls.Add(this.tbAddNote);
+            this.Controls.Add(this.cbAddNote);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.btnShowHistory);
             this.Controls.Add(this.btnRemoveIssue);
@@ -439,8 +467,10 @@
         private System.Windows.Forms.Label labelClosesDate;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnRemoveIssue;
-        private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Button btnShowHistory;
+        private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.CheckBox cbAddNote;
+        private System.Windows.Forms.TextBox tbAddNote;
 
     }
 }

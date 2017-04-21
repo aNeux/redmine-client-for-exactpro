@@ -32,14 +32,15 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.createNewIssueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newIssueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.refreshStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.logOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reAuthenticateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.userInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.logOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.labelSelectProject = new System.Windows.Forms.Label();
             this.cbProjects = new System.Windows.Forms.ComboBox();
             this.lvIssues = new System.Windows.Forms.ListView();
@@ -52,6 +53,7 @@
             this.btnProjectInfo = new System.Windows.Forms.Button();
             this.contextMenuIssue = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.issueInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeIssueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.labelProjectRoles = new System.Windows.Forms.Label();
@@ -68,51 +70,59 @@
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.toolsToolStripMenuItem,
-            this.logOutToolStripMenuItem});
+            this.toolsToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(496, 24);
+            this.menuStrip.Size = new System.Drawing.Size(584, 24);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "Menu";
             // 
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.createNewIssueToolStripMenuItem,
+            this.newIssueToolStripMenuItem,
             this.refreshStripMenuItem,
-            this.exitToolStripMenuItem});
+            this.exitToolStripMenuItem,
+            this.logOutToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
-            // createNewIssueToolStripMenuItem
+            // newIssueToolStripMenuItem
             // 
-            this.createNewIssueToolStripMenuItem.Enabled = false;
-            this.createNewIssueToolStripMenuItem.Name = "createNewIssueToolStripMenuItem";
-            this.createNewIssueToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
-            this.createNewIssueToolStripMenuItem.Text = "Create new issue";
-            this.createNewIssueToolStripMenuItem.Click += new System.EventHandler(this.newIssueToolStripMenuItem_Click);
+            this.newIssueToolStripMenuItem.Enabled = false;
+            this.newIssueToolStripMenuItem.Name = "newIssueToolStripMenuItem";
+            this.newIssueToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.newIssueToolStripMenuItem.Text = "New issue";
+            this.newIssueToolStripMenuItem.Click += new System.EventHandler(this.newIssueToolStripMenuItem_Click);
             // 
             // refreshStripMenuItem
             // 
             this.refreshStripMenuItem.Name = "refreshStripMenuItem";
-            this.refreshStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.refreshStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.refreshStripMenuItem.Text = "Refresh";
             this.refreshStripMenuItem.Click += new System.EventHandler(this.refreshStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // logOutToolStripMenuItem
+            // 
+            this.logOutToolStripMenuItem.Name = "logOutToolStripMenuItem";
+            this.logOutToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.logOutToolStripMenuItem.Text = "Log out";
+            this.logOutToolStripMenuItem.Click += new System.EventHandler(this.logOutToolStripMenuItem_Click);
             // 
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.reAuthenticateToolStripMenuItem,
             this.userInformationToolStripMenuItem,
+            this.optionsToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
@@ -133,19 +143,19 @@
             this.userInformationToolStripMenuItem.Text = "User information";
             this.userInformationToolStripMenuItem.Click += new System.EventHandler(this.userInformationToolStripMenuItem_Click);
             // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.Enabled = false;
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.optionsToolStripMenuItem.Text = "Options";
+            // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
-            // logOutToolStripMenuItem
-            // 
-            this.logOutToolStripMenuItem.Name = "logOutToolStripMenuItem";
-            this.logOutToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
-            this.logOutToolStripMenuItem.Text = "Log out";
-            this.logOutToolStripMenuItem.Click += new System.EventHandler(this.logOutToolStripMenuItem_Click);
             // 
             // labelSelectProject
             // 
@@ -164,7 +174,7 @@
             "< non selected >"});
             this.cbProjects.Location = new System.Drawing.Point(13, 45);
             this.cbProjects.Name = "cbProjects";
-            this.cbProjects.Size = new System.Drawing.Size(225, 21);
+            this.cbProjects.Size = new System.Drawing.Size(231, 21);
             this.cbProjects.TabIndex = 2;
             this.cbProjects.SelectedIndexChanged += new System.EventHandler(this.cbSelectProject_SelectedIndexChanged);
             // 
@@ -185,7 +195,7 @@
             this.lvIssues.Location = new System.Drawing.Point(12, 73);
             this.lvIssues.MultiSelect = false;
             this.lvIssues.Name = "lvIssues";
-            this.lvIssues.Size = new System.Drawing.Size(472, 203);
+            this.lvIssues.Size = new System.Drawing.Size(560, 255);
             this.lvIssues.TabIndex = 5;
             this.lvIssues.UseCompatibleStateImageBehavior = false;
             this.lvIssues.View = System.Windows.Forms.View.Details;
@@ -195,17 +205,17 @@
             // columnHeaderID
             // 
             this.columnHeaderID.Text = "ID";
-            this.columnHeaderID.Width = 30;
+            this.columnHeaderID.Width = 35;
             // 
             // columnHeaderSubject
             // 
             this.columnHeaderSubject.Text = "Subject";
-            this.columnHeaderSubject.Width = 110;
+            this.columnHeaderSubject.Width = 160;
             // 
             // columnHeaderTracker
             // 
             this.columnHeaderTracker.Text = "Tracker";
-            this.columnHeaderTracker.Width = 62;
+            this.columnHeaderTracker.Width = 70;
             // 
             // columnHeaderStatus
             // 
@@ -215,18 +225,18 @@
             // columnHeaderPriority
             // 
             this.columnHeaderPriority.Text = "Priority";
-            this.columnHeaderPriority.Width = 62;
+            this.columnHeaderPriority.Width = 70;
             // 
             // columnHeaderLastUpdate
             // 
             this.columnHeaderLastUpdate.Text = "Last update";
-            this.columnHeaderLastUpdate.Width = 122;
+            this.columnHeaderLastUpdate.Width = 140;
             // 
             // btnProjectInfo
             // 
-            this.btnProjectInfo.Location = new System.Drawing.Point(244, 44);
+            this.btnProjectInfo.Location = new System.Drawing.Point(250, 45);
             this.btnProjectInfo.Name = "btnProjectInfo";
-            this.btnProjectInfo.Size = new System.Drawing.Size(85, 23);
+            this.btnProjectInfo.Size = new System.Drawing.Size(85, 21);
             this.btnProjectInfo.TabIndex = 3;
             this.btnProjectInfo.Text = "Project info";
             this.btnProjectInfo.UseVisualStyleBackColor = true;
@@ -236,25 +246,33 @@
             // contextMenuIssue
             // 
             this.contextMenuIssue.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.issueInfoToolStripMenuItem});
+            this.issueInfoToolStripMenuItem,
+            this.removeIssueToolStripMenuItem});
             this.contextMenuIssue.Name = "contextMenuStripIssue";
-            this.contextMenuIssue.Size = new System.Drawing.Size(125, 26);
+            this.contextMenuIssue.Size = new System.Drawing.Size(153, 70);
             // 
             // issueInfoToolStripMenuItem
             // 
             this.issueInfoToolStripMenuItem.Name = "issueInfoToolStripMenuItem";
-            this.issueInfoToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.issueInfoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.issueInfoToolStripMenuItem.Text = "Issue info";
             this.issueInfoToolStripMenuItem.Click += new System.EventHandler(this.issueInfotoolStripMenuItem_Click);
+            // 
+            // removeIssueToolStripMenuItem
+            // 
+            this.removeIssueToolStripMenuItem.Name = "removeIssueToolStripMenuItem";
+            this.removeIssueToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.removeIssueToolStripMenuItem.Text = "Remove";
+            this.removeIssueToolStripMenuItem.Visible = false;
+            this.removeIssueToolStripMenuItem.Click += new System.EventHandler(this.removeIssueToolStripMenuItem_Click);
             // 
             // statusStrip
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 287);
+            this.statusStrip.Location = new System.Drawing.Point(0, 339);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(496, 22);
-            this.statusStrip.SizingGrip = false;
+            this.statusStrip.Size = new System.Drawing.Size(584, 22);
             this.statusStrip.TabIndex = 6;
             // 
             // toolStripStatusLabel
@@ -266,9 +284,9 @@
             // 
             this.labelProjectRoles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelProjectRoles.Location = new System.Drawing.Point(335, 45);
+            this.labelProjectRoles.Location = new System.Drawing.Point(341, 45);
             this.labelProjectRoles.Name = "labelProjectRoles";
-            this.labelProjectRoles.Size = new System.Drawing.Size(149, 21);
+            this.labelProjectRoles.Size = new System.Drawing.Size(231, 21);
             this.labelProjectRoles.TabIndex = 4;
             this.labelProjectRoles.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -297,7 +315,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(496, 309);
+            this.ClientSize = new System.Drawing.Size(584, 361);
             this.Controls.Add(this.labelProjectRoles);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.btnProjectInfo);
@@ -307,7 +325,7 @@
             this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip;
-            this.MinimumSize = new System.Drawing.Size(512, 348);
+            this.MinimumSize = new System.Drawing.Size(600, 400);
             this.Name = "MainForm";
             this.Text = "Redmine Client";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -338,7 +356,7 @@
         private System.Windows.Forms.ColumnHeader columnHeaderStatus;
         private System.Windows.Forms.ColumnHeader columnHeaderLastUpdate;
         private System.Windows.Forms.Button btnProjectInfo;
-        private System.Windows.Forms.ToolStripMenuItem createNewIssueToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newIssueToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem refreshStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenuIssue;
         private System.Windows.Forms.ToolStripMenuItem issueInfoToolStripMenuItem;
@@ -352,7 +370,9 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuNotifyIcon;
         private System.Windows.Forms.ToolStripMenuItem exitFromNotifyIconToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader columnHeaderPriority;
+        private System.Windows.Forms.ToolStripMenuItem removeIssueToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem logOutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
     }
 }
 
