@@ -43,16 +43,22 @@ namespace RedmineClient.Models
         public IssueStatus Status { set; get; }
         [JsonProperty("priority")]
         public IssuePriority Priority { set; get; }
-        [JsonProperty("author")]
-        public User Author { set; get; }
         [JsonProperty("assigned_to")]
         public User AssignedTo { set; get; }
+        [JsonProperty("author")]
+        public User Author { set; get; }
         [JsonProperty("subject")]
         public string Subject { set; get; }
         [JsonProperty("description")]
         public string Description { set; get; }
+        [JsonProperty("is_private")]
+        public bool IsPrivate { set; get; }
         [JsonProperty("start_date")]
         public DateTime StartDate { set; get; }
+        [JsonProperty("due_date")]
+        public DateTime DueDate { set; get; }
+        [JsonProperty("estimated_hours")]
+        public string EstimatedHours { set; get; }
         [JsonProperty("done_ratio")]
         public int DoneRatio { set; get; }
         [JsonProperty("created_on")]
@@ -75,7 +81,7 @@ namespace RedmineClient.Models
         [JsonProperty("user")]
         public User User { set; get; }
         [JsonProperty("notes")]
-        public string Notes { set; get; }
+        public string Note { set; get; }
         [JsonProperty("created_on")]
         public DateTime CreatedOn { set; get; }
         [JsonProperty("details")]

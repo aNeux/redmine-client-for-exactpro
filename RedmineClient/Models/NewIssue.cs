@@ -47,6 +47,8 @@ namespace RedmineClient.Models
         [JsonProperty("watcher_user_ids")]
         public List<long> WatcherUserIDs { set; get; }
         [JsonProperty("notes")]
-        public string Notes { set; get; }
+        public string Note { set; get; }
+        [JsonProperty("private_notes")]
+        public bool IsNotePrivate { set; get; }
     }
 }

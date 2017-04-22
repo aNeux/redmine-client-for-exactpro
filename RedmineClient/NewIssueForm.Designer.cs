@@ -64,7 +64,7 @@
             // 
             // labelTracker
             // 
-            this.labelTracker.Location = new System.Drawing.Point(12, 60);
+            this.labelTracker.Location = new System.Drawing.Point(12, 57);
             this.labelTracker.Name = "labelTracker";
             this.labelTracker.Size = new System.Drawing.Size(54, 21);
             this.labelTracker.TabIndex = 3;
@@ -76,7 +76,7 @@
             this.cbTracker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbTracker.Enabled = false;
             this.cbTracker.FormattingEnabled = true;
-            this.cbTracker.Location = new System.Drawing.Point(71, 60);
+            this.cbTracker.Location = new System.Drawing.Point(71, 57);
             this.cbTracker.Name = "cbTracker";
             this.cbTracker.Size = new System.Drawing.Size(121, 21);
             this.cbTracker.TabIndex = 4;
@@ -84,7 +84,7 @@
             // tbDescription
             // 
             this.tbDescription.Enabled = false;
-            this.tbDescription.Location = new System.Drawing.Point(12, 135);
+            this.tbDescription.Location = new System.Drawing.Point(12, 126);
             this.tbDescription.Multiline = true;
             this.tbDescription.Name = "tbDescription";
             this.tbDescription.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -93,7 +93,7 @@
             // 
             // labelDescription
             // 
-            this.labelDescription.Location = new System.Drawing.Point(15, 116);
+            this.labelDescription.Location = new System.Drawing.Point(15, 107);
             this.labelDescription.Name = "labelDescription";
             this.labelDescription.Size = new System.Drawing.Size(64, 16);
             this.labelDescription.TabIndex = 12;
@@ -105,14 +105,14 @@
             this.cbPriority.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbPriority.Enabled = false;
             this.cbPriority.FormattingEnabled = true;
-            this.cbPriority.Location = new System.Drawing.Point(264, 35);
+            this.cbPriority.Location = new System.Drawing.Point(264, 32);
             this.cbPriority.Name = "cbPriority";
             this.cbPriority.Size = new System.Drawing.Size(121, 21);
             this.cbPriority.TabIndex = 8;
             // 
             // labelPriority
             // 
-            this.labelPriority.Location = new System.Drawing.Point(207, 35);
+            this.labelPriority.Location = new System.Drawing.Point(207, 32);
             this.labelPriority.Name = "labelPriority";
             this.labelPriority.Size = new System.Drawing.Size(54, 21);
             this.labelPriority.TabIndex = 7;
@@ -124,14 +124,14 @@
             this.cbAssignee.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbAssignee.Enabled = false;
             this.cbAssignee.FormattingEnabled = true;
-            this.cbAssignee.Location = new System.Drawing.Point(264, 62);
+            this.cbAssignee.Location = new System.Drawing.Point(264, 59);
             this.cbAssignee.Name = "cbAssignee";
             this.cbAssignee.Size = new System.Drawing.Size(121, 21);
             this.cbAssignee.TabIndex = 10;
             // 
             // labelAssignee
             // 
-            this.labelAssignee.Location = new System.Drawing.Point(206, 62);
+            this.labelAssignee.Location = new System.Drawing.Point(206, 59);
             this.labelAssignee.Name = "labelAssignee";
             this.labelAssignee.Size = new System.Drawing.Size(54, 21);
             this.labelAssignee.TabIndex = 9;
@@ -141,7 +141,7 @@
             // tbProject
             // 
             this.tbProject.Enabled = false;
-            this.tbProject.Location = new System.Drawing.Point(71, 34);
+            this.tbProject.Location = new System.Drawing.Point(71, 31);
             this.tbProject.Name = "tbProject";
             this.tbProject.ReadOnly = true;
             this.tbProject.Size = new System.Drawing.Size(121, 20);
@@ -149,7 +149,7 @@
             // 
             // labelProject
             // 
-            this.labelProject.Location = new System.Drawing.Point(12, 34);
+            this.labelProject.Location = new System.Drawing.Point(12, 31);
             this.labelProject.Name = "labelProject";
             this.labelProject.Size = new System.Drawing.Size(54, 20);
             this.labelProject.TabIndex = 1;
@@ -160,7 +160,7 @@
             // 
             this.cblWatchers.Enabled = false;
             this.cblWatchers.FormattingEnabled = true;
-            this.cblWatchers.Location = new System.Drawing.Point(12, 264);
+            this.cblWatchers.Location = new System.Drawing.Point(12, 254);
             this.cblWatchers.MultiColumn = true;
             this.cblWatchers.Name = "cblWatchers";
             this.cblWatchers.Size = new System.Drawing.Size(373, 64);
@@ -168,7 +168,7 @@
             // 
             // labelWatchers
             // 
-            this.labelWatchers.Location = new System.Drawing.Point(15, 246);
+            this.labelWatchers.Location = new System.Drawing.Point(15, 236);
             this.labelWatchers.Name = "labelWatchers";
             this.labelWatchers.Size = new System.Drawing.Size(64, 16);
             this.labelWatchers.TabIndex = 25;
@@ -177,7 +177,7 @@
             // 
             // labelInfo
             // 
-            this.labelInfo.Location = new System.Drawing.Point(12, 9);
+            this.labelInfo.Location = new System.Drawing.Point(12, 6);
             this.labelInfo.Name = "labelInfo";
             this.labelInfo.Size = new System.Drawing.Size(381, 19);
             this.labelInfo.TabIndex = 0;
@@ -186,7 +186,7 @@
             // 
             // labelSubject
             // 
-            this.labelSubject.Location = new System.Drawing.Point(12, 87);
+            this.labelSubject.Location = new System.Drawing.Point(12, 84);
             this.labelSubject.Name = "labelSubject";
             this.labelSubject.Size = new System.Drawing.Size(54, 20);
             this.labelSubject.TabIndex = 5;
@@ -196,7 +196,7 @@
             // tbSubject
             // 
             this.tbSubject.Enabled = false;
-            this.tbSubject.Location = new System.Drawing.Point(71, 87);
+            this.tbSubject.Location = new System.Drawing.Point(71, 84);
             this.tbSubject.Name = "tbSubject";
             this.tbSubject.Size = new System.Drawing.Size(121, 20);
             this.tbSubject.TabIndex = 6;
@@ -204,7 +204,7 @@
             // btnCreateIssue
             // 
             this.btnCreateIssue.Enabled = false;
-            this.btnCreateIssue.Location = new System.Drawing.Point(82, 334);
+            this.btnCreateIssue.Location = new System.Drawing.Point(82, 324);
             this.btnCreateIssue.Name = "btnCreateIssue";
             this.btnCreateIssue.Size = new System.Drawing.Size(115, 23);
             this.btnCreateIssue.TabIndex = 27;
@@ -215,7 +215,7 @@
             // btnCancel
             // 
             this.btnCancel.Enabled = false;
-            this.btnCancel.Location = new System.Drawing.Point(203, 334);
+            this.btnCancel.Location = new System.Drawing.Point(203, 324);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(115, 23);
             this.btnCancel.TabIndex = 28;
@@ -227,7 +227,7 @@
             // 
             this.cbIsPrivate.AutoSize = true;
             this.cbIsPrivate.Enabled = false;
-            this.cbIsPrivate.Location = new System.Drawing.Point(208, 90);
+            this.cbIsPrivate.Location = new System.Drawing.Point(208, 87);
             this.cbIsPrivate.Name = "cbIsPrivate";
             this.cbIsPrivate.Size = new System.Drawing.Size(134, 17);
             this.cbIsPrivate.TabIndex = 11;
@@ -236,7 +236,7 @@
             // 
             // labelStartDate
             // 
-            this.labelStartDate.Location = new System.Drawing.Point(12, 196);
+            this.labelStartDate.Location = new System.Drawing.Point(12, 187);
             this.labelStartDate.Name = "labelStartDate";
             this.labelStartDate.Size = new System.Drawing.Size(60, 20);
             this.labelStartDate.TabIndex = 14;
@@ -245,7 +245,7 @@
             // 
             // labelDueDate
             // 
-            this.labelDueDate.Location = new System.Drawing.Point(205, 196);
+            this.labelDueDate.Location = new System.Drawing.Point(205, 187);
             this.labelDueDate.Name = "labelDueDate";
             this.labelDueDate.Size = new System.Drawing.Size(57, 20);
             this.labelDueDate.TabIndex = 16;
@@ -254,12 +254,12 @@
             // 
             // labelPercentage
             // 
-            this.labelPercentage.Location = new System.Drawing.Point(365, 221);
+            this.labelPercentage.Location = new System.Drawing.Point(365, 213);
             this.labelPercentage.Name = "labelPercentage";
             this.labelPercentage.Size = new System.Drawing.Size(20, 20);
             this.labelPercentage.TabIndex = 24;
             this.labelPercentage.Text = "%";
-            this.labelPercentage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.labelPercentage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // nudDoneRatio
             // 
@@ -269,7 +269,7 @@
             0,
             0,
             0});
-            this.nudDoneRatio.Location = new System.Drawing.Point(290, 221);
+            this.nudDoneRatio.Location = new System.Drawing.Point(290, 212);
             this.nudDoneRatio.Name = "nudDoneRatio";
             this.nudDoneRatio.Size = new System.Drawing.Size(69, 20);
             this.nudDoneRatio.TabIndex = 23;
@@ -277,7 +277,7 @@
             // 
             // labelDoneRatio
             // 
-            this.labelDoneRatio.Location = new System.Drawing.Point(223, 221);
+            this.labelDoneRatio.Location = new System.Drawing.Point(223, 212);
             this.labelDoneRatio.Name = "labelDoneRatio";
             this.labelDoneRatio.Size = new System.Drawing.Size(61, 20);
             this.labelDoneRatio.TabIndex = 22;
@@ -287,14 +287,9 @@
             // nudEstimatedTime
             // 
             this.nudEstimatedTime.Enabled = false;
-            this.nudEstimatedTime.Location = new System.Drawing.Point(98, 221);
+            this.nudEstimatedTime.Location = new System.Drawing.Point(98, 212);
             this.nudEstimatedTime.Maximum = new decimal(new int[] {
             9000,
-            0,
-            0,
-            0});
-            this.nudEstimatedTime.Minimum = new decimal(new int[] {
-            1,
             0,
             0,
             0});
@@ -302,15 +297,10 @@
             this.nudEstimatedTime.Size = new System.Drawing.Size(69, 20);
             this.nudEstimatedTime.TabIndex = 20;
             this.nudEstimatedTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.nudEstimatedTime.Value = new decimal(new int[] {
-            24,
-            0,
-            0,
-            0});
             // 
             // labelHours
             // 
-            this.labelHours.Location = new System.Drawing.Point(173, 221);
+            this.labelHours.Location = new System.Drawing.Point(173, 212);
             this.labelHours.Name = "labelHours";
             this.labelHours.Size = new System.Drawing.Size(38, 20);
             this.labelHours.TabIndex = 21;
@@ -319,7 +309,7 @@
             // 
             // labelEstimatedTime
             // 
-            this.labelEstimatedTime.Location = new System.Drawing.Point(12, 221);
+            this.labelEstimatedTime.Location = new System.Drawing.Point(12, 212);
             this.labelEstimatedTime.Name = "labelEstimatedTime";
             this.labelEstimatedTime.Size = new System.Drawing.Size(80, 20);
             this.labelEstimatedTime.TabIndex = 19;
@@ -331,7 +321,7 @@
             this.dtpStartDate.CustomFormat = " ";
             this.dtpStartDate.Enabled = false;
             this.dtpStartDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtpStartDate.Location = new System.Drawing.Point(71, 196);
+            this.dtpStartDate.Location = new System.Drawing.Point(71, 187);
             this.dtpStartDate.Name = "dtpStartDate";
             this.dtpStartDate.Size = new System.Drawing.Size(121, 20);
             this.dtpStartDate.TabIndex = 15;
@@ -342,10 +332,10 @@
             this.dtpDueDate.CustomFormat = " ";
             this.dtpDueDate.Enabled = false;
             this.dtpDueDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtpDueDate.Location = new System.Drawing.Point(264, 196);
+            this.dtpDueDate.Location = new System.Drawing.Point(260, 187);
             this.dtpDueDate.Name = "dtpDueDate";
             this.dtpDueDate.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.dtpDueDate.Size = new System.Drawing.Size(95, 20);
+            this.dtpDueDate.Size = new System.Drawing.Size(99, 20);
             this.dtpDueDate.TabIndex = 17;
             this.dtpDueDate.Value = new System.DateTime(1753, 1, 1, 0, 0, 0, 0);
             this.dtpDueDate.ValueChanged += new System.EventHandler(this.dateTimePicker_ValueChanged);
@@ -356,7 +346,7 @@
             // 
             this.btnResetDueDate.Enabled = false;
             this.btnResetDueDate.Image = ((System.Drawing.Image)(resources.GetObject("btnResetDueDate.Image")));
-            this.btnResetDueDate.Location = new System.Drawing.Point(365, 197);
+            this.btnResetDueDate.Location = new System.Drawing.Point(365, 189);
             this.btnResetDueDate.Name = "btnResetDueDate";
             this.btnResetDueDate.Size = new System.Drawing.Size(20, 20);
             this.btnResetDueDate.TabIndex = 18;
@@ -367,7 +357,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(397, 365);
+            this.ClientSize = new System.Drawing.Size(397, 355);
             this.Controls.Add(this.btnResetDueDate);
             this.Controls.Add(this.dtpDueDate);
             this.Controls.Add(this.dtpStartDate);

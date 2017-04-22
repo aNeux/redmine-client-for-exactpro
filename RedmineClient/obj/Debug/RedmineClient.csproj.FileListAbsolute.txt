@@ -23,4 +23,3 @@ C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\Re
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.IssueInformationForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.csprojResolveAssemblyReference.cache
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.NewIssueForm.resources
-C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.IssueHistoryForm.resources

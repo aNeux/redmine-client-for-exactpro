@@ -591,6 +591,15 @@ namespace RedmineClient
         }
 
         /// <summary>
+        /// Получение списка всех проектов, в которых зарегистрирован текущий пользователь.
+        /// </summary>
+        /// <returns>Список проектов.</returns>
+        public List<Project> GetProjects()
+        {
+            return projects;
+        }
+
+        /// <summary>
         /// Получение информации о проекте по его идентификатору.
         /// </summary>
         /// <param name="projectID">Идентификатор проекта.</param>
