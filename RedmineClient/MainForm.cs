@@ -174,6 +174,11 @@ namespace RedmineClient
             new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProject(lastSelectedProjectID).Roles).ShowDialog();
         }
 
+        private void notifyIcon_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+        }
+
         private void removeIssueToolStripMenuItem_Click(object sender, EventArgs e)
         {
             long issueID = long.Parse(lvIssues.FocusedItem.SubItems[0].Text);
@@ -232,6 +237,7 @@ namespace RedmineClient
                             MessageBox.Show("Cannot connect to Redmine services and load projects. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
+                            this.Text = "Redmine Client";
                             toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                             if (Properties.Settings.Default.api_key.Length != 0)
                             {
@@ -268,6 +274,7 @@ namespace RedmineClient
                                 lvi.SubItems.Add(issue.Tracker.Name);
                                 lvi.SubItems.Add(issue.Status.Name);
                                 lvi.SubItems.Add(issue.Priority.Name);
+                                lvi.SubItems.Add(issue.AssignedTo != null && issue.AssignedTo.Name.Length > 0 ? issue.AssignedTo.Name : "< none >");
                                 lvi.SubItems.Add(issue.UpdatedOn.ToShortTimeString() + ", " + issue.UpdatedOn.ToShortDateString());
                                 lvIssues.Items.Add(lvi);
                             }
@@ -278,6 +285,7 @@ namespace RedmineClient
                             MessageBox.Show("Cannot connect to Redmine services and load issues. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
+                            this.Text = "Redmine Client";
                             toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                             if (Properties.Settings.Default.api_key.Length != 0)
                             {
@@ -323,6 +331,7 @@ namespace RedmineClient
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         break;
                     case ErrorTypes.UnathorizedAccess:
+                        this.Text = "Redmine Client";
                         toolStripStatusLabel.Text = "Issue #" + issueID + "removing failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                         if (Properties.Settings.Default.api_key.Length != 0)
                             {
@@ -348,6 +357,7 @@ namespace RedmineClient
         {
             Action action = () =>
                 {
+                    this.Text = "Redmine Client";
                     toolStripStatusLabel.Text = "Last request failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                     new AuthorizationForm().ShowDialog();
                 };
@@ -379,7 +389,7 @@ namespace RedmineClient
         public int Compare(object x, object y)
         {
             int returnValue = -1;
-            if (column == 5)
+            if (column == 6)
             {
                 string[] splittedFullDate = ((ListViewItem)x).SubItems[column].Text.Replace(" ", "").Split(',');
                 DateTime firstDate = new DateTime(int.Parse(splittedFullDate[1].Split('.')[2]), int.Parse(splittedFullDate[1].Split('.')[1]), int.Parse(splittedFullDate[1].Split('.')[0]), int.Parse(splittedFullDate[0].Split(':')[0]), int.Parse(splittedFullDate[0].Split(':')[1]), 0);

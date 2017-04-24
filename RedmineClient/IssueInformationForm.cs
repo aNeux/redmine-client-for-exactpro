@@ -43,7 +43,10 @@ namespace RedmineClient
                 tbHistory.Select();
                 tbHistory.SelectionStart = tbHistory.Text.Length;
                 tbHistory.ScrollToCaret();
+                btnSave.Enabled = false;
             }
+            else
+                btnSave.Enabled = true;
         }
 
         private void cbAddNote_CheckedChanged(object sender, EventArgs e)
@@ -126,7 +129,11 @@ namespace RedmineClient
                     case ErrorTypes.NoErrors:
                         tbID.Text = issue.ID.ToString();
                         int indexToSelect = 0;
-                        foreach (Project currentProject in controller.GetProjects().Where(temp => temp.Roles.Contains("Manager")))
+                        List<Project> projects = new List<Project>();
+                        projects.AddRange(controller.GetProjects());
+                        if (projectRoles.Contains("Manager"))
+                            projects.RemoveAll(temp => !temp.Roles.Contains("Manager"));
+                        foreach (Project currentProject in projects)
                         {
                             if (currentProject.Parent == null)
                                 cbProject.Items.Add(new TextAndValueItem { Text = currentProject.Name, Value = currentProject.ID });
@@ -145,9 +152,11 @@ namespace RedmineClient
                         }
                         cbTracker.SelectedIndex = indexToSelect;
                         indexToSelect = 0;
+                        List<IssueStatus> availableIssueStatuses = new List<IssueStatus>();
+                        availableIssueStatuses.AddRange(issueStatuses);
                         if (!projectRoles.Contains("Manager"))
-                            issueStatuses.RemoveAll(temp => temp.ID < issue.Status.ID || temp.Name == "Closed" || temp.Name == "Rejected");
-                        foreach (IssueStatus currentStatus in issueStatuses)
+                            availableIssueStatuses.RemoveAll(temp => temp.ID < issue.Status.ID || temp.Name == "Closed" || temp.Name == "Rejected");
+                        foreach (IssueStatus currentStatus in availableIssueStatuses)
                         {
                             cbStatus.Items.Add(new TextAndValueItem { Text = currentStatus.Name, Value = currentStatus.ID });
                             if (currentStatus.ID == issue.Status.ID)

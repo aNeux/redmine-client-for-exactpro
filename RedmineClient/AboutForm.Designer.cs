@@ -36,6 +36,8 @@
             this.linkLabelPavelTropinovVK = new System.Windows.Forms.LinkLabel();
             this.linkLabelIlyaIlichevVK = new System.Windows.Forms.LinkLabel();
             this.labelIlyaIlichev = new System.Windows.Forms.Label();
+            this.linkLabelExactProSystemsWeb = new System.Windows.Forms.LinkLabel();
+            this.labelExactProSystems = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbRedmineLogo)).BeginInit();
             this.SuspendLayout();
             // 
@@ -51,10 +53,10 @@
             // 
             // btnClose
             // 
-            this.btnClose.Location = new System.Drawing.Point(274, 221);
+            this.btnClose.Location = new System.Drawing.Point(116, 261);
             this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(75, 23);
-            this.btnClose.TabIndex = 6;
+            this.btnClose.Size = new System.Drawing.Size(129, 23);
+            this.btnClose.TabIndex = 8;
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
@@ -72,14 +74,14 @@
             this.labelPavelTropinov.AutoSize = true;
             this.labelPavelTropinov.Location = new System.Drawing.Point(13, 210);
             this.labelPavelTropinov.Name = "labelPavelTropinov";
-            this.labelPavelTropinov.Size = new System.Drawing.Size(98, 13);
+            this.labelPavelTropinov.Size = new System.Drawing.Size(189, 13);
             this.labelPavelTropinov.TabIndex = 2;
-            this.labelPavelTropinov.Text = "● Pavel Tropinov - ";
+            this.labelPavelTropinov.Text = "● Pavel Tropinov (Main functionality) - ";
             // 
             // linkLabelPavelTropinovVK
             // 
             this.linkLabelPavelTropinovVK.AutoSize = true;
-            this.linkLabelPavelTropinovVK.Location = new System.Drawing.Point(107, 210);
+            this.linkLabelPavelTropinovVK.Location = new System.Drawing.Point(196, 210);
             this.linkLabelPavelTropinovVK.Name = "linkLabelPavelTropinovVK";
             this.linkLabelPavelTropinovVK.Size = new System.Drawing.Size(112, 13);
             this.linkLabelPavelTropinovVK.TabIndex = 3;
@@ -90,7 +92,7 @@
             // linkLabelIlyaIlichevVK
             // 
             this.linkLabelIlyaIlichevVK.AutoSize = true;
-            this.linkLabelIlyaIlichevVK.Location = new System.Drawing.Point(85, 226);
+            this.linkLabelIlyaIlichevVK.Location = new System.Drawing.Point(185, 226);
             this.linkLabelIlyaIlichevVK.Name = "linkLabelIlyaIlichevVK";
             this.linkLabelIlyaIlichevVK.Size = new System.Drawing.Size(131, 13);
             this.linkLabelIlyaIlichevVK.TabIndex = 5;
@@ -103,15 +105,37 @@
             this.labelIlyaIlichev.AutoSize = true;
             this.labelIlyaIlichev.Location = new System.Drawing.Point(13, 226);
             this.labelIlyaIlichev.Name = "labelIlyaIlichev";
-            this.labelIlyaIlichev.Size = new System.Drawing.Size(76, 13);
+            this.labelIlyaIlichev.Size = new System.Drawing.Size(178, 13);
             this.labelIlyaIlichev.TabIndex = 4;
-            this.labelIlyaIlichev.Text = "● Ilya Ilichev - ";
+            this.labelIlyaIlichev.Text = "● Ilya Ilichev (Design and security) - ";
+            // 
+            // linkLabelExactProSystemsWeb
+            // 
+            this.linkLabelExactProSystemsWeb.AutoSize = true;
+            this.linkLabelExactProSystemsWeb.Location = new System.Drawing.Point(172, 242);
+            this.linkLabelExactProSystemsWeb.Name = "linkLabelExactProSystemsWeb";
+            this.linkLabelExactProSystemsWeb.Size = new System.Drawing.Size(171, 13);
+            this.linkLabelExactProSystemsWeb.TabIndex = 7;
+            this.linkLabelExactProSystemsWeb.TabStop = true;
+            this.linkLabelExactProSystemsWeb.Text = "https://www.exactprosystems.com";
+            this.linkLabelExactProSystemsWeb.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel_LinkClicked);
+            // 
+            // labelExactProSystems
+            // 
+            this.labelExactProSystems.AutoSize = true;
+            this.labelExactProSystems.Location = new System.Drawing.Point(13, 242);
+            this.labelExactProSystems.Name = "labelExactProSystems";
+            this.labelExactProSystems.Size = new System.Drawing.Size(165, 13);
+            this.labelExactProSystems.TabIndex = 6;
+            this.labelExactProSystems.Text = "● ExactPro Systems (Organizer) - ";
             // 
             // AboutForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(361, 253);
+            this.ClientSize = new System.Drawing.Size(361, 291);
+            this.Controls.Add(this.linkLabelExactProSystemsWeb);
+            this.Controls.Add(this.labelExactProSystems);
             this.Controls.Add(this.linkLabelIlyaIlichevVK);
             this.Controls.Add(this.labelIlyaIlichev);
             this.Controls.Add(this.linkLabelPavelTropinovVK);
@@ -120,9 +144,9 @@
             this.Controls.Add(this.labelAbout);
             this.Controls.Add(this.pbRedmineLogo);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AboutForm";
             this.ShowInTaskbar = false;
             this.Text = "About";
@@ -141,5 +165,7 @@
         private System.Windows.Forms.LinkLabel linkLabelPavelTropinovVK;
         private System.Windows.Forms.LinkLabel linkLabelIlyaIlichevVK;
         private System.Windows.Forms.Label labelIlyaIlichev;
+        private System.Windows.Forms.LinkLabel linkLabelExactProSystemsWeb;
+        private System.Windows.Forms.Label labelExactProSystems;
     }
 }

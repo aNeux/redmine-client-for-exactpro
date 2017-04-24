@@ -49,6 +49,7 @@
             this.columnHeaderTracker = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderAssignee = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderLastUpdate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnProjectInfo = new System.Windows.Forms.Button();
             this.contextMenuIssue = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -73,7 +74,7 @@
             this.toolsToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(584, 24);
+            this.menuStrip.Size = new System.Drawing.Size(644, 24);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "Menu";
             // 
@@ -189,13 +190,14 @@
             this.columnHeaderTracker,
             this.columnHeaderStatus,
             this.columnHeaderPriority,
+            this.columnHeaderAssignee,
             this.columnHeaderLastUpdate});
             this.lvIssues.FullRowSelect = true;
             this.lvIssues.GridLines = true;
             this.lvIssues.Location = new System.Drawing.Point(12, 73);
             this.lvIssues.MultiSelect = false;
             this.lvIssues.Name = "lvIssues";
-            this.lvIssues.Size = new System.Drawing.Size(560, 255);
+            this.lvIssues.Size = new System.Drawing.Size(620, 255);
             this.lvIssues.TabIndex = 5;
             this.lvIssues.UseCompatibleStateImageBehavior = false;
             this.lvIssues.View = System.Windows.Forms.View.Details;
@@ -205,12 +207,12 @@
             // columnHeaderID
             // 
             this.columnHeaderID.Text = "ID";
-            this.columnHeaderID.Width = 35;
+            this.columnHeaderID.Width = 30;
             // 
             // columnHeaderSubject
             // 
             this.columnHeaderSubject.Text = "Subject";
-            this.columnHeaderSubject.Width = 160;
+            this.columnHeaderSubject.Width = 150;
             // 
             // columnHeaderTracker
             // 
@@ -227,10 +229,15 @@
             this.columnHeaderPriority.Text = "Priority";
             this.columnHeaderPriority.Width = 70;
             // 
+            // columnHeaderAssignee
+            // 
+            this.columnHeaderAssignee.Text = "Assignee";
+            this.columnHeaderAssignee.Width = 100;
+            // 
             // columnHeaderLastUpdate
             // 
             this.columnHeaderLastUpdate.Text = "Last update";
-            this.columnHeaderLastUpdate.Width = 140;
+            this.columnHeaderLastUpdate.Width = 110;
             // 
             // btnProjectInfo
             // 
@@ -249,19 +256,19 @@
             this.issueInfoToolStripMenuItem,
             this.removeIssueToolStripMenuItem});
             this.contextMenuIssue.Name = "contextMenuStripIssue";
-            this.contextMenuIssue.Size = new System.Drawing.Size(153, 70);
+            this.contextMenuIssue.Size = new System.Drawing.Size(125, 48);
             // 
             // issueInfoToolStripMenuItem
             // 
             this.issueInfoToolStripMenuItem.Name = "issueInfoToolStripMenuItem";
-            this.issueInfoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.issueInfoToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.issueInfoToolStripMenuItem.Text = "Issue info";
             this.issueInfoToolStripMenuItem.Click += new System.EventHandler(this.issueInfotoolStripMenuItem_Click);
             // 
             // removeIssueToolStripMenuItem
             // 
             this.removeIssueToolStripMenuItem.Name = "removeIssueToolStripMenuItem";
-            this.removeIssueToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.removeIssueToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.removeIssueToolStripMenuItem.Text = "Remove";
             this.removeIssueToolStripMenuItem.Visible = false;
             this.removeIssueToolStripMenuItem.Click += new System.EventHandler(this.removeIssueToolStripMenuItem_Click);
@@ -272,7 +279,7 @@
             this.toolStripStatusLabel});
             this.statusStrip.Location = new System.Drawing.Point(0, 339);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(584, 22);
+            this.statusStrip.Size = new System.Drawing.Size(644, 22);
             this.statusStrip.TabIndex = 6;
             // 
             // toolStripStatusLabel
@@ -286,7 +293,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.labelProjectRoles.Location = new System.Drawing.Point(341, 45);
             this.labelProjectRoles.Name = "labelProjectRoles";
-            this.labelProjectRoles.Size = new System.Drawing.Size(231, 21);
+            this.labelProjectRoles.Size = new System.Drawing.Size(291, 21);
             this.labelProjectRoles.TabIndex = 4;
             this.labelProjectRoles.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -296,6 +303,7 @@
             this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
             this.notifyIcon.Text = "Redmine Client";
             this.notifyIcon.Visible = true;
+            this.notifyIcon.Click += new System.EventHandler(this.notifyIcon_Click);
             // 
             // contextMenuNotifyIcon
             // 
@@ -315,7 +323,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(584, 361);
+            this.ClientSize = new System.Drawing.Size(644, 361);
             this.Controls.Add(this.labelProjectRoles);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.btnProjectInfo);
@@ -325,7 +333,7 @@
             this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip;
-            this.MinimumSize = new System.Drawing.Size(600, 400);
+            this.MinimumSize = new System.Drawing.Size(660, 400);
             this.Name = "MainForm";
             this.Text = "Redmine Client";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -373,6 +381,7 @@
         private System.Windows.Forms.ToolStripMenuItem removeIssueToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem logOutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
+        private System.Windows.Forms.ColumnHeader columnHeaderAssignee;
     }
 }
 

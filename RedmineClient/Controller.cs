@@ -253,6 +253,7 @@ namespace RedmineClient
                             issues.AddRange(issuesJSONObject.Issues);
                             offset += issuesJSONObject.Limit;
                         } while (issuesJSONObject.Issues.Count != 0);
+                        issues.RemoveAll(temp1 => projects.FindIndex(temp2 => temp2.ID == temp1.Project.ID) < 0);
                         if (OnIssuesUpdated != null)
                             OnIssuesUpdated(ErrorTypes.NoErrors, issues);
                     }

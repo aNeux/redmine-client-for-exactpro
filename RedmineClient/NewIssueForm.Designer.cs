@@ -387,9 +387,11 @@
             this.Controls.Add(this.labelSubject);
             this.Controls.Add(this.cbTracker);
             this.Controls.Add(this.labelTracker);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.ShowInTaskbar = false;
             this.Name = "NewIssueForm";
             this.Text = "New issue [please, wait..]";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CreateNewIssueForm_FormClosing);
