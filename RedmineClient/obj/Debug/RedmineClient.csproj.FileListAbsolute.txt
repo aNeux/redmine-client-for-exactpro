@@ -18,8 +18,8 @@ C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\Re
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.csproj.GenerateResource.Cache
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.AboutForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.UserInformationForm.resources
-C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.ProjectInformation.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.AuthorizationForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.IssueInformationForm.resources
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.csprojResolveAssemblyReference.cache
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.NewIssueForm.resources
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.ProjectInformation.resources

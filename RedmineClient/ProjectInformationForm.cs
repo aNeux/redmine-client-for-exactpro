@@ -63,15 +63,19 @@ namespace RedmineClient
                         btnClose.Enabled = true;
                         this.Text = "Project information";
                         break;
-                    case ErrorTypes.NetworkError:
+                    case ErrorTypes.ConnectionError:
+                        this.Text = "Project information";
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         break;
                     case ErrorTypes.UnathorizedAccess:
-                        MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Text = "Project information";
+                        MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        controller.NeedToReAuthenticate();
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:
+                        this.Text = "Project information";
                         MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         break;

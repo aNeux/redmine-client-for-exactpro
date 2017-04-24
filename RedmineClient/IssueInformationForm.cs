@@ -194,15 +194,19 @@ namespace RedmineClient
                         ChangeUIState(true);
                         this.Text = "Issue information [" + projectRoles + "]";
                         break;
-                    case ErrorTypes.NetworkError:
+                    case ErrorTypes.ConnectionError:
+                        this.Text = "Issue information [" + projectRoles + "]";
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         break;
                     case ErrorTypes.UnathorizedAccess:
-                        MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Text = "Issue information [" + projectRoles + "]";
+                        MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        controller.NeedToReAuthenticate();
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:
+                        this.Text = "Issue information [" + projectRoles + "]";
                         MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         break;
@@ -223,20 +227,21 @@ namespace RedmineClient
                     case ErrorTypes.NoErrors:
                         this.Close();
                         break;
-                    case ErrorTypes.NetworkError:
+                    case ErrorTypes.ConnectionError:
+                        this.Text = "Issue information [" + projectRoles + "]";
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         ChangeUIState(true);
-                        this.Text = "Issue information [" + projectRoles + "]";
                         break;
                     case ErrorTypes.UnathorizedAccess:
-                        MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        ChangeUIState(true);
                         this.Text = "Issue information [" + projectRoles + "]";
+                        MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        controller.NeedToReAuthenticate();
+                        this.Close();
                         break;
                     case ErrorTypes.UnknownError:
+                        this.Text = "Issue information [" + projectRoles + "]";
                         MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         ChangeUIState(true);
-                        this.Text = "Issue information [" + projectRoles + "]";
                         break;
                 }
             };

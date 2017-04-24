@@ -120,11 +120,11 @@
       <DependentUpon>NewIssueForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="ProjectInformation.cs">
+    <Compile Include="ProjectInformationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ProjectInformation.Designer.cs">
-      <DependentUpon>ProjectInformation.cs</DependentUpon>
+    <Compile Include="ProjectInformationForm.Designer.cs">
+      <DependentUpon>ProjectInformationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInformationForm.cs">
@@ -149,8 +149,8 @@
     <EmbeddedResource Include="NewIssueForm.resx">
       <DependentUpon>NewIssueForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ProjectInformation.resx">
-      <DependentUpon>ProjectInformation.cs</DependentUpon>
+    <EmbeddedResource Include="ProjectInformationForm.resx">
+      <DependentUpon>ProjectInformationForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

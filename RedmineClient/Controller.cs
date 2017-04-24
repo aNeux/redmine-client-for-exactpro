@@ -14,7 +14,7 @@ namespace RedmineClient
     /// <summary>
     /// Перечисление возможных ошибок, возникающих в резульате запроса к серверу.
     /// </summary>
-    public enum ErrorTypes { NoErrors, NetworkError, UnathorizedAccess, UnknownError }
+    public enum ErrorTypes { NoErrors, ConnectionError, UnathorizedAccess, UnknownError }
 
     /// <summary>
     /// Класс, представляющий собой контроллер для взаимодействия с данными (реализация паттерна MVC).
@@ -49,6 +49,8 @@ namespace RedmineClient
         public event Action<ErrorTypes> OnIssueUpdated;
         // Событие, возникающее после удаления задачи
         public event Action<ErrorTypes, long> OnIssueRemoved;
+        // Событие, возникающее при необходимости открытия окна авторизации
+        public event Action OnNeededToReAuthenticate;
 
         public Controller()
         {
@@ -76,6 +78,7 @@ namespace RedmineClient
                         else
                             request.Headers.Add("X-Redmine-API-Key", data);
                         request.Accept = "application/json";
+                        request.Timeout = 10000;
                         HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                         StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                         string jsonResponse = streamReader.ReadToEnd();
@@ -108,16 +111,18 @@ namespace RedmineClient
                                 OnUserAuthenticated(ErrorTypes.NoErrors, false);
                         }
                     }
-                    catch (Exception ex)
+                    catch (WebException webException)
                     {
-                        if (OnUserAuthenticated != null)
-                            if (ex.Message.Contains("401"))
-                                OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
-                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
-                                OnUserAuthenticated(ErrorTypes.NetworkError, false);
-                            else
-                                OnUserAuthenticated(ErrorTypes.UnknownError, false);
-                        
+                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                            OnUserAuthenticated(ErrorTypes.ConnectionError, false);
+                        else if (webException.Status == WebExceptionStatus.ProtocolError)
+                            OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
+                        else
+                            OnUserAuthenticated(ErrorTypes.UnknownError, false);
+                    }
+                    catch (ArgumentException)
+                    {
+                        OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
                     }
                 }).Start();
         }
@@ -144,6 +149,7 @@ namespace RedmineClient
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                             request.Accept = "application/json";
+                            request.Timeout = 10000;
                             response = (HttpWebResponse)request.GetResponse();
                             streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                             jsonResponse = streamReader.ReadToEnd();
@@ -165,6 +171,7 @@ namespace RedmineClient
                                 request.Method = "GET";
                                 request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                                 request.Accept = "application/json";
+                                request.Timeout = 10000;
                                 response = (HttpWebResponse)request.GetResponse();
                                 streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                                 jsonResponse = streamReader.ReadToEnd();
@@ -197,15 +204,18 @@ namespace RedmineClient
                         if (OnProjectsUpdated != null)
                             OnProjectsUpdated(ErrorTypes.NoErrors, projects);
                     }
-                    catch (Exception ex)
+                    catch (WebException webException)
                     {
-                        if (OnProjectsUpdated != null)
-                            if (ex.Message.Contains("401"))
-                                OnProjectsUpdated(ErrorTypes.UnathorizedAccess, null);
-                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
-                                OnProjectsUpdated(ErrorTypes.NetworkError, null);
-                            else
-                                OnProjectsUpdated(ErrorTypes.UnknownError, null);
+                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                            OnProjectsUpdated(ErrorTypes.ConnectionError, null);
+                        else if (webException.Status == WebExceptionStatus.ProtocolError)
+                            OnProjectsUpdated(ErrorTypes.UnathorizedAccess, null);
+                        else
+                            OnProjectsUpdated(ErrorTypes.UnknownError, null);
+                    }
+                    catch (ArgumentException)
+                    {
+                        OnProjectsUpdated(ErrorTypes.UnathorizedAccess, null);
                     }
                 }).Start();
         }
@@ -233,6 +243,7 @@ namespace RedmineClient
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                             request.Accept = "application/json";
+                            request.Timeout = 10000;
                             response = (HttpWebResponse)request.GetResponse();
                             streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                             jsonResponse = streamReader.ReadToEnd();
@@ -245,15 +256,18 @@ namespace RedmineClient
                         if (OnIssuesUpdated != null)
                             OnIssuesUpdated(ErrorTypes.NoErrors, issues);
                     }
-                    catch (Exception ex)
+                    catch (WebException webException)
                     {
-                        if (OnIssuesUpdated != null)
-                            if (ex.Message.Contains("401"))
-                                OnIssuesUpdated(ErrorTypes.UnathorizedAccess, null);
-                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
-                                OnIssuesUpdated(ErrorTypes.NetworkError, null);
-                            else
-                                OnIssuesUpdated(ErrorTypes.UnknownError, null);
+                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                            OnIssuesUpdated(ErrorTypes.ConnectionError, null);
+                        else if (webException.Status == WebExceptionStatus.ProtocolError)
+                            OnIssuesUpdated(ErrorTypes.UnathorizedAccess, null);
+                        else
+                            OnIssuesUpdated(ErrorTypes.UnknownError, null);
+                    }
+                    catch (ArgumentException)
+                    {
+                        OnIssuesUpdated(ErrorTypes.UnathorizedAccess, null);
                     }
                 }).Start();
         }
@@ -278,6 +292,7 @@ namespace RedmineClient
                         request.Method = "GET";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.Accept = "application/json";
+                        request.Timeout = 10000;
                         response = (HttpWebResponse)request.GetResponse();
                         streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                         jsonResponse = streamReader.ReadToEnd();
@@ -289,6 +304,7 @@ namespace RedmineClient
                         request.Method = "GET";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.Accept = "application/json";
+                        request.Timeout = 10000;
                         response = (HttpWebResponse)request.GetResponse();
                         streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                         jsonResponse = streamReader.ReadToEnd();
@@ -305,6 +321,7 @@ namespace RedmineClient
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                             request.Accept = "application/json";
+                            request.Timeout = 10000;
                             response = (HttpWebResponse)request.GetResponse();
                             streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                             jsonResponse = streamReader.ReadToEnd();
@@ -318,15 +335,18 @@ namespace RedmineClient
                         if (OnPreparedToCreateNewIssue != null)
                             OnPreparedToCreateNewIssue(ErrorTypes.NoErrors, issueTrackers, issuePriorities, memberships);
                     }
-                    catch (Exception ex)
+                    catch (WebException webException)
                     {
-                        if (OnPreparedToCreateNewIssue != null)
-                            if (ex.Message.Contains("401"))
-                                OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
-                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
-                                OnPreparedToCreateNewIssue(ErrorTypes.NetworkError, null, null, null);
-                            else
-                                OnPreparedToCreateNewIssue(ErrorTypes.UnknownError, null, null, null);
+                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                            OnPreparedToCreateNewIssue(ErrorTypes.ConnectionError, null, null, null);
+                        else if (webException.Status == WebExceptionStatus.ProtocolError)
+                            OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
+                        else
+                            OnPreparedToCreateNewIssue(ErrorTypes.UnknownError, null, null, null);
+                    }
+                    catch (ArgumentException)
+                    {
+                        OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
                     }
                 }).Start();
         }
@@ -346,6 +366,7 @@ namespace RedmineClient
                         request.Method = "POST";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.ContentType = "application/json";
+                        request.Timeout = 10000;
                         StreamWriter streamWriter = new StreamWriter(request.GetRequestStream());
                         streamWriter.Write(jsonRequest);
                         streamWriter.Flush();
@@ -355,15 +376,18 @@ namespace RedmineClient
                         if (OnIssueCreated != null)
                             OnIssueCreated(ErrorTypes.NoErrors);
                     }
-                    catch (Exception ex)
+                    catch (WebException webException)
                     {
-                        if (OnIssueCreated != null)
-                            if (ex.Message.Contains("401"))
-                                OnIssueCreated(ErrorTypes.UnathorizedAccess);
-                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
-                                OnIssueCreated(ErrorTypes.NetworkError);
-                            else
-                                OnIssueCreated(ErrorTypes.UnknownError);
+                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                            OnIssueCreated(ErrorTypes.ConnectionError);
+                        else if (webException.Status == WebExceptionStatus.ProtocolError)
+                            OnIssueCreated(ErrorTypes.UnathorizedAccess);
+                        else
+                            OnIssueCreated(ErrorTypes.UnknownError);
+                    }
+                    catch (ArgumentException)
+                    {
+                        OnIssueCreated(ErrorTypes.UnathorizedAccess);
                     }
                 }).Start();
         }
@@ -383,6 +407,7 @@ namespace RedmineClient
                         request.Method = "GET";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.Accept = "application/json";
+                        request.Timeout = 10000;
                         HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                         StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                         string jsonResponse = streamReader.ReadToEnd();
@@ -399,6 +424,7 @@ namespace RedmineClient
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                             request.Accept = "application/json";
+                            request.Timeout = 10000;
                             response = (HttpWebResponse)request.GetResponse();
                             streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                             jsonResponse = streamReader.ReadToEnd();
@@ -412,15 +438,18 @@ namespace RedmineClient
                         if (OnProjectInformationLoaded != null)
                             OnProjectInformationLoaded(ErrorTypes.NoErrors, project, memberships);
                     }
-                    catch (Exception ex)
+                    catch (WebException webException)
                     {
-                        if (OnProjectInformationLoaded != null)
-                            if (ex.Message.Contains("401"))
-                                OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
-                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
-                                OnProjectInformationLoaded(ErrorTypes.NetworkError, null, null);
-                            else
-                                OnProjectInformationLoaded(ErrorTypes.UnknownError, null, null);
+                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                            OnProjectInformationLoaded(ErrorTypes.ConnectionError, null, null);
+                        else if (webException.Status == WebExceptionStatus.ProtocolError)
+                            OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
+                        else
+                            OnProjectInformationLoaded(ErrorTypes.UnknownError, null, null);
+                    }
+                    catch (ArgumentException)
+                    {
+                        OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
                     }
                 }).Start();
         }
@@ -445,6 +474,7 @@ namespace RedmineClient
                         request.Method = "GET";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.Accept = "application/json";
+                        request.Timeout = 10000;
                         response = (HttpWebResponse)request.GetResponse();
                         streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                         jsonResponse = streamReader.ReadToEnd();
@@ -456,6 +486,7 @@ namespace RedmineClient
                         request.Method = "GET";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.Accept = "application/json";
+                        request.Timeout = 10000;
                         response = (HttpWebResponse)request.GetResponse();
                         streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                         jsonResponse = streamReader.ReadToEnd();
@@ -467,6 +498,7 @@ namespace RedmineClient
                         request.Method = "GET";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.Accept = "application/json";
+                        request.Timeout = 10000;
                         response = (HttpWebResponse)request.GetResponse();
                         streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                         jsonResponse = streamReader.ReadToEnd();
@@ -478,6 +510,7 @@ namespace RedmineClient
                         request.Method = "GET";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.Accept = "application/json";
+                        request.Timeout = 10000;
                         response = (HttpWebResponse)request.GetResponse();
                         streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                         jsonResponse = streamReader.ReadToEnd();
@@ -494,6 +527,7 @@ namespace RedmineClient
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                             request.Accept = "application/json";
+                            request.Timeout = 10000;
                             response = (HttpWebResponse)request.GetResponse();
                             streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                             jsonResponse = streamReader.ReadToEnd();
@@ -507,15 +541,18 @@ namespace RedmineClient
                         if (OnIssueInformationLoaded != null)
                             OnIssueInformationLoaded(ErrorTypes.NoErrors, issue, issueTrackers, issueStatuses, issuePriorities, memberships);
                     }
-                    catch (Exception ex)
+                    catch (WebException webException)
                     {
-                        if (OnIssueInformationLoaded != null)
-                            if (ex.Message.Contains("401"))
-                                OnIssueInformationLoaded(ErrorTypes.UnathorizedAccess, null, null, null, null, null);
-                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
-                                OnIssueInformationLoaded(ErrorTypes.NetworkError, null, null, null, null, null);
-                            else
-                                OnIssueInformationLoaded(ErrorTypes.UnknownError, null, null, null, null, null);
+                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                            OnIssueInformationLoaded(ErrorTypes.ConnectionError, null, null, null, null, null);
+                        else if (webException.Status == WebExceptionStatus.ProtocolError)
+                            OnIssueInformationLoaded(ErrorTypes.UnathorizedAccess, null, null, null, null, null);
+                        else
+                            OnIssueInformationLoaded(ErrorTypes.UnknownError, null, null, null, null, null);
+                    }
+                    catch (ArgumentException)
+                    {
+                        OnIssueInformationLoaded(ErrorTypes.UnathorizedAccess, null, null, null, null, null);
                     }
                 }).Start();
         }
@@ -536,6 +573,7 @@ namespace RedmineClient
                         request.Method = "PUT";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.ContentType = "application/json";
+                        request.Timeout = 10000;
                         StreamWriter streamWriter = new StreamWriter(request.GetRequestStream());
                         streamWriter.Write(jsonRequest);
                         streamWriter.Flush();
@@ -545,15 +583,18 @@ namespace RedmineClient
                         if (OnIssueUpdated != null)
                             OnIssueUpdated(ErrorTypes.NoErrors);
                     }
-                    catch (Exception ex)
+                    catch (WebException webException)
                     {
-                        if (OnIssueUpdated != null)
-                            if (ex.Message.Contains("401"))
-                                OnIssueUpdated(ErrorTypes.UnathorizedAccess);
-                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
-                                OnIssueUpdated(ErrorTypes.NetworkError);
-                            else
-                                OnIssueUpdated(ErrorTypes.UnknownError);
+                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                            OnIssueUpdated(ErrorTypes.ConnectionError);
+                        else if (webException.Status == WebExceptionStatus.ProtocolError)
+                            OnIssueUpdated(ErrorTypes.UnathorizedAccess);
+                        else
+                            OnIssueUpdated(ErrorTypes.UnknownError);
+                    }
+                    catch (ArgumentException)
+                    {
+                        OnIssueUpdated(ErrorTypes.UnathorizedAccess);
                     }
                 }).Start();
         }
@@ -573,19 +614,23 @@ namespace RedmineClient
                         request.Method = "DELETE";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.Accept = "application/json";
+                        request.Timeout = 10000;
                         HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                         if (OnIssueRemoved != null)
                             OnIssueRemoved(ErrorTypes.NoErrors, issueID);
                     }
-                    catch (Exception ex)
+                    catch (WebException webException)
                     {
-                        if (OnIssueRemoved != null)
-                            if (ex.Message.Contains("401"))
-                                OnIssueRemoved(ErrorTypes.UnathorizedAccess, issueID);
-                            else if (ex.Message.Contains(Regex.Replace(Regex.Replace(REDMINE_HOST, "http[s]*:", ""), "//*", "")))
-                                OnIssueRemoved(ErrorTypes.NetworkError, issueID);
-                            else
-                                OnIssueRemoved(ErrorTypes.UnknownError, issueID);
+                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                            OnIssueRemoved(ErrorTypes.ConnectionError, issueID);
+                        else if (webException.Status == WebExceptionStatus.ProtocolError)
+                            OnIssueRemoved(ErrorTypes.UnathorizedAccess, issueID);
+                        else
+                            OnIssueRemoved(ErrorTypes.UnknownError, issueID);
+                    }
+                    catch (ArgumentException)
+                    {
+                        OnIssueRemoved(ErrorTypes.UnathorizedAccess, issueID);
                     }
                 }).Start();
         }
@@ -614,6 +659,21 @@ namespace RedmineClient
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Метод, оповещающий главную форму о необходимости открытия окна авторизации.
+        /// </summary>
+        public void NeedToReAuthenticate()
+        {
+            new Thread(
+                delegate()
+                {
+                    Properties.Settings.Default.api_key = "";
+                    Properties.Settings.Default.Save();
+                    if (OnNeededToReAuthenticate != null)
+                        OnNeededToReAuthenticate();
+                }).Start();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace RedmineClient
 {
     public partial class AuthorizationForm : Form
     {
-        Controller controller;
+        private Controller controller;
 
         public AuthorizationForm()
         {
@@ -70,13 +70,8 @@ namespace RedmineClient
                     MessageBox.Show("Please, enter your password!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else
                 {
-                    labelLogin.Enabled = false;
-                    tbLogin.Enabled = false;
-                    labelPassword.Enabled = false;
-                    tbPassword.Enabled = false;
-                    cbUseAPIKeyInstead.Enabled = false;
-                    btnSave.Enabled = false;
-                    btnCancel.Enabled = false;
+                    ChangeUIState(false);
+                    this.Text = "Authorization [please, wait..]";
                     controller.Authorize(true, Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(tbLogin.Text + ":" + tbPassword.Text)));
                 }
             else
@@ -84,11 +79,8 @@ namespace RedmineClient
                     MessageBox.Show("Please, enter your API key!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else
                 {
-                    labelAPIKey.Enabled = false;
-                    tbAPIKey.Enabled = false;
-                    cbUseAPIKeyInstead.Enabled = false;
-                    btnSave.Enabled = false;
-                    btnCancel.Enabled = false;
+                    ChangeUIState(false);
+                    this.Text = "Authorization [please, wait..]";
                     controller.Authorize(false, tbAPIKey.Text);
                 }
         }
@@ -114,41 +106,19 @@ namespace RedmineClient
                         case ErrorTypes.NoErrors:
                             this.Close();
                             break;
-                        case ErrorTypes.NetworkError:
+                        case ErrorTypes.ConnectionError:
+                            this.Text = "Authorization";
                             MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            labelLogin.Enabled = !cbUseAPIKeyInstead.Checked;
-                            tbLogin.Enabled = !cbUseAPIKeyInstead.Checked;
-                            labelPassword.Enabled = !cbUseAPIKeyInstead.Checked;
-                            tbPassword.Enabled = !cbUseAPIKeyInstead.Checked;
-                            labelAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
-                            tbAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
-                            cbUseAPIKeyInstead.Enabled = true;
-                            btnSave.Enabled = true;
-                            btnCancel.Enabled = true;
+                            ChangeUIState(true);
                             break;
                         case ErrorTypes.UnathorizedAccess:
-                            MessageBox.Show("Wrong authorization data. Please check it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            labelLogin.Enabled = !cbUseAPIKeyInstead.Checked;
-                            tbLogin.Enabled = !cbUseAPIKeyInstead.Checked;
-                            labelPassword.Enabled = !cbUseAPIKeyInstead.Checked;
-                            tbPassword.Enabled = !cbUseAPIKeyInstead.Checked;
-                            labelAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
-                            tbAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
-                            cbUseAPIKeyInstead.Enabled = true;
-                            btnSave.Enabled = true;
-                            btnCancel.Enabled = true;
+                            this.Text = "Authorization";
+                            MessageBox.Show("You have entered the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ChangeUIState(true);
                             break;
                         case ErrorTypes.UnknownError:
-                            MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            labelLogin.Enabled = !cbUseAPIKeyInstead.Checked;
-                            tbLogin.Enabled = !cbUseAPIKeyInstead.Checked;
-                            labelPassword.Enabled = !cbUseAPIKeyInstead.Checked;
-                            tbPassword.Enabled = !cbUseAPIKeyInstead.Checked;
-                            labelAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
-                            tbAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
-                            cbUseAPIKeyInstead.Enabled = true;
-                            btnSave.Enabled = true;
-                            btnCancel.Enabled = true;
+                            this.Text = "Authorization";
+                            ChangeUIState(true);
                             break;
                     }
                 };
@@ -156,6 +126,19 @@ namespace RedmineClient
                 Invoke(action);
             else
                 action();
+        }
+
+        private void ChangeUIState(bool isEnabled)
+        {
+            labelLogin.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
+            tbLogin.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
+            labelPassword.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
+            tbPassword.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
+            labelAPIKey.Enabled = isEnabled && cbUseAPIKeyInstead.Checked;
+            tbAPIKey.Enabled = isEnabled && cbUseAPIKeyInstead.Checked;
+            cbUseAPIKeyInstead.Enabled = isEnabled;
+            btnSave.Enabled = isEnabled;
+            btnCancel.Enabled = isEnabled;
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Net;
 using System.Management;
 
 namespace RedmineClient
@@ -46,14 +44,16 @@ namespace RedmineClient
         private static string GetUniqueKey()
         {
             string result = "";
-            SelectQuery selectionQuery = new SelectQuery(@"Select * from Win32_ComputerSystem");
-            System.Management.ManagementObjectSearcher moSearcher = new ManagementObjectSearcher(selectionQuery);
+            ManagementObjectSearcher moSearcher = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
             foreach (ManagementObject process in moSearcher.Get())
             {
                 process.Get();
-                result += process["Manufacturer"];
+                result += process["Manufacturer"].ToString() + process["Model"].ToString();
             }
-            return result;
+            moSearcher = new ManagementObjectSearcher("SELECT * FROM Win32_BIOS");
+            foreach (ManagementObject mObject in moSearcher.Get())
+                result += ((string[])mObject["BIOSVersion"])[0];
+            return result.Replace(" ", "");
         }
     }
 }

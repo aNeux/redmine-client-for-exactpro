@@ -29,6 +29,7 @@ namespace RedmineClient
             controller.OnIssueCreated += controller_OnIssueCreatedOrUpdated;
             controller.OnIssueUpdated += controller_OnIssueCreatedOrUpdated;
             controller.OnIssueRemoved += controller_OnIssueRemoved;
+            controller.OnNeededToReAuthenticate += controller_OnNeededToReAuthenticate;
             controller.UpdateProjects();
             toolStripStatusLabel.Text = "Updating projects..";
         }
@@ -46,6 +47,7 @@ namespace RedmineClient
                     controller.OnIssueCreated -= controller_OnIssueCreatedOrUpdated;
                     controller.OnIssueUpdated -= controller_OnIssueCreatedOrUpdated;
                     controller.OnIssueRemoved -= controller_OnIssueRemoved;
+                    controller.OnNeededToReAuthenticate -= controller_OnNeededToReAuthenticate;
                 }
                 else
                     e.Cancel = true;
@@ -58,6 +60,7 @@ namespace RedmineClient
                 controller.OnIssueCreated -= controller_OnIssueCreatedOrUpdated;
                 controller.OnIssueUpdated -= controller_OnIssueCreatedOrUpdated;
                 controller.OnIssueRemoved -= controller_OnIssueRemoved;
+                controller.OnNeededToReAuthenticate -= controller_OnNeededToReAuthenticate;
             }
         }
 
@@ -144,7 +147,20 @@ namespace RedmineClient
 
         private void lvIssues_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            
+            if (e.Column != lastSortedColumn)
+            {
+                lastSortedColumn = e.Column;
+                lvIssues.Sorting = SortOrder.Ascending;
+            }
+            else
+            {
+                if (lvIssues.Sorting == SortOrder.Ascending)
+                    lvIssues.Sorting = SortOrder.Descending;
+                else
+                    lvIssues.Sorting = SortOrder.Ascending;
+            }
+            this.lvIssues.ListViewItemSorter = new ListViewItemComparer(e.Column, lvIssues.Sorting);
+            lvIssues.Sort();
         }
 
         private void lvIssues_MouseClick(object sender, MouseEventArgs e)
@@ -211,16 +227,19 @@ namespace RedmineClient
                                 toolStripStatusLabel.Text = "Projects was updated at " + DateTime.Now.ToShortTimeString();
                             cbProjects.SelectedIndex = indexToSelect;
                             break;
-                        case ErrorTypes.NetworkError:
+                        case ErrorTypes.ConnectionError:
                             toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
                             MessageBox.Show("Cannot connect to Redmine services and load projects. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
                             toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
-                            if (Properties.Settings.Default.api_key.Length == 0)
-                                new AuthorizationForm().ShowDialog();
-                            else
-                                MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            if (Properties.Settings.Default.api_key.Length != 0)
+                            {
+                                Properties.Settings.Default.api_key = "";
+                                Properties.Settings.Default.Save();
+                                MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            new AuthorizationForm().ShowDialog();
                             break;
                         case ErrorTypes.UnknownError:
                             toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (unknown error)";
@@ -254,16 +273,19 @@ namespace RedmineClient
                             }
                             toolStripStatusLabel.Text = "Issues was updated at " + DateTime.Now.ToShortTimeString();
                             break;
-                        case ErrorTypes.NetworkError:
+                        case ErrorTypes.ConnectionError:
                             toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
                             MessageBox.Show("Cannot connect to Redmine services and load issues. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
                             toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
-                            if (Properties.Settings.Default.api_key.Length == 0)
-                                new AuthorizationForm().ShowDialog();
-                            else
-                                MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            if (Properties.Settings.Default.api_key.Length != 0)
+                            {
+                                Properties.Settings.Default.api_key = "";
+                                Properties.Settings.Default.Save();
+                                MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            new AuthorizationForm().ShowDialog();
                             break;
                         case ErrorTypes.UnknownError:
                             toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (unknown error)";
@@ -296,13 +318,19 @@ namespace RedmineClient
                         toolStripStatusLabel.Text = "Updating issues..";
                         controller.UpdateIssues(lastSelectedProjectID);
                         break;
-                    case ErrorTypes.NetworkError:
+                    case ErrorTypes.ConnectionError:
                         toolStripStatusLabel.Text = "Issue #" + issueID + "removing failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         break;
                     case ErrorTypes.UnathorizedAccess:
                         toolStripStatusLabel.Text = "Issue #" + issueID + "removing failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
-                        MessageBox.Show("You have wrong authorization data. Please check it, change if necessary and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        if (Properties.Settings.Default.api_key.Length != 0)
+                            {
+                                Properties.Settings.Default.api_key = "";
+                                Properties.Settings.Default.Save();
+                                MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            new AuthorizationForm().ShowDialog();
                         break;
                     case ErrorTypes.UnknownError:
                         toolStripStatusLabel.Text = "Issue #" + issueID + "removing failed at " + DateTime.Now.ToShortTimeString() + " (unknown error)";
@@ -315,12 +343,32 @@ namespace RedmineClient
             else
                 action();
         }
+
+        private void controller_OnNeededToReAuthenticate()
+        {
+            Action action = () =>
+                {
+                    toolStripStatusLabel.Text = "Last request failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
+                    new AuthorizationForm().ShowDialog();
+                };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
+        }
     }
+
 
     class ListViewItemComparer : IComparer
     {
         private int column;
         private SortOrder sortOrder;
+
+        public ListViewItemComparer()
+        {
+            column = 0;
+            sortOrder = SortOrder.Ascending;
+        }
 
         public ListViewItemComparer(int column, SortOrder sortOrder)
         {
@@ -330,7 +378,20 @@ namespace RedmineClient
 
         public int Compare(object x, object y)
         {
-            return 0;
+            int returnValue = -1;
+            if (column == 5)
+            {
+                string[] splittedFullDate = ((ListViewItem)x).SubItems[column].Text.Replace(" ", "").Split(',');
+                DateTime firstDate = new DateTime(int.Parse(splittedFullDate[1].Split('.')[2]), int.Parse(splittedFullDate[1].Split('.')[1]), int.Parse(splittedFullDate[1].Split('.')[0]), int.Parse(splittedFullDate[0].Split(':')[0]), int.Parse(splittedFullDate[0].Split(':')[1]), 0);
+                splittedFullDate = ((ListViewItem)y).SubItems[column].Text.Replace(" ", "").Split(',');
+                DateTime secondDate = new DateTime(int.Parse(splittedFullDate[1].Split('.')[2]), int.Parse(splittedFullDate[1].Split('.')[1]), int.Parse(splittedFullDate[1].Split('.')[0]), int.Parse(splittedFullDate[0].Split(':')[0]), int.Parse(splittedFullDate[0].Split(':')[1]), 0);
+                returnValue = DateTime.Compare(firstDate, secondDate);
+            }
+            else
+                returnValue = String.Compare(((ListViewItem)x).SubItems[column].Text, ((ListViewItem)y).SubItems[column].Text);
+            if (sortOrder == SortOrder.Descending)
+                returnValue *= -1;
+            return returnValue;
         }
     }
 }
