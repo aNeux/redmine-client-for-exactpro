@@ -84,9 +84,9 @@
             // btnSave
             // 
             this.btnSave.Enabled = false;
-            this.btnSave.Location = new System.Drawing.Point(109, 341);
+            this.btnSave.Location = new System.Drawing.Point(314, 341);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(129, 23);
+            this.btnSave.Size = new System.Drawing.Size(75, 23);
             this.btnSave.TabIndex = 40;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -95,9 +95,9 @@
             // btnClose
             // 
             this.btnClose.Enabled = false;
-            this.btnClose.Location = new System.Drawing.Point(244, 341);
+            this.btnClose.Location = new System.Drawing.Point(395, 341);
             this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(129, 23);
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 41;
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;

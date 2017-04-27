@@ -24,14 +24,13 @@ namespace RedmineClient
             cbProjects.SelectedIndex = 0;
             controller = Program.controllerGlobal;
             controller.OnUserAuthenticated += controller_OnUserAuthenticated;
-            controller.OnProjectsUpdated += controller_OnProjectsUpdated;
-            controller.OnIssuesUpdated += controller_OnIssuesUpdated;
+            controller.OnUpdated += controller_OnUpdated;
             controller.OnIssueCreated += controller_OnIssueCreatedOrUpdated;
             controller.OnIssueUpdated += controller_OnIssueCreatedOrUpdated;
             controller.OnIssueRemoved += controller_OnIssueRemoved;
             controller.OnNeededToReAuthenticate += controller_OnNeededToReAuthenticate;
-            controller.UpdateProjects();
-            toolStripStatusLabel.Text = "Updating projects..";
+            toolStripStatusLabel.Text = "Updating..";
+            controller.Update();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -42,8 +41,7 @@ namespace RedmineClient
                 if (dialogResult == DialogResult.Yes)
                 {
                     controller.OnUserAuthenticated -= controller_OnUserAuthenticated;
-                    controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
-                    controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
+                    controller.OnUpdated -= controller_OnUpdated;
                     controller.OnIssueCreated -= controller_OnIssueCreatedOrUpdated;
                     controller.OnIssueUpdated -= controller_OnIssueCreatedOrUpdated;
                     controller.OnIssueRemoved -= controller_OnIssueRemoved;
@@ -55,8 +53,7 @@ namespace RedmineClient
             else
             {
                 controller.OnUserAuthenticated -= controller_OnUserAuthenticated;
-                controller.OnProjectsUpdated -= controller_OnProjectsUpdated;
-                controller.OnIssuesUpdated -= controller_OnIssuesUpdated;
+                controller.OnUpdated -= controller_OnUpdated;
                 controller.OnIssueCreated -= controller_OnIssueCreatedOrUpdated;
                 controller.OnIssueUpdated -= controller_OnIssueCreatedOrUpdated;
                 controller.OnIssueRemoved -= controller_OnIssueRemoved;
@@ -73,8 +70,8 @@ namespace RedmineClient
 
         private void refreshStripMenuItem_Click(object sender, EventArgs e)
         {
-            toolStripStatusLabel.Text = "Updating projects..";
-            controller.UpdateProjects();
+            toolStripStatusLabel.Text = "Updating..";
+            controller.Update();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -117,25 +114,31 @@ namespace RedmineClient
             if (cbProjects.SelectedIndex != 0)
             {
                 btnProjectInfo.Visible = true;
-                if (lastSelectedProjectID != (long)(cbProjects.SelectedItem as TextAndValueItem).Value)
-                {
-                    lastSelectedProjectID = (long)(cbProjects.SelectedItem as TextAndValueItem).Value;
-                    lvIssues.Items.Clear();
-                }
-                Project currentProject = controller.GetProject(lastSelectedProjectID);
+                lastSelectedProjectID = (long)(cbProjects.SelectedItem as TextAndValueItem).Value;
+                Project currentProject = controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID);
                 newIssueToolStripMenuItem.Enabled = currentProject.Roles.Contains("Manager") && currentProject.Status == 1;
-                removeIssueToolStripMenuItem.Visible = newIssueToolStripMenuItem.Enabled;
                 labelProjectRoles.Text = "Roles: " + currentProject.Roles;
-                toolStripStatusLabel.Text = "Updating issues..";
-                controller.UpdateIssues(lastSelectedProjectID);
+                lvIssues.Items.Clear();
+                foreach (Issue issue in controller.GetIssues(lastSelectedProjectID))
+                {
+                    ListViewItem lvi = new ListViewItem(issue.ID + "");
+                    lvi.SubItems.Add(issue.Subject);
+                    lvi.SubItems.Add(issue.Tracker.Name);
+                    lvi.SubItems.Add(issue.Status.Name);
+                    lvi.SubItems.Add(issue.Priority.Name);
+                    lvi.SubItems.Add(issue.AssignedTo != null && issue.AssignedTo.Name.Length > 0 ? issue.AssignedTo.Name : "< none >");
+                    lvi.SubItems.Add(issue.UpdatedOn.ToShortTimeString() + ", " + issue.UpdatedOn.ToShortDateString());
+                    lvIssues.Items.Add(lvi);
+                }
+                removeIssueToolStripMenuItem.Visible = newIssueToolStripMenuItem.Enabled;
             }
             else
             {
                 lastSelectedProjectID = -1;
                 newIssueToolStripMenuItem.Enabled = false;
-                removeIssueToolStripMenuItem.Visible = false;
                 btnProjectInfo.Visible = false;
                 labelProjectRoles.Text = "";
+                removeIssueToolStripMenuItem.Visible = false;
                 lvIssues.Items.Clear();
             }
         }
@@ -171,7 +174,7 @@ namespace RedmineClient
 
         private void issueInfotoolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProject(lastSelectedProjectID).Roles).ShowDialog();
+            new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID).Roles).ShowDialog();
         }
 
         private void notifyIcon_Click(object sender, EventArgs e)
@@ -197,8 +200,8 @@ namespace RedmineClient
                     if (error == ErrorTypes.NoErrors && isUserChanged)
                     {
                         cbProjects.SelectedIndex = 0;
-                        toolStripStatusLabel.Text = "Updating projects..";
-                        controller.UpdateProjects();
+                        toolStripStatusLabel.Text = "Updating..";
+                        controller.Update();
                     }
                 };
             if (InvokeRequired)
@@ -207,14 +210,14 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnProjectsUpdated(ErrorTypes error, List<Project> projects)
+        private void controller_OnUpdated(ErrorTypes error, List<Project> projects)
         {
             Action action = () =>
                 {
                     switch (error)
                     {
                         case ErrorTypes.NoErrors:
-                            this.Text = "Redmine Client ["+ Properties.Settings.Default.login +"]";
+                            this.Text = "Redmine Client [" + Properties.Settings.Default.login + "]";
                             userInformationToolStripMenuItem.Enabled = true;
                             for (int i = cbProjects.Items.Count - 1; i >= 1; i--)
                                 cbProjects.Items.RemoveAt(i);
@@ -222,23 +225,22 @@ namespace RedmineClient
                             for (int i = 0; i < projects.Count; i++)
                             {
                                 if (projects[i].Parent == null)
-                                    cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name, Value = projects[i].ID });
+                                    cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
                                 else
-                                    cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name, Value = projects[i].ID });
+                                    cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
                                 if (lastSelectedProjectID == projects[i].ID)
                                     indexToSelect = i + 1;
                             }
-                            if (indexToSelect == 0)
-                                toolStripStatusLabel.Text = "Projects was updated at " + DateTime.Now.ToShortTimeString();
+                            toolStripStatusLabel.Text = "Last update was at " + DateTime.Now.ToShortTimeString() + " (success)";
                             cbProjects.SelectedIndex = indexToSelect;
                             break;
                         case ErrorTypes.ConnectionError:
-                            toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
+                            toolStripStatusLabel.Text = "Last update failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
                             MessageBox.Show("Cannot connect to Redmine services and load projects. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
                             this.Text = "Redmine Client";
-                            toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
+                            toolStripStatusLabel.Text = "Last update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                             if (Properties.Settings.Default.api_key.Length != 0)
                             {
                                 Properties.Settings.Default.api_key = "";
@@ -248,7 +250,7 @@ namespace RedmineClient
                             new AuthorizationForm().ShowDialog();
                             break;
                         case ErrorTypes.UnknownError:
-                            toolStripStatusLabel.Text = "Projects update failed at " + DateTime.Now.ToShortTimeString() + " (unknown error)";
+                            toolStripStatusLabel.Text = "Last update failed at " + DateTime.Now.ToShortTimeString() + " (unknown error)";
                             MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                     }
@@ -259,61 +261,27 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnIssuesUpdated(ErrorTypes error, List<Issue> issues)
+        private void controller_OnIssueCreatedOrUpdated(ErrorTypes error, long projectID)
         {
             Action action = () =>
                 {
-                    lvIssues.Items.Clear();
-                    switch (error)
+                    if (error == ErrorTypes.NoErrors)
                     {
-                        case ErrorTypes.NoErrors:
-                            foreach (Issue issue in issues)
+                        for (int i = 1; i < cbProjects.Items.Count; i++)
+                            if ((long)(cbProjects.Items[i] as TextAndValueItem).Value == projectID)
                             {
-                                ListViewItem lvi = new ListViewItem(issue.ID + "");
-                                lvi.SubItems.Add(issue.Subject);
-                                lvi.SubItems.Add(issue.Tracker.Name);
-                                lvi.SubItems.Add(issue.Status.Name);
-                                lvi.SubItems.Add(issue.Priority.Name);
-                                lvi.SubItems.Add(issue.AssignedTo != null && issue.AssignedTo.Name.Length > 0 ? issue.AssignedTo.Name : "< none >");
-                                lvi.SubItems.Add(issue.UpdatedOn.ToShortTimeString() + ", " + issue.UpdatedOn.ToShortDateString());
-                                lvIssues.Items.Add(lvi);
+                                if (cbProjects.SelectedIndex == i)
+                                    cbSelectProject_SelectedIndexChanged(null, null);
+                                else
+                                    cbProjects.SelectedIndex = i;
+                                break;
                             }
-                            toolStripStatusLabel.Text = "Issues was updated at " + DateTime.Now.ToShortTimeString();
-                            break;
-                        case ErrorTypes.ConnectionError:
-                            toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
-                            MessageBox.Show("Cannot connect to Redmine services and load issues. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            break;
-                        case ErrorTypes.UnathorizedAccess:
-                            this.Text = "Redmine Client";
-                            toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
-                            if (Properties.Settings.Default.api_key.Length != 0)
-                            {
-                                Properties.Settings.Default.api_key = "";
-                                Properties.Settings.Default.Save();
-                                MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                            new AuthorizationForm().ShowDialog();
-                            break;
-                        case ErrorTypes.UnknownError:
-                            toolStripStatusLabel.Text = "Issues update failed at " + DateTime.Now.ToShortTimeString() + " (unknown error)";
-                            MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            break;
                     }
                 };
             if (InvokeRequired)
                 Invoke(action);
             else
                 action();
-        }
-
-        private void controller_OnIssueCreatedOrUpdated(ErrorTypes error)
-        {
-            if (error == ErrorTypes.NoErrors)
-            {
-                toolStripStatusLabel.Text = "Updating issues..";
-                controller.UpdateIssues(lastSelectedProjectID);
-            }
         }
 
         private void controller_OnIssueRemoved(ErrorTypes error, long issueID)
@@ -323,8 +291,8 @@ namespace RedmineClient
                 switch (error)
                 {
                     case ErrorTypes.NoErrors:
-                        toolStripStatusLabel.Text = "Updating issues..";
-                        controller.UpdateIssues(lastSelectedProjectID);
+                        cbSelectProject_SelectedIndexChanged(null, null);
+                        toolStripStatusLabel.Text = "Issue #" + issueID + " removed at " + DateTime.Now.ToShortTimeString() + " (success)";
                         break;
                     case ErrorTypes.ConnectionError:
                         toolStripStatusLabel.Text = "Issue #" + issueID + "removing failed at " + DateTime.Now.ToShortTimeString() + " (network error)";

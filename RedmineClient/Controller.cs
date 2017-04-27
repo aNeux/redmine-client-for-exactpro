@@ -33,24 +33,24 @@ namespace RedmineClient
 
         // Событие, возникающее при авторизации пользователя
         public event Action<ErrorTypes, bool> OnUserAuthenticated;
-        // Событие, возникающее после обновления списка проектов, в которых участвует текущий пользователь
-        public event Action<ErrorTypes, List<Project>> OnProjectsUpdated;
-        // Событие, возникающее после обновления списка задач для выбранного проекта
-        public event Action<ErrorTypes, List<Issue>> OnIssuesUpdated;
+        // Событие, возникающее при необходимости открытия окна авторизации
+        public event Action OnNeededToReAuthenticate;
+        // Событие, возникающее после обновления списка проектов и задач, в которых участвует текущий пользователь
+        public event Action<ErrorTypes, List<Project>> OnUpdated;
         // Событие, информирующее о готовности к созданию новой задачи
         public event Action<ErrorTypes, List<IssueTracker>, List<IssuePriority>, List<Membership>> OnPreparedToCreateNewIssue;
+        // Событие, возникающее после загрузки списка участников указанного проекта
+        public event Action<ErrorTypes, List<Membership>> OnMembershipsLoaded;
         // Событие, возникающее после создания новой задачи
-        public event Action<ErrorTypes> OnIssueCreated;
+        public event Action<ErrorTypes, long> OnIssueCreated;
         // Собитие, возникающее после загрузки информации о выбранном проекте
         public event Action<ErrorTypes, Project, List<Membership>> OnProjectInformationLoaded;
         // Событие, возникающее после загрузки информации о выбранной задаче
         public event Action<ErrorTypes, Issue, List<IssueTracker>, List<IssueStatus>, List<IssuePriority>, List<Membership>> OnIssueInformationLoaded;
         // Событие, возникающее после изменения информации о задаче
-        public event Action<ErrorTypes> OnIssueUpdated;
+        public event Action<ErrorTypes, long> OnIssueUpdated;
         // Событие, возникающее после удаления задачи
         public event Action<ErrorTypes, long> OnIssueRemoved;
-        // Событие, возникающее при необходимости открытия окна авторизации
-        public event Action OnNeededToReAuthenticate;
 
         public Controller()
         {
@@ -111,28 +111,48 @@ namespace RedmineClient
                                 OnUserAuthenticated(ErrorTypes.NoErrors, false);
                         }
                     }
-                    catch (WebException webException)
+                    catch (Exception ex)
                     {
-                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                            OnUserAuthenticated(ErrorTypes.ConnectionError, false);
-                        else if (webException.Status == WebExceptionStatus.ProtocolError)
-                            OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
-                        else
-                            OnUserAuthenticated(ErrorTypes.UnknownError, false);
-                    }
-                    catch (ArgumentException)
-                    {
-                        OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
+                        if (OnUserAuthenticated != null)
+                        {
+                            if (ex is WebException)
+                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                                    OnUserAuthenticated(ErrorTypes.ConnectionError, false);
+                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                    OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
+                                else
+                                    OnUserAuthenticated(ErrorTypes.UnknownError, false);
+                            else if (ex is ArgumentException)
+                                OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
+                            else
+                                OnUserAuthenticated(ErrorTypes.UnknownError, false);
+                        }
                     }
                 }).Start();
         }
 
         /// <summary>
-        /// Обновление списка проектов, в которых участвует текущий пользователь.
+        /// Метод, оповещающий главную форму о необходимости открытия окна авторизации.
         /// </summary>
-        public void UpdateProjects()
+        public void NeedToReAuthenticate()
         {
-            new Thread(delegate()
+            new Thread(
+                delegate()
+                {
+                    Properties.Settings.Default.api_key = "";
+                    Properties.Settings.Default.Save();
+                    if (OnNeededToReAuthenticate != null)
+                        OnNeededToReAuthenticate();
+                }).Start();
+        }
+
+        /// <summary>
+        /// Обновление списка проектов и задач для текущего пользователя.
+        /// </summary>
+        public void Update()
+        {
+            new Thread(
+                delegate()
                 {
                     try
                     {
@@ -140,6 +160,7 @@ namespace RedmineClient
                         HttpWebResponse response;
                         StreamReader streamReader;
                         string jsonResponse;
+                        // Загружаем список проектов
                         projects = new List<Project>();
                         ProjectsJSONObject projectsJSONObject = new ProjectsJSONObject();
                         int offset = 0;
@@ -201,45 +222,13 @@ namespace RedmineClient
                                 i--;
                             }
                         }
-                        if (OnProjectsUpdated != null)
-                            OnProjectsUpdated(ErrorTypes.NoErrors, projects);
-                    }
-                    catch (WebException webException)
-                    {
-                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                            OnProjectsUpdated(ErrorTypes.ConnectionError, null);
-                        else if (webException.Status == WebExceptionStatus.ProtocolError)
-                            OnProjectsUpdated(ErrorTypes.UnathorizedAccess, null);
-                        else
-                            OnProjectsUpdated(ErrorTypes.UnknownError, null);
-                    }
-                    catch (ArgumentException)
-                    {
-                        OnProjectsUpdated(ErrorTypes.UnathorizedAccess, null);
-                    }
-                }).Start();
-        }
-
-        /// <summary>
-        /// Обновление списка задач для указанного проекта.
-        /// </summary>
-        /// <param name="projectID">Идентификатор проекта, для которого необходимо получить список задач.</param>
-        public void UpdateIssues(long projectID)
-        {
-            new Thread(delegate()
-                {
-                    try
-                    {
-                        HttpWebRequest request;
-                        HttpWebResponse response;
-                        StreamReader streamReader;
-                        string jsonResponse;
+                        // Загружаем список задач
                         issues = new List<Issue>();
                         IssuesJSONObject issuesJSONObject = new IssuesJSONObject();
-                        int offset = 0;
+                        offset = 0;
                         do
                         {
-                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?project_id=" + projectID + "&offset=" + offset);
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?offset=" + offset);
                             request.Method = "GET";
                             request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                             request.Accept = "application/json";
@@ -254,23 +243,51 @@ namespace RedmineClient
                             offset += issuesJSONObject.Limit;
                         } while (issuesJSONObject.Issues.Count != 0);
                         issues.RemoveAll(temp1 => projects.FindIndex(temp2 => temp2.ID == temp1.Project.ID) < 0);
-                        if (OnIssuesUpdated != null)
-                            OnIssuesUpdated(ErrorTypes.NoErrors, issues);
+                        if (OnUpdated != null)
+                            OnUpdated(ErrorTypes.NoErrors, projects);
                     }
-                    catch (WebException webException)
+                    catch (Exception ex)
                     {
-                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                            OnIssuesUpdated(ErrorTypes.ConnectionError, null);
-                        else if (webException.Status == WebExceptionStatus.ProtocolError)
-                            OnIssuesUpdated(ErrorTypes.UnathorizedAccess, null);
-                        else
-                            OnIssuesUpdated(ErrorTypes.UnknownError, null);
-                    }
-                    catch (ArgumentException)
-                    {
-                        OnIssuesUpdated(ErrorTypes.UnathorizedAccess, null);
+                        if (OnUpdated != null)
+                        {
+                            if (ex is WebException)
+                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                                    OnUpdated(ErrorTypes.ConnectionError, null);
+                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                    OnUpdated(ErrorTypes.UnathorizedAccess, null);
+                                else
+                                    OnUpdated(ErrorTypes.UnknownError, null);
+                            else if (ex is ArgumentException)
+                                OnUpdated(ErrorTypes.UnathorizedAccess, null);
+                            else
+                                OnUpdated(ErrorTypes.UnknownError, null);
+                        }
                     }
                 }).Start();
+        }
+
+        /// <summary>
+        /// Получение списка всех проектов, в которых зарегистрирован текущий пользователь.
+        /// </summary>
+        /// <returns>Список проектов.</returns>
+        public List<Project> GetProjects()
+        {
+            List<Project> tempProjects = new List<Project>();
+            tempProjects.AddRange(projects);
+            return tempProjects;
+        }
+
+        /// <summary>
+        /// Получение списка задач для выбранного проекта.
+        /// </summary>
+        /// <param name="projectID">Идентификатор проекта.</param>
+        /// <returns>Список задач.</returns>
+        public List<Issue> GetIssues(long projectID)
+        {
+            List<Issue> tempIssues = new List<Issue>();
+            tempIssues.AddRange(issues);
+            tempIssues.RemoveAll(temp => temp.Project.ID != projectID);
+            return tempIssues;
         }
 
         /// <summary>
@@ -336,18 +353,76 @@ namespace RedmineClient
                         if (OnPreparedToCreateNewIssue != null)
                             OnPreparedToCreateNewIssue(ErrorTypes.NoErrors, issueTrackers, issuePriorities, memberships);
                     }
-                    catch (WebException webException)
+                    catch (Exception ex)
                     {
-                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                            OnPreparedToCreateNewIssue(ErrorTypes.ConnectionError, null, null, null);
-                        else if (webException.Status == WebExceptionStatus.ProtocolError)
-                            OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
-                        else
-                            OnPreparedToCreateNewIssue(ErrorTypes.UnknownError, null, null, null);
+                        if (OnPreparedToCreateNewIssue != null)
+                        {
+                            if (ex is WebException)
+                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                                    OnPreparedToCreateNewIssue(ErrorTypes.ConnectionError, null, null, null);
+                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                    OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
+                                else
+                                    OnPreparedToCreateNewIssue(ErrorTypes.UnknownError, null, null, null);
+                            else if (ex is ArgumentException)
+                                OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
+                            else
+                                OnPreparedToCreateNewIssue(ErrorTypes.UnknownError, null, null, null);
+                        }
                     }
-                    catch (ArgumentException)
+                }).Start();
+        }
+
+        /// <summary>
+        /// Получение списка участников для указанного проекта.
+        /// </summary>
+        /// <param name="projectID">Идентификатор проекта.</param>
+        public void LoadMemberships(long projectID)
+        {
+            new Thread(
+                delegate()
+                {
+                    try
                     {
-                        OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
+                        List<Membership> memberships = new List<Membership>();
+                        MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
+                        int offset = 0;
+                        do
+                        {
+                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                            request.Accept = "application/json";
+                            request.Timeout = 10000;
+                            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                            StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            string jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
+                            memberships.AddRange(membershipsJSONObject.Memberships);
+                            offset += membershipsJSONObject.Limit;
+                        } while (membershipsJSONObject.Memberships.Count != 0);
+                        memberships.RemoveAll(temp => temp.User == null);
+                        if (OnMembershipsLoaded != null)
+                            OnMembershipsLoaded(ErrorTypes.NoErrors, memberships);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (OnMembershipsLoaded != null)
+                        {
+                            if (ex is WebException)
+                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                                    OnMembershipsLoaded(ErrorTypes.ConnectionError, null);
+                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                    OnMembershipsLoaded(ErrorTypes.UnathorizedAccess, null);
+                                else
+                                    OnMembershipsLoaded(ErrorTypes.UnknownError, null);
+                            else if (ex is ArgumentException)
+                                OnMembershipsLoaded(ErrorTypes.UnathorizedAccess, null);
+                            else
+                                OnMembershipsLoaded(ErrorTypes.UnknownError, null);
+                        }
                     }
                 }).Start();
         }
@@ -355,40 +430,69 @@ namespace RedmineClient
         /// <summary>
         /// Создание новой задачи.
         /// </summary>
-        /// <param name="jsonRequest">Набор параметров в виде JSON для создаваемой задачи.</param>
-        public void CreateIssue(string jsonRequest)
+        /// <param name="newIssue">Новая задача.</param>
+        public void CreateIssue(NewIssue newIssue)
         {
             new Thread(
                 delegate()
                 {
                     try
                     {
-                        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json");
+                        HttpWebRequest request;
+                        HttpWebResponse response;
+                        StreamReader streamReader;
+                        string jsonResponse;
+                        request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json");
                         request.Method = "POST";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.ContentType = "application/json";
                         request.Timeout = 10000;
                         StreamWriter streamWriter = new StreamWriter(request.GetRequestStream());
-                        streamWriter.Write(jsonRequest);
+                        streamWriter.Write(JsonConvert.SerializeObject(new NewIssueJSONObject() { NewIssue = newIssue }, Formatting.Indented, new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore }));
                         streamWriter.Flush();
-                        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                        response = (HttpWebResponse)request.GetResponse();
                         streamWriter.Close();
                         response.Close();
+                        // Здесь же обновляем список задач для текущего пользователя
+                        issues = new List<Issue>();
+                        IssuesJSONObject issuesJSONObject = new IssuesJSONObject();
+                        int offset = 0;
+                        do
+                        {
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?offset=" + offset);
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                            request.Accept = "application/json";
+                            request.Timeout = 10000;
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            issuesJSONObject = JsonConvert.DeserializeObject<IssuesJSONObject>(jsonResponse);
+                            issues.AddRange(issuesJSONObject.Issues);
+                            offset += issuesJSONObject.Limit;
+                        } while (issuesJSONObject.Issues.Count != 0);
+                        issues.RemoveAll(temp1 => projects.FindIndex(temp2 => temp2.ID == temp1.Project.ID) < 0);
                         if (OnIssueCreated != null)
-                            OnIssueCreated(ErrorTypes.NoErrors);
+                            OnIssueCreated(ErrorTypes.NoErrors, newIssue.ProjectID);
                     }
-                    catch (WebException webException)
+                    catch (Exception ex)
                     {
-                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                            OnIssueCreated(ErrorTypes.ConnectionError);
-                        else if (webException.Status == WebExceptionStatus.ProtocolError)
-                            OnIssueCreated(ErrorTypes.UnathorizedAccess);
-                        else
-                            OnIssueCreated(ErrorTypes.UnknownError);
-                    }
-                    catch (ArgumentException)
-                    {
-                        OnIssueCreated(ErrorTypes.UnathorizedAccess);
+                        if (OnIssueCreated != null)
+                        {
+                            if (ex is WebException)
+                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                                    OnIssueCreated(ErrorTypes.ConnectionError, newIssue.ProjectID);
+                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                    OnIssueCreated(ErrorTypes.UnathorizedAccess, newIssue.ProjectID);
+                                else
+                                    OnIssueCreated(ErrorTypes.UnknownError, newIssue.ProjectID);
+                            else if (ex is ArgumentException)
+                                OnIssueCreated(ErrorTypes.UnathorizedAccess, newIssue.ProjectID);
+                            else
+                                OnIssueCreated(ErrorTypes.UnknownError, newIssue.ProjectID);
+                        }
                     }
                 }).Start();
         }
@@ -441,16 +545,23 @@ namespace RedmineClient
                     }
                     catch (WebException webException)
                     {
-                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                            OnProjectInformationLoaded(ErrorTypes.ConnectionError, null, null);
-                        else if (webException.Status == WebExceptionStatus.ProtocolError)
-                            OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
-                        else
-                            OnProjectInformationLoaded(ErrorTypes.UnknownError, null, null);
+                        if (OnProjectInformationLoaded != null)
+                            if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                                OnProjectInformationLoaded(ErrorTypes.ConnectionError, null, null);
+                            else if (webException.Status == WebExceptionStatus.ProtocolError)
+                                OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
+                            else
+                                OnProjectInformationLoaded(ErrorTypes.UnknownError, null, null);
                     }
                     catch (ArgumentException)
                     {
-                        OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
+                        if (OnProjectInformationLoaded != null)
+                            OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
+                    }
+                    catch
+                    {
+                        if (OnProjectInformationLoaded != null)
+                            OnProjectInformationLoaded(ErrorTypes.UnknownError, null, null);
                     }
                 }).Start();
         }
@@ -470,7 +581,7 @@ namespace RedmineClient
                         HttpWebResponse response;
                         StreamReader streamReader;
                         string jsonResponse;
-                        // Получаем полную информацию о задаче (включая историю ее измения)
+                        // Получаем полную информацию о задаче (включая историю ее изменения)
                         request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues/" + issueID + ".json?include=journals");
                         request.Method = "GET";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
@@ -542,18 +653,22 @@ namespace RedmineClient
                         if (OnIssueInformationLoaded != null)
                             OnIssueInformationLoaded(ErrorTypes.NoErrors, issue, issueTrackers, issueStatuses, issuePriorities, memberships);
                     }
-                    catch (WebException webException)
+                    catch (Exception ex)
                     {
-                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                            OnIssueInformationLoaded(ErrorTypes.ConnectionError, null, null, null, null, null);
-                        else if (webException.Status == WebExceptionStatus.ProtocolError)
-                            OnIssueInformationLoaded(ErrorTypes.UnathorizedAccess, null, null, null, null, null);
-                        else
-                            OnIssueInformationLoaded(ErrorTypes.UnknownError, null, null, null, null, null);
-                    }
-                    catch (ArgumentException)
-                    {
-                        OnIssueInformationLoaded(ErrorTypes.UnathorizedAccess, null, null, null, null, null);
+                        if (OnIssueInformationLoaded != null)
+                        {
+                            if (ex is WebException)
+                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                                    OnIssueInformationLoaded(ErrorTypes.ConnectionError, null, null, null, null, null);
+                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                    OnIssueInformationLoaded(ErrorTypes.UnathorizedAccess, null, null, null, null, null);
+                                else
+                                    OnIssueInformationLoaded(ErrorTypes.UnknownError, null, null, null, null, null);
+                            else if (ex is ArgumentException)
+                                OnIssueInformationLoaded(ErrorTypes.UnathorizedAccess, null, null, null, null, null);
+                            else
+                                OnIssueInformationLoaded(ErrorTypes.UnknownError, null, null, null, null, null);
+                        }
                     }
                 }).Start();
         }
@@ -563,39 +678,68 @@ namespace RedmineClient
         /// </summary>
         /// <param name="issueID">Идентификатор задачи.</param>
         /// <param name="jsonRequest">Набор параметров в виде JSON для изменяемой задачи.</param>
-        public void UpdateIssue(long issueID, string jsonRequest)
+        public void UpdateIssue(long issueID, NewIssue updatedIssue)
         {
             new Thread(
                 delegate()
                 {
                     try
                     {
-                        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues/" + issueID + ".json");
+                        HttpWebRequest request;
+                        HttpWebResponse response;
+                        StreamReader streamReader;
+                        string jsonResponse;
+                        request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues/" + issueID + ".json");
                         request.Method = "PUT";
                         request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                         request.ContentType = "application/json";
                         request.Timeout = 10000;
                         StreamWriter streamWriter = new StreamWriter(request.GetRequestStream());
-                        streamWriter.Write(jsonRequest);
+                        streamWriter.Write(JsonConvert.SerializeObject(new NewIssueJSONObject { NewIssue = updatedIssue }, Newtonsoft.Json.Formatting.Indented, new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore }));
                         streamWriter.Flush();
-                        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                        response = (HttpWebResponse)request.GetResponse();
                         streamWriter.Close();
                         response.Close();
+                        // Здесь же обновляем список задач для текущего пользователя
+                        issues = new List<Issue>();
+                        IssuesJSONObject issuesJSONObject = new IssuesJSONObject();
+                        int offset = 0;
+                        do
+                        {
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?offset=" + offset);
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                            request.Accept = "application/json";
+                            request.Timeout = 10000;
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            issuesJSONObject = JsonConvert.DeserializeObject<IssuesJSONObject>(jsonResponse);
+                            issues.AddRange(issuesJSONObject.Issues);
+                            offset += issuesJSONObject.Limit;
+                        } while (issuesJSONObject.Issues.Count != 0);
+                        issues.RemoveAll(temp1 => projects.FindIndex(temp2 => temp2.ID == temp1.Project.ID) < 0);
                         if (OnIssueUpdated != null)
-                            OnIssueUpdated(ErrorTypes.NoErrors);
+                            OnIssueUpdated(ErrorTypes.NoErrors, updatedIssue.ProjectID);
                     }
-                    catch (WebException webException)
+                    catch (Exception ex)
                     {
-                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                            OnIssueUpdated(ErrorTypes.ConnectionError);
-                        else if (webException.Status == WebExceptionStatus.ProtocolError)
-                            OnIssueUpdated(ErrorTypes.UnathorizedAccess);
-                        else
-                            OnIssueUpdated(ErrorTypes.UnknownError);
-                    }
-                    catch (ArgumentException)
-                    {
-                        OnIssueUpdated(ErrorTypes.UnathorizedAccess);
+                        if (OnIssueUpdated != null)
+                        {
+                            if (ex is WebException)
+                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                                    OnIssueUpdated(ErrorTypes.ConnectionError, updatedIssue.ProjectID);
+                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                    OnIssueUpdated(ErrorTypes.UnathorizedAccess, updatedIssue.ProjectID);
+                                else
+                                    OnIssueUpdated(ErrorTypes.UnknownError, updatedIssue.ProjectID);
+                            else if (ex is ArgumentException)
+                                OnIssueUpdated(ErrorTypes.UnathorizedAccess, updatedIssue.ProjectID);
+                            else
+                                OnIssueUpdated(ErrorTypes.UnknownError, updatedIssue.ProjectID);
+                        }
                     }
                 }).Start();
         }
@@ -617,63 +761,27 @@ namespace RedmineClient
                         request.Accept = "application/json";
                         request.Timeout = 10000;
                         HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                        issues.RemoveAt(issues.FindIndex(temp => temp.ID == issueID));
                         if (OnIssueRemoved != null)
                             OnIssueRemoved(ErrorTypes.NoErrors, issueID);
                     }
-                    catch (WebException webException)
+                    catch (Exception ex)
                     {
-                        if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                            OnIssueRemoved(ErrorTypes.ConnectionError, issueID);
-                        else if (webException.Status == WebExceptionStatus.ProtocolError)
-                            OnIssueRemoved(ErrorTypes.UnathorizedAccess, issueID);
-                        else
-                            OnIssueRemoved(ErrorTypes.UnknownError, issueID);
+                        if (OnIssueRemoved != null)
+                        {
+                            if (ex is WebException)
+                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                                    OnIssueRemoved(ErrorTypes.ConnectionError, issueID);
+                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                    OnIssueRemoved(ErrorTypes.UnathorizedAccess, issueID);
+                                else
+                                    OnIssueRemoved(ErrorTypes.UnknownError, issueID);
+                            else if (ex is ArgumentException)
+                                OnIssueRemoved(ErrorTypes.UnathorizedAccess, issueID);
+                            else
+                                OnIssueRemoved(ErrorTypes.UnknownError, issueID);
+                        }
                     }
-                    catch (ArgumentException)
-                    {
-                        OnIssueRemoved(ErrorTypes.UnathorizedAccess, issueID);
-                    }
-                }).Start();
-        }
-
-        /// <summary>
-        /// Получение списка всех проектов, в которых зарегистрирован текущий пользователь.
-        /// </summary>
-        /// <returns>Список проектов.</returns>
-        public List<Project> GetProjects()
-        {
-            return projects;
-        }
-
-        /// <summary>
-        /// Получение информации о проекте по его идентификатору.
-        /// </summary>
-        /// <param name="projectID">Идентификатор проекта.</param>
-        /// <returns>Объект типа Project.</returns>
-        public Project GetProject(long projectID)
-        {
-            try
-            {
-                return projects.Single(temp => temp.ID == projectID);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Метод, оповещающий главную форму о необходимости открытия окна авторизации.
-        /// </summary>
-        public void NeedToReAuthenticate()
-        {
-            new Thread(
-                delegate()
-                {
-                    Properties.Settings.Default.api_key = "";
-                    Properties.Settings.Default.Save();
-                    if (OnNeededToReAuthenticate != null)
-                        OnNeededToReAuthenticate();
                 }).Start();
         }
     }

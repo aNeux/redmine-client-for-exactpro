@@ -45,10 +45,10 @@
             this.tbCreationDate = new System.Windows.Forms.TextBox();
             this.tbLastUpdate = new System.Windows.Forms.TextBox();
             this.lbMembers = new System.Windows.Forms.ListBox();
-            this.btnClose = new System.Windows.Forms.Button();
             this.tbHomepage = new System.Windows.Forms.TextBox();
             this.labelHomepage = new System.Windows.Forms.Label();
             this.cbIsPublic = new System.Windows.Forms.CheckBox();
+            this.btnClose = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // labelID
@@ -190,17 +190,6 @@
             this.lbMembers.Size = new System.Drawing.Size(167, 56);
             this.lbMembers.TabIndex = 17;
             // 
-            // btnClose
-            // 
-            this.btnClose.Enabled = false;
-            this.btnClose.Location = new System.Drawing.Point(145, 195);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(129, 23);
-            this.btnClose.TabIndex = 19;
-            this.btnClose.Text = "Close";
-            this.btnClose.UseVisualStyleBackColor = true;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
-            // 
             // tbHomepage
             // 
             this.tbHomepage.Location = new System.Drawing.Point(92, 89);
@@ -229,11 +218,22 @@
             this.cbIsPublic.Text = "Is public";
             this.cbIsPublic.UseVisualStyleBackColor = true;
             // 
+            // btnClose
+            // 
+            this.btnClose.Enabled = false;
+            this.btnClose.Location = new System.Drawing.Point(327, 187);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 19;
+            this.btnClose.Text = "Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
             // ProjectInformation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(414, 227);
+            this.ClientSize = new System.Drawing.Size(414, 217);
             this.Controls.Add(this.cbIsPublic);
             this.Controls.Add(this.tbHomepage);
             this.Controls.Add(this.labelHomepage);
@@ -286,9 +286,9 @@
         private System.Windows.Forms.TextBox tbCreationDate;
         private System.Windows.Forms.TextBox tbLastUpdate;
         private System.Windows.Forms.ListBox lbMembers;
-        private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.TextBox tbHomepage;
         private System.Windows.Forms.Label labelHomepage;
         private System.Windows.Forms.CheckBox cbIsPublic;
+        private System.Windows.Forms.Button btnClose;
     }
 }

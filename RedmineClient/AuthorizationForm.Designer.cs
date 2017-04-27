@@ -31,7 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AuthorizationForm));
             this.labelInfo = new System.Windows.Forms.Label();
             this.tbAPIKey = new System.Windows.Forms.TextBox();
-            this.btnSave = new System.Windows.Forms.Button();
+            this.btnLogIn = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.cbUseAPIKeyInstead = new System.Windows.Forms.CheckBox();
             this.labelLogin = new System.Windows.Forms.Label();
@@ -57,21 +57,21 @@
             this.tbAPIKey.Size = new System.Drawing.Size(256, 20);
             this.tbAPIKey.TabIndex = 7;
             // 
-            // btnSave
+            // btnLogIn
             // 
-            this.btnSave.Location = new System.Drawing.Point(12, 208);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(125, 22);
-            this.btnSave.TabIndex = 8;
-            this.btnSave.Text = "Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.btnLogIn.Location = new System.Drawing.Point(112, 208);
+            this.btnLogIn.Name = "btnLogIn";
+            this.btnLogIn.Size = new System.Drawing.Size(75, 23);
+            this.btnLogIn.TabIndex = 8;
+            this.btnLogIn.Text = "Log In";
+            this.btnLogIn.UseVisualStyleBackColor = true;
+            this.btnLogIn.Click += new System.EventHandler(this.btnLogIn_Click);
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(143, 208);
+            this.btnCancel.Location = new System.Drawing.Point(193, 208);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(125, 23);
+            this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 9;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -143,13 +143,13 @@
             this.Controls.Add(this.labelLogin);
             this.Controls.Add(this.cbUseAPIKeyInstead);
             this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnSave);
+            this.Controls.Add(this.btnLogIn);
             this.Controls.Add(this.tbAPIKey);
             this.Controls.Add(this.labelInfo);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AuthorizationForm";
             this.ShowInTaskbar = false;
             this.Text = "Authorization";
@@ -164,7 +164,7 @@
 
         private System.Windows.Forms.Label labelInfo;
         private System.Windows.Forms.TextBox tbAPIKey;
-        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnLogIn;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.CheckBox cbUseAPIKeyInstead;
         private System.Windows.Forms.Label labelLogin;

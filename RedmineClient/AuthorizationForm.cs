@@ -61,7 +61,7 @@ namespace RedmineClient
             }
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private void btnLogIn_Click(object sender, EventArgs e)
         {
             if (!cbUseAPIKeyInstead.Checked)
                 if (tbLogin.Text.Length == 0)
@@ -137,7 +137,7 @@ namespace RedmineClient
             labelAPIKey.Enabled = isEnabled && cbUseAPIKeyInstead.Checked;
             tbAPIKey.Enabled = isEnabled && cbUseAPIKeyInstead.Checked;
             cbUseAPIKeyInstead.Enabled = isEnabled;
-            btnSave.Enabled = isEnabled;
+            btnLogIn.Enabled = isEnabled;
             btnCancel.Enabled = isEnabled;
         }
     }

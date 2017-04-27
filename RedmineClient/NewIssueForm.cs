@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using RedmineClient.Models;
-using Newtonsoft.Json;
 using System.Windows.Forms;
 
 namespace RedmineClient
@@ -11,7 +10,7 @@ namespace RedmineClient
         private Controller controller;
         private long projectID;
         private string projectName;
-        private bool isIssueCreated = false;
+        private bool isCouldCloseForm = false;
 
         public NewIssueForm(long projectID, string projectName)
         {
@@ -27,13 +26,14 @@ namespace RedmineClient
             labelInfo.Select();
             controller = Program.controllerGlobal;
             controller.OnPreparedToCreateNewIssue += controller_OnPreparedToCreateNewIssue;
+            controller.OnMembershipsLoaded += controller_OnMembershipsLoaded;
             controller.OnIssueCreated += controller_OnIssueCreated;
             controller.PrepareDataForCreatingNewIssue(projectID);
         }
 
         private void CreateNewIssueForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!isIssueCreated && e.CloseReason == CloseReason.UserClosing)
+            if (!isCouldCloseForm && e.CloseReason == CloseReason.UserClosing)
             {
                 var dialogResult = MessageBox.Show("Are you sure you want to stop creating new issue?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
@@ -48,6 +48,16 @@ namespace RedmineClient
             {
                 controller.OnPreparedToCreateNewIssue -= controller_OnPreparedToCreateNewIssue;
                 controller.OnIssueCreated -= controller_OnIssueCreated;
+            }
+        }
+
+        private void cbProject_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if ((long)(cbProjects.SelectedItem as TextAndValueItem).Value != projectID)
+            {
+                this.Text = "New issue [please, wait..]";
+                ChangeUIState(false);
+                controller.LoadMemberships((long)(cbProjects.SelectedItem as TextAndValueItem).Value);
             }
         }
 
@@ -90,10 +100,10 @@ namespace RedmineClient
             else
             {
                 NewIssue newIssue = new NewIssue();
-                newIssue.ProjectID = projectID;
-                newIssue.TrackerID = (int)(cbTracker.SelectedItem as TextAndValueItem).Value;
+                newIssue.ProjectID = (long)(cbProjects.SelectedItem as TextAndValueItem).Value;
+                newIssue.TrackerID = (int)(cbTrackers.SelectedItem as TextAndValueItem).Value;
                 newIssue.Subject = tbSubject.Text;
-                newIssue.PriorityID = (int)(cbPriority.SelectedItem as TextAndValueItem).Value;
+                newIssue.PriorityID = (int)(cbPriorities.SelectedItem as TextAndValueItem).Value;
                 newIssue.AssignedToID = (cbAssignee.SelectedItem as TextAndValueItem).Value.ToString();
                 newIssue.IsPrivate = cbIsPrivate.Checked;
                 newIssue.Description = tbDescription.Text;
@@ -106,10 +116,9 @@ namespace RedmineClient
                 foreach (var currentUser in cblWatchers.CheckedItems)
                     watcherUserIDs.Add((long)(currentUser as TextAndValueItem).Value);
                 newIssue.WatcherUserIDs = watcherUserIDs;
-                string jsonRequest = JsonConvert.SerializeObject(new NewIssueJSONObject() { NewIssue = newIssue }, Formatting.Indented, new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore });
                 ChangeUIState(false);
                 this.Text = "New issue [please, wait..]";
-                controller.CreateIssue(jsonRequest);
+                controller.CreateIssue(newIssue);
             }
         }
 
@@ -125,18 +134,30 @@ namespace RedmineClient
                 switch (error)
                 {
                     case ErrorTypes.NoErrors:
-                        tbProject.Text = projectName;
+                        int indexToSelect = 0;
+                        List<Project> projects = controller.GetProjects();
+                        projects.RemoveAll(temp => !temp.Roles.Contains("Manager") || temp.Status == 5);
+                        foreach (Project currentProject in projects)
+                        {
+                            if (currentProject.Parent == null)
+                                cbProjects.Items.Add(new TextAndValueItem { Text = currentProject.Name, Value = currentProject.ID });
+                            else
+                                cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + currentProject.Name, Value = currentProject.ID });
+                            if (currentProject.ID == projectID)
+                                indexToSelect = cbProjects.Items.Count - 1;
+                        }
+                        cbProjects.SelectedIndex = indexToSelect;
                         foreach (IssueTracker currentTracker in issueTrackers)
-                            cbTracker.Items.Add(new TextAndValueItem { Text = currentTracker.Name, Value = currentTracker.ID });
+                            cbTrackers.Items.Add(new TextAndValueItem { Text = currentTracker.Name, Value = currentTracker.ID });
                         foreach (IssuePriority currentPriority in issuePriorities)
-                            cbPriority.Items.Add(new TextAndValueItem { Text = currentPriority.Name, Value = currentPriority.ID });
+                            cbPriorities.Items.Add(new TextAndValueItem { Text = currentPriority.Name, Value = currentPriority.ID });
                         foreach (Membership currentMembership in memberships)
                         {
                             cbAssignee.Items.Add(new TextAndValueItem { Text = currentMembership.User.Name, Value = currentMembership.User.ID });
                             cblWatchers.Items.Add(new TextAndValueItem { Text = currentMembership.User.Name, Value = currentMembership.User.ID });
                         }
-                        cbTracker.SelectedIndex = 0;
-                        cbPriority.SelectedIndex = 0;
+                        cbTrackers.SelectedIndex = 0;
+                        cbPriorities.SelectedIndex = 0;
                         cbAssignee.SelectedIndex = 0;
                         dtpStartDate.Value = DateTime.Now;
                         ChangeUIState(true);
@@ -145,17 +166,20 @@ namespace RedmineClient
                     case ErrorTypes.ConnectionError:
                         this.Text = "New issue";
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        isCouldCloseForm = true;
                         this.Close();
                         break;
                     case ErrorTypes.UnathorizedAccess:
                         this.Text = "New issue";
                         MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        isCouldCloseForm = true;
                         controller.NeedToReAuthenticate();
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:
                         this.Text = "New issue";
                         MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        isCouldCloseForm = true;
                         this.Close();
                         break;
                 }
@@ -166,14 +190,70 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnIssueCreated(ErrorTypes error)
+        private void controller_OnMembershipsLoaded(ErrorTypes error, List<Membership> memberships)
         {
             Action action = () =>
             {
                 switch (error)
                 {
                     case ErrorTypes.NoErrors:
-                        isIssueCreated = true;
+                        for (int i = cbAssignee.Items.Count - 1; i >= 1; i--)
+                            cbAssignee.Items.RemoveAt(i);
+                        cblWatchers.Items.Clear();
+                        foreach (Membership currentMembership in memberships)
+                        {
+                            cbAssignee.Items.Add(new TextAndValueItem { Text = currentMembership.User.Name, Value = currentMembership.User.ID });
+                            cblWatchers.Items.Add(new TextAndValueItem { Text = currentMembership.User.Name, Value = currentMembership.User.ID });
+                        }
+                        cbAssignee.SelectedIndex = 0;
+                        projectID = (long)(cbProjects.SelectedItem as TextAndValueItem).Value;
+                        ChangeUIState(true);
+                        this.Text = "New issue";
+                        break;
+                    case ErrorTypes.ConnectionError:
+                        this.Text = "New issue";
+                        MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        for (int i = 0; i < cbProjects.Items.Count; i++)
+                            if ((long)(cbProjects.Items[i] as TextAndValueItem).Value == projectID)
+                            {
+                                cbProjects.SelectedIndex = i;
+                                break;
+                            }
+                        ChangeUIState(true);
+                        break;
+                    case ErrorTypes.UnathorizedAccess:
+                        this.Text = "New issue";
+                        MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        controller.NeedToReAuthenticate();
+                        this.Close();
+                        break;
+                    case ErrorTypes.UnknownError:
+                        this.Text = "New issue";
+                        MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        for (int i = 0; i < cbProjects.Items.Count; i++)
+                            if ((long)(cbProjects.Items[i] as TextAndValueItem).Value == projectID)
+                            {
+                                cbProjects.SelectedIndex = i;
+                                break;
+                            }
+                        ChangeUIState(true);
+                        break;
+                }
+            };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
+        }
+
+        private void controller_OnIssueCreated(ErrorTypes error, long projectID)
+        {
+            Action action = () =>
+            {
+                switch (error)
+                {
+                    case ErrorTypes.NoErrors:
+                        isCouldCloseForm = true;
                         this.Close();
                         break;
                     case ErrorTypes.ConnectionError:
@@ -202,10 +282,10 @@ namespace RedmineClient
 
         private void ChangeUIState(bool isEnabled)
         {
-            tbProject.Enabled = isEnabled;
-            cbTracker.Enabled = isEnabled;
+            cbProjects.Enabled = isEnabled;
+            cbTrackers.Enabled = isEnabled;
             tbSubject.Enabled = isEnabled;
-            cbPriority.Enabled = isEnabled;
+            cbPriorities.Enabled = isEnabled;
             cbAssignee.Enabled = isEnabled;
             cbIsPrivate.Enabled = isEnabled;
             tbDescription.Enabled = isEnabled;

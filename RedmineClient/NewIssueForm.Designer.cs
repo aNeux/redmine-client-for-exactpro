@@ -30,14 +30,13 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewIssueForm));
             this.labelTracker = new System.Windows.Forms.Label();
-            this.cbTracker = new System.Windows.Forms.ComboBox();
+            this.cbTrackers = new System.Windows.Forms.ComboBox();
             this.tbDescription = new System.Windows.Forms.TextBox();
             this.labelDescription = new System.Windows.Forms.Label();
-            this.cbPriority = new System.Windows.Forms.ComboBox();
+            this.cbPriorities = new System.Windows.Forms.ComboBox();
             this.labelPriority = new System.Windows.Forms.Label();
             this.cbAssignee = new System.Windows.Forms.ComboBox();
             this.labelAssignee = new System.Windows.Forms.Label();
-            this.tbProject = new System.Windows.Forms.TextBox();
             this.labelProject = new System.Windows.Forms.Label();
             this.cblWatchers = new System.Windows.Forms.CheckedListBox();
             this.labelWatchers = new System.Windows.Forms.Label();
@@ -58,28 +57,29 @@
             this.dtpStartDate = new System.Windows.Forms.DateTimePicker();
             this.dtpDueDate = new System.Windows.Forms.DateTimePicker();
             this.btnResetDueDate = new System.Windows.Forms.Button();
+            this.cbProjects = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudDoneRatio)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudEstimatedTime)).BeginInit();
             this.SuspendLayout();
             // 
             // labelTracker
             // 
-            this.labelTracker.Location = new System.Drawing.Point(12, 57);
+            this.labelTracker.Location = new System.Drawing.Point(12, 59);
             this.labelTracker.Name = "labelTracker";
             this.labelTracker.Size = new System.Drawing.Size(54, 21);
             this.labelTracker.TabIndex = 3;
             this.labelTracker.Text = "Tracker*:";
             this.labelTracker.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // cbTracker
+            // cbTrackers
             // 
-            this.cbTracker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbTracker.Enabled = false;
-            this.cbTracker.FormattingEnabled = true;
-            this.cbTracker.Location = new System.Drawing.Point(71, 57);
-            this.cbTracker.Name = "cbTracker";
-            this.cbTracker.Size = new System.Drawing.Size(121, 21);
-            this.cbTracker.TabIndex = 4;
+            this.cbTrackers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbTrackers.Enabled = false;
+            this.cbTrackers.FormattingEnabled = true;
+            this.cbTrackers.Location = new System.Drawing.Point(71, 59);
+            this.cbTrackers.Name = "cbTrackers";
+            this.cbTrackers.Size = new System.Drawing.Size(121, 21);
+            this.cbTrackers.TabIndex = 4;
             // 
             // tbDescription
             // 
@@ -100,15 +100,15 @@
             this.labelDescription.Text = "Description:";
             this.labelDescription.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // cbPriority
+            // cbPriorities
             // 
-            this.cbPriority.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPriority.Enabled = false;
-            this.cbPriority.FormattingEnabled = true;
-            this.cbPriority.Location = new System.Drawing.Point(264, 32);
-            this.cbPriority.Name = "cbPriority";
-            this.cbPriority.Size = new System.Drawing.Size(121, 21);
-            this.cbPriority.TabIndex = 8;
+            this.cbPriorities.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPriorities.Enabled = false;
+            this.cbPriorities.FormattingEnabled = true;
+            this.cbPriorities.Location = new System.Drawing.Point(264, 32);
+            this.cbPriorities.Name = "cbPriorities";
+            this.cbPriorities.Size = new System.Drawing.Size(121, 21);
+            this.cbPriorities.TabIndex = 8;
             // 
             // labelPriority
             // 
@@ -138,22 +138,13 @@
             this.labelAssignee.Text = "Assignee:";
             this.labelAssignee.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // tbProject
-            // 
-            this.tbProject.Enabled = false;
-            this.tbProject.Location = new System.Drawing.Point(71, 31);
-            this.tbProject.Name = "tbProject";
-            this.tbProject.ReadOnly = true;
-            this.tbProject.Size = new System.Drawing.Size(121, 20);
-            this.tbProject.TabIndex = 2;
-            // 
             // labelProject
             // 
-            this.labelProject.Location = new System.Drawing.Point(12, 31);
+            this.labelProject.Location = new System.Drawing.Point(12, 32);
             this.labelProject.Name = "labelProject";
-            this.labelProject.Size = new System.Drawing.Size(54, 20);
+            this.labelProject.Size = new System.Drawing.Size(54, 21);
             this.labelProject.TabIndex = 1;
-            this.labelProject.Text = "Project:";
+            this.labelProject.Text = "Project*:";
             this.labelProject.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // cblWatchers
@@ -186,7 +177,7 @@
             // 
             // labelSubject
             // 
-            this.labelSubject.Location = new System.Drawing.Point(12, 84);
+            this.labelSubject.Location = new System.Drawing.Point(12, 86);
             this.labelSubject.Name = "labelSubject";
             this.labelSubject.Size = new System.Drawing.Size(54, 20);
             this.labelSubject.TabIndex = 5;
@@ -196,7 +187,7 @@
             // tbSubject
             // 
             this.tbSubject.Enabled = false;
-            this.tbSubject.Location = new System.Drawing.Point(71, 84);
+            this.tbSubject.Location = new System.Drawing.Point(71, 86);
             this.tbSubject.Name = "tbSubject";
             this.tbSubject.Size = new System.Drawing.Size(121, 20);
             this.tbSubject.TabIndex = 6;
@@ -204,9 +195,9 @@
             // btnCreateIssue
             // 
             this.btnCreateIssue.Enabled = false;
-            this.btnCreateIssue.Location = new System.Drawing.Point(82, 324);
+            this.btnCreateIssue.Location = new System.Drawing.Point(229, 324);
             this.btnCreateIssue.Name = "btnCreateIssue";
-            this.btnCreateIssue.Size = new System.Drawing.Size(115, 23);
+            this.btnCreateIssue.Size = new System.Drawing.Size(75, 23);
             this.btnCreateIssue.TabIndex = 27;
             this.btnCreateIssue.Text = "Create issue";
             this.btnCreateIssue.UseVisualStyleBackColor = true;
@@ -215,9 +206,9 @@
             // btnCancel
             // 
             this.btnCancel.Enabled = false;
-            this.btnCancel.Location = new System.Drawing.Point(203, 324);
+            this.btnCancel.Location = new System.Drawing.Point(310, 324);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(115, 23);
+            this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 28;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -227,7 +218,7 @@
             // 
             this.cbIsPrivate.AutoSize = true;
             this.cbIsPrivate.Enabled = false;
-            this.cbIsPrivate.Location = new System.Drawing.Point(208, 87);
+            this.cbIsPrivate.Location = new System.Drawing.Point(208, 86);
             this.cbIsPrivate.Name = "cbIsPrivate";
             this.cbIsPrivate.Size = new System.Drawing.Size(134, 17);
             this.cbIsPrivate.TabIndex = 11;
@@ -353,11 +344,23 @@
             this.btnResetDueDate.UseVisualStyleBackColor = true;
             this.btnResetDueDate.Click += new System.EventHandler(this.btnResetDueDate_Click);
             // 
+            // cbProjects
+            // 
+            this.cbProjects.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbProjects.Enabled = false;
+            this.cbProjects.FormattingEnabled = true;
+            this.cbProjects.Location = new System.Drawing.Point(71, 32);
+            this.cbProjects.Name = "cbProjects";
+            this.cbProjects.Size = new System.Drawing.Size(121, 21);
+            this.cbProjects.TabIndex = 2;
+            this.cbProjects.SelectedIndexChanged += new System.EventHandler(this.cbProject_SelectedIndexChanged);
+            // 
             // NewIssueForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(397, 355);
+            this.ClientSize = new System.Drawing.Size(397, 354);
+            this.Controls.Add(this.cbProjects);
             this.Controls.Add(this.btnResetDueDate);
             this.Controls.Add(this.dtpDueDate);
             this.Controls.Add(this.dtpStartDate);
@@ -375,23 +378,20 @@
             this.Controls.Add(this.labelInfo);
             this.Controls.Add(this.labelWatchers);
             this.Controls.Add(this.cblWatchers);
-            this.Controls.Add(this.tbProject);
             this.Controls.Add(this.labelProject);
             this.Controls.Add(this.cbAssignee);
             this.Controls.Add(this.labelAssignee);
-            this.Controls.Add(this.cbPriority);
+            this.Controls.Add(this.cbPriorities);
             this.Controls.Add(this.labelPriority);
             this.Controls.Add(this.tbDescription);
             this.Controls.Add(this.labelDescription);
             this.Controls.Add(this.tbSubject);
             this.Controls.Add(this.labelSubject);
-            this.Controls.Add(this.cbTracker);
+            this.Controls.Add(this.cbTrackers);
             this.Controls.Add(this.labelTracker);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.ShowInTaskbar = false;
             this.Name = "NewIssueForm";
             this.Text = "New issue [please, wait..]";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CreateNewIssueForm_FormClosing);
@@ -406,14 +406,13 @@
         #endregion
 
         private System.Windows.Forms.Label labelTracker;
-        private System.Windows.Forms.ComboBox cbTracker;
+        private System.Windows.Forms.ComboBox cbTrackers;
         private System.Windows.Forms.TextBox tbDescription;
         private System.Windows.Forms.Label labelDescription;
-        private System.Windows.Forms.ComboBox cbPriority;
+        private System.Windows.Forms.ComboBox cbPriorities;
         private System.Windows.Forms.Label labelPriority;
         private System.Windows.Forms.ComboBox cbAssignee;
         private System.Windows.Forms.Label labelAssignee;
-        private System.Windows.Forms.TextBox tbProject;
         private System.Windows.Forms.Label labelProject;
         private System.Windows.Forms.CheckedListBox cblWatchers;
         private System.Windows.Forms.Label labelWatchers;
@@ -434,5 +433,6 @@
         private System.Windows.Forms.DateTimePicker dtpStartDate;
         private System.Windows.Forms.DateTimePicker dtpDueDate;
         private System.Windows.Forms.Button btnResetDueDate;
+        private System.Windows.Forms.ComboBox cbProjects;
     }
 }

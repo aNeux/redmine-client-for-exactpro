@@ -151,9 +151,9 @@
             // 
             // btnClose
             // 
-            this.btnClose.Location = new System.Drawing.Point(93, 216);
+            this.btnClose.Location = new System.Drawing.Point(225, 214);
             this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(129, 23);
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 15;
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;
@@ -189,7 +189,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(312, 249);
+            this.ClientSize = new System.Drawing.Size(312, 244);
             this.Controls.Add(this.tbID);
             this.Controls.Add(this.labelID);
             this.Controls.Add(this.labelInfo);
@@ -207,9 +207,9 @@
             this.Controls.Add(this.tbLogin);
             this.Controls.Add(this.labelLogin);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "UserInformationForm";
             this.ShowInTaskbar = false;
             this.Text = "User information";

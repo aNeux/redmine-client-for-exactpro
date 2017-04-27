@@ -109,10 +109,9 @@ namespace RedmineClient
                 updatedIssue.Note = tbAddNote.Text;
                 updatedIssue.IsNotePrivate = cbIsNotePrivate.Checked;
             }
-            string jsonRequest = JsonConvert.SerializeObject(new NewIssueJSONObject { NewIssue = updatedIssue }, Newtonsoft.Json.Formatting.Indented, new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore });
             ChangeUIState(false);
             this.Text = "Issue information [please, wait..]";
-            controller.UpdateIssue(issueID, jsonRequest);
+            controller.UpdateIssue(issueID, updatedIssue);
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -129,10 +128,9 @@ namespace RedmineClient
                     case ErrorTypes.NoErrors:
                         tbID.Text = issue.ID.ToString();
                         int indexToSelect = 0;
-                        List<Project> projects = new List<Project>();
-                        projects.AddRange(controller.GetProjects());
+                        List<Project> projects = controller.GetProjects();
                         if (projectRoles.Contains("Manager"))
-                            projects.RemoveAll(temp => !temp.Roles.Contains("Manager"));
+                            projects.RemoveAll(temp => !temp.Roles.Contains("Manager") || temp.Status == 5);
                         foreach (Project currentProject in projects)
                         {
                             if (currentProject.Parent == null)
@@ -227,7 +225,7 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnIssueUpdated(ErrorTypes error)
+        private void controller_OnIssueUpdated(ErrorTypes error, long projectID)
         {
             Action action = () =>
             {
@@ -272,7 +270,7 @@ namespace RedmineClient
                     switch (currentDetail.Name)
                     {
                         case "project_id":
-                            result += " » Project changed from \"" + Program.controllerGlobal.GetProject(Convert.ToInt64(currentDetail.OldValue)).Name + "\" to \"" + Program.controllerGlobal.GetProject(Convert.ToInt64(currentDetail.NewValue)).Name + "\"\r\n";
+                            result += " » Project changed from \"" + Program.controllerGlobal.GetProjects().Single(temp => temp.ID == Convert.ToInt64(currentDetail.OldValue)).Name + "\" to \"" + Program.controllerGlobal.GetProjects().Single(temp => temp.ID == Convert.ToInt64(currentDetail.NewValue)).Name + "\"\r\n";
                             break;
                         case "tracker_id":
                             result += " » Tracker changed from \"" + issueTrackers.Single(temp => temp.ID.ToString() == currentDetail.OldValue).Name + "\" to \"" + issueTrackers.Single(temp => temp.ID.ToString() == currentDetail.NewValue).Name + "\"\r\n";
