@@ -22,7 +22,7 @@ namespace RedmineClient
     public class Controller
     {
         // URL-адрес Redmine сервера
-        private string REDMINE_HOST = "http://student-rm.exactpro.com/";
+        private string REDMINE_HOST;
         // api-ключ для текущего пользователя
         private string currentAPIKey;
 
@@ -51,11 +51,14 @@ namespace RedmineClient
         public event Action<ErrorTypes, long> OnIssueUpdated;
         // Событие, возникающее после удаления задачи
         public event Action<ErrorTypes, long> OnIssueRemoved;
+        // Событие, возникающее при изменении настроек программы и показывающее, какие из основных пунктов меню изменились
+        public event Action<bool[]> OnSettingsChanged;
 
         public Controller()
         {
-            if (Properties.Settings.Default.api_key.Length != 0)
-                currentAPIKey = Utils.DecodeXOR(Properties.Settings.Default.api_key);
+            REDMINE_HOST = Properties.Application.Default.redmine_host;
+            if (Properties.User.Default.api_key.Length != 0)
+                currentAPIKey = Properties.Application.Default.enable_encryption ? Utils.DecodeXOR(Properties.User.Default.api_key) : Properties.User.Default.api_key;
             else
                 currentAPIKey = "";
         }
@@ -85,27 +88,27 @@ namespace RedmineClient
                         response.Close();
                         streamReader.Close();
                         User currentUser = JsonConvert.DeserializeObject<UserJSONObject>(jsonResponse).User;
-                        if (Properties.Settings.Default.api_key.Length == 0 || currentUser.ID != Properties.Settings.Default.id)
+                        if (Properties.User.Default.api_key.Length == 0 || currentUser.ID != Properties.User.Default.id)
                         {
-                            Properties.Settings.Default.id = currentUser.ID;
-                            Properties.Settings.Default.login = currentUser.Login;
-                            Properties.Settings.Default.first_name = currentUser.FirstName;
-                            Properties.Settings.Default.last_name = currentUser.LastName;
-                            Properties.Settings.Default.email = currentUser.Email;
-                            Properties.Settings.Default.created_on = currentUser.CreatedOn;
-                            Properties.Settings.Default.api_key = Utils.EncodeXOR(currentUser.APIKey);
-                            Properties.Settings.Default.Save();
+                            Properties.User.Default.id = currentUser.ID;
+                            Properties.User.Default.login = currentUser.Login;
+                            Properties.User.Default.first_name = currentUser.FirstName;
+                            Properties.User.Default.last_name = currentUser.LastName;
+                            Properties.User.Default.email = currentUser.Email;
+                            Properties.User.Default.created_on = currentUser.CreatedOn;
+                            Properties.User.Default.api_key = Properties.Application.Default.enable_encryption ? Utils.EncodeXOR(currentUser.APIKey) : currentUser.APIKey;
+                            Properties.User.Default.Save();
                             currentAPIKey = currentUser.APIKey;
                             if (OnUserAuthenticated != null)
                                 OnUserAuthenticated(ErrorTypes.NoErrors, true);
                         }
                         else
                         {
-                            Properties.Settings.Default.first_name = currentUser.FirstName;
-                            Properties.Settings.Default.last_name = currentUser.LastName;
-                            Properties.Settings.Default.email = currentUser.Email;
-                            Properties.Settings.Default.api_key = Utils.EncodeXOR(currentUser.APIKey);
-                            Properties.Settings.Default.Save();
+                            Properties.User.Default.first_name = currentUser.FirstName;
+                            Properties.User.Default.last_name = currentUser.LastName;
+                            Properties.User.Default.email = currentUser.Email;
+                            Properties.User.Default.api_key = Utils.EncodeXOR(currentUser.APIKey);
+                            Properties.User.Default.Save();
                             currentAPIKey = currentUser.APIKey;
                             if (OnUserAuthenticated != null)
                                 OnUserAuthenticated(ErrorTypes.NoErrors, false);
@@ -116,12 +119,15 @@ namespace RedmineClient
                         if (OnUserAuthenticated != null)
                         {
                             if (ex is WebException)
-                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
                                     OnUserAuthenticated(ErrorTypes.ConnectionError, false);
-                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
                                     OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
                                 else
                                     OnUserAuthenticated(ErrorTypes.UnknownError, false);
+                            }
                             else if (ex is ArgumentException)
                                 OnUserAuthenticated(ErrorTypes.UnathorizedAccess, false);
                             else
@@ -139,8 +145,8 @@ namespace RedmineClient
             new Thread(
                 delegate()
                 {
-                    Properties.Settings.Default.api_key = "";
-                    Properties.Settings.Default.Save();
+                    Properties.User.Default.api_key = "";
+                    Properties.User.Default.Save();
                     if (OnNeededToReAuthenticate != null)
                         OnNeededToReAuthenticate();
                 }).Start();
@@ -201,21 +207,16 @@ namespace RedmineClient
                                 membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
                                 memberships.AddRange(membershipsJSONObject.Memberships);
                                 offset += membershipsJSONObject.Limit;
-                            } while (membershipsJSONObject.Memberships.FindIndex(temp => temp.User.ID == Properties.Settings.Default.id) < 0 && membershipsJSONObject.Memberships.Count != 0);
+                            } while (membershipsJSONObject.Memberships.FindIndex(temp => temp.User.ID == Properties.User.Default.id) < 0 && membershipsJSONObject.Memberships.Count != 0);
                             Membership membership = null;
                             foreach (Membership currentMembership in memberships)
-                                if (currentMembership.User.ID == Properties.Settings.Default.id)
+                                if (currentMembership.User.ID == Properties.User.Default.id)
                                 {
                                     membership = currentMembership;
                                     break;
                                 }
                             if (membership != null)
-                            {
-                                string projectRoles = "";
-                                foreach (Role role in membership.Roles)
-                                    projectRoles += role.Name + ", ";
-                                projects[i].Roles = projectRoles.Remove(projectRoles.Length - 2);
-                            }
+                                projects[i].Roles = membership.Roles;
                             else
                             {
                                 projects.RemoveAt(i);
@@ -251,12 +252,15 @@ namespace RedmineClient
                         if (OnUpdated != null)
                         {
                             if (ex is WebException)
-                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
                                     OnUpdated(ErrorTypes.ConnectionError, null);
-                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
                                     OnUpdated(ErrorTypes.UnathorizedAccess, null);
                                 else
                                     OnUpdated(ErrorTypes.UnknownError, null);
+                            }
                             else if (ex is ArgumentException)
                                 OnUpdated(ErrorTypes.UnathorizedAccess, null);
                             else
@@ -358,12 +362,15 @@ namespace RedmineClient
                         if (OnPreparedToCreateNewIssue != null)
                         {
                             if (ex is WebException)
-                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
                                     OnPreparedToCreateNewIssue(ErrorTypes.ConnectionError, null, null, null);
-                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
                                     OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
                                 else
                                     OnPreparedToCreateNewIssue(ErrorTypes.UnknownError, null, null, null);
+                            }
                             else if (ex is ArgumentException)
                                 OnPreparedToCreateNewIssue(ErrorTypes.UnathorizedAccess, null, null, null);
                             else
@@ -412,12 +419,15 @@ namespace RedmineClient
                         if (OnMembershipsLoaded != null)
                         {
                             if (ex is WebException)
-                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
                                     OnMembershipsLoaded(ErrorTypes.ConnectionError, null);
-                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
                                     OnMembershipsLoaded(ErrorTypes.UnathorizedAccess, null);
                                 else
                                     OnMembershipsLoaded(ErrorTypes.UnknownError, null);
+                            }
                             else if (ex is ArgumentException)
                                 OnMembershipsLoaded(ErrorTypes.UnathorizedAccess, null);
                             else
@@ -482,12 +492,15 @@ namespace RedmineClient
                         if (OnIssueCreated != null)
                         {
                             if (ex is WebException)
-                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
                                     OnIssueCreated(ErrorTypes.ConnectionError, newIssue.ProjectID);
-                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
                                     OnIssueCreated(ErrorTypes.UnathorizedAccess, newIssue.ProjectID);
                                 else
                                     OnIssueCreated(ErrorTypes.UnknownError, newIssue.ProjectID);
+                            }
                             else if (ex is ArgumentException)
                                 OnIssueCreated(ErrorTypes.UnathorizedAccess, newIssue.ProjectID);
                             else
@@ -543,25 +556,25 @@ namespace RedmineClient
                         if (OnProjectInformationLoaded != null)
                             OnProjectInformationLoaded(ErrorTypes.NoErrors, project, memberships);
                     }
-                    catch (WebException webException)
+                    catch (Exception ex)
                     {
                         if (OnProjectInformationLoaded != null)
-                            if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                                OnProjectInformationLoaded(ErrorTypes.ConnectionError, null, null);
-                            else if (webException.Status == WebExceptionStatus.ProtocolError)
+                        {
+                            if (ex is WebException)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                                    OnProjectInformationLoaded(ErrorTypes.ConnectionError, null, null);
+                                else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
+                                    OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
+                                else
+                                    OnProjectInformationLoaded(ErrorTypes.UnknownError, null, null);
+                            }
+                            else if (ex is ArgumentException)
                                 OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
                             else
                                 OnProjectInformationLoaded(ErrorTypes.UnknownError, null, null);
-                    }
-                    catch (ArgumentException)
-                    {
-                        if (OnProjectInformationLoaded != null)
-                            OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
-                    }
-                    catch
-                    {
-                        if (OnProjectInformationLoaded != null)
-                            OnProjectInformationLoaded(ErrorTypes.UnknownError, null, null);
+                        }
                     }
                 }).Start();
         }
@@ -658,12 +671,15 @@ namespace RedmineClient
                         if (OnIssueInformationLoaded != null)
                         {
                             if (ex is WebException)
-                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
                                     OnIssueInformationLoaded(ErrorTypes.ConnectionError, null, null, null, null, null);
-                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
                                     OnIssueInformationLoaded(ErrorTypes.UnathorizedAccess, null, null, null, null, null);
                                 else
                                     OnIssueInformationLoaded(ErrorTypes.UnknownError, null, null, null, null, null);
+                            }
                             else if (ex is ArgumentException)
                                 OnIssueInformationLoaded(ErrorTypes.UnathorizedAccess, null, null, null, null, null);
                             else
@@ -729,12 +745,15 @@ namespace RedmineClient
                         if (OnIssueUpdated != null)
                         {
                             if (ex is WebException)
-                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
                                     OnIssueUpdated(ErrorTypes.ConnectionError, updatedIssue.ProjectID);
-                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
                                     OnIssueUpdated(ErrorTypes.UnathorizedAccess, updatedIssue.ProjectID);
                                 else
                                     OnIssueUpdated(ErrorTypes.UnknownError, updatedIssue.ProjectID);
+                            }
                             else if (ex is ArgumentException)
                                 OnIssueUpdated(ErrorTypes.UnathorizedAccess, updatedIssue.ProjectID);
                             else
@@ -770,12 +789,15 @@ namespace RedmineClient
                         if (OnIssueRemoved != null)
                         {
                             if (ex is WebException)
-                                if (((WebException)ex).Status == WebExceptionStatus.Timeout || ((WebException)ex).Status == WebExceptionStatus.NameResolutionFailure)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
                                     OnIssueRemoved(ErrorTypes.ConnectionError, issueID);
-                                else if (((WebException)ex).Status == WebExceptionStatus.ProtocolError)
+                                else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
                                     OnIssueRemoved(ErrorTypes.UnathorizedAccess, issueID);
                                 else
                                     OnIssueRemoved(ErrorTypes.UnknownError, issueID);
+                            }
                             else if (ex is ArgumentException)
                                 OnIssueRemoved(ErrorTypes.UnathorizedAccess, issueID);
                             else
@@ -783,6 +805,29 @@ namespace RedmineClient
                         }
                     }
                 }).Start();
+        }
+
+        /// <summary>
+        /// Уведомление о изменении настроек программы.
+        /// </summary>
+        /// <param name="whatsChanged">Массив изменений в основных настройках программы.</param>
+        public void NotifyAboutChangedSettings(bool[] whatsChanged)
+        {
+            if (whatsChanged[2])
+            {
+                if (Properties.Application.Default.enable_encryption)
+                    Properties.User.Default.api_key = Utils.EncodeXOR(currentAPIKey);
+                else
+                    Properties.User.Default.api_key = currentAPIKey;
+                Properties.User.Default.Save();
+            }
+            if (whatsChanged[5])
+            {
+                REDMINE_HOST = Properties.Application.Default.redmine_host;
+                NeedToReAuthenticate();
+            }
+            if (OnSettingsChanged != null)
+                OnSettingsChanged(whatsChanged);
         }
     }
 }

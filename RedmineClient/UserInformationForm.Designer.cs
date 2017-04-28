@@ -182,7 +182,7 @@
             this.labelInfo.Name = "labelInfo";
             this.labelInfo.Size = new System.Drawing.Size(288, 19);
             this.labelInfo.TabIndex = 0;
-            this.labelInfo.Text = "You could edit personal info at you own Redmine page.";
+            this.labelInfo.Text = "You could edit personal info at your own Redmine page.";
             this.labelInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // UserInformationForm

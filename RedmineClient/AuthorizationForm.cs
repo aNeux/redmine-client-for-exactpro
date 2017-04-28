@@ -18,10 +18,10 @@ namespace RedmineClient
 
         private void APITokenForm_Shown(object sender, EventArgs e)
         {
-            if (Properties.Settings.Default.api_key.Length != 0)
+            if (Properties.User.Default.api_key.Length != 0)
             {
                 cbUseAPIKeyInstead.Checked = true;
-                tbAPIKey.Text = Utils.DecodeXOR(Properties.Settings.Default.api_key);
+                tbAPIKey.Text = Utils.DecodeXOR(Properties.User.Default.api_key);
                 tbAPIKey.Select();
                 tbAPIKey.SelectAll();
             }
@@ -34,7 +34,7 @@ namespace RedmineClient
         private void EnterAPITokenForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             controller.OnUserAuthenticated -= controller_OnUserAuthenticated;
-            if (Properties.Settings.Default.api_key.Length == 0)
+            if (Properties.User.Default.api_key.Length == 0)
                 Application.Exit();
         }
 
@@ -87,7 +87,7 @@ namespace RedmineClient
 
         private void btnCacnel_Click(object sender, EventArgs e)
         {
-            if (Properties.Settings.Default.api_key.Length != 0)
+            if (Properties.User.Default.api_key.Length != 0)
                 this.Close();
             else
             {

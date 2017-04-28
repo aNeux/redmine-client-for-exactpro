@@ -136,7 +136,7 @@ namespace RedmineClient
                     case ErrorTypes.NoErrors:
                         int indexToSelect = 0;
                         List<Project> projects = controller.GetProjects();
-                        projects.RemoveAll(temp => !temp.Roles.Contains("Manager") || temp.Status == 5);
+                        projects.RemoveAll(temp1 => temp1.Roles.FindIndex(temp2 => temp2.ID == 3) < 0 || temp1.Status == 5);
                         foreach (Project currentProject in projects)
                         {
                             if (currentProject.Parent == null)

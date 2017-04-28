@@ -11,13 +11,13 @@ namespace RedmineClient
     {
         private Controller controller;
         private long issueID;
-        private string projectRoles;
+        private bool isManager;
 
-        public IssueInformationForm(long issueID, string projectRoles)
+        public IssueInformationForm(long issueID, bool isManager)
         {
             InitializeComponent();
             this.issueID = issueID;
-            this.projectRoles = projectRoles;
+            this.isManager = isManager;
             this.StartPosition = FormStartPosition.CenterParent;
         }
         private void IssueInformationForm_Shown(object sender, EventArgs e)
@@ -129,18 +129,30 @@ namespace RedmineClient
                         tbID.Text = issue.ID.ToString();
                         int indexToSelect = 0;
                         List<Project> projects = controller.GetProjects();
-                        if (projectRoles.Contains("Manager"))
-                            projects.RemoveAll(temp => !temp.Roles.Contains("Manager") || temp.Status == 5);
-                        foreach (Project currentProject in projects)
+                        Project projectForThisIssue = projects.Single(temp => temp.ID == issue.Project.ID);
+                        if (projectForThisIssue.Status != 5)
                         {
-                            if (currentProject.Parent == null)
-                                cbProject.Items.Add(new TextAndValueItem { Text = currentProject.Name, Value = currentProject.ID });
-                            else
-                                cbProject.Items.Add(new TextAndValueItem { Text = "    └ " + currentProject.Name, Value = currentProject.ID });
-                            if (currentProject.ID == issue.Project.ID)
-                                indexToSelect = cbProject.Items.Count - 1;
+                            if (isManager)
+                                projects.RemoveAll(temp1 => temp1.Roles.FindIndex(temp2 => temp2.ID == 3) < 0 || temp1.Status == 5);
+                            foreach (Project currentProject in projects)
+                            {
+                                if (currentProject.Parent == null)
+                                    cbProject.Items.Add(new TextAndValueItem { Text = currentProject.Name, Value = currentProject.ID });
+                                else
+                                    cbProject.Items.Add(new TextAndValueItem { Text = "    └ " + currentProject.Name, Value = currentProject.ID });
+                                if (currentProject.ID == issue.Project.ID)
+                                    indexToSelect = cbProject.Items.Count - 1;
+                            }
+                            cbProject.SelectedIndex = indexToSelect;
                         }
-                        cbProject.SelectedIndex = indexToSelect;
+                        else
+                        {
+                            if (projectForThisIssue.Parent == null)
+                                cbProject.Items.Add(new TextAndValueItem { Text = projectForThisIssue.Name, Value = projectForThisIssue.ID });
+                            else
+                                cbProject.Items.Add(new TextAndValueItem { Text = "    └ " + projectForThisIssue.Name, Value = projectForThisIssue.ID });
+                            cbProject.SelectedIndex = 0;
+                        }
                         indexToSelect = 0;
                         foreach (IssueTracker currentTracker in issueTrackers)
                         {
@@ -152,7 +164,7 @@ namespace RedmineClient
                         indexToSelect = 0;
                         List<IssueStatus> availableIssueStatuses = new List<IssueStatus>();
                         availableIssueStatuses.AddRange(issueStatuses);
-                        if (!projectRoles.Contains("Manager"))
+                        if (!isManager)
                             availableIssueStatuses.RemoveAll(temp => temp.ID < issue.Status.ID || temp.Name == "Closed" || temp.Name == "Rejected");
                         foreach (IssueStatus currentStatus in availableIssueStatuses)
                         {
@@ -195,25 +207,35 @@ namespace RedmineClient
                             labelClosesDate.Visible = true;
                             tbClosedDate.Visible = true;
                         }
-                        tbSubject.ReadOnly = !projectRoles.Contains("Manager");
-                        tbDescription.ReadOnly = !projectRoles.Contains("Manager");
+                        tbSubject.ReadOnly = !isManager;
+                        tbDescription.ReadOnly = !isManager;
                         FillIssueHistory(issue, issueTrackers, issueStatuses, issuePriorities, memberships);
-                        ChangeUIState(true);
-                        this.Text = "Issue information [" + projectRoles + "]";
+                        if (projectForThisIssue.Status != 5)
+                        {
+                            btnSave.Visible = true;
+                            ChangeUIState(true);
+                            this.Text = "Issue information";
+                        }
+                        else
+                        {
+                            tabControl.Enabled = true;
+                            btnClose.Enabled = true;
+                            this.Text = "Issue information [closed]";
+                        }
                         break;
                     case ErrorTypes.ConnectionError:
-                        this.Text = "Issue information [" + projectRoles + "]";
+                        this.Text = "Issue information";
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         break;
                     case ErrorTypes.UnathorizedAccess:
-                        this.Text = "Issue information [" + projectRoles + "]";
+                        this.Text = "Issue information";
                         MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         controller.NeedToReAuthenticate();
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:
-                        this.Text = "Issue information [" + projectRoles + "]";
+                        this.Text = "Issue information";
                         MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         break;
@@ -235,18 +257,18 @@ namespace RedmineClient
                         this.Close();
                         break;
                     case ErrorTypes.ConnectionError:
-                        this.Text = "Issue information [" + projectRoles + "]";
+                        this.Text = "Issue information";
                         MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         ChangeUIState(true);
                         break;
                     case ErrorTypes.UnathorizedAccess:
-                        this.Text = "Issue information [" + projectRoles + "]";
+                        this.Text = "Issue information";
                         MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         controller.NeedToReAuthenticate();
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:
-                        this.Text = "Issue information [" + projectRoles + "]";
+                        this.Text = "Issue information";
                         MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         ChangeUIState(true);
                         break;
@@ -270,7 +292,14 @@ namespace RedmineClient
                     switch (currentDetail.Name)
                     {
                         case "project_id":
-                            result += " » Project changed from \"" + Program.controllerGlobal.GetProjects().Single(temp => temp.ID == Convert.ToInt64(currentDetail.OldValue)).Name + "\" to \"" + Program.controllerGlobal.GetProjects().Single(temp => temp.ID == Convert.ToInt64(currentDetail.NewValue)).Name + "\"\r\n";
+                            try
+                            {
+                                result += " » Project changed from \"" + Program.controllerGlobal.GetProjects().Single(temp => temp.ID == Convert.ToInt64(currentDetail.OldValue)).Name + "\" to \"" + Program.controllerGlobal.GetProjects().Single(temp => temp.ID == Convert.ToInt64(currentDetail.NewValue)).Name + "\"\r\n";
+                            }
+                            catch
+                            {
+                                result += " » Project's ID changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
+                            }
                             break;
                         case "tracker_id":
                             result += " » Tracker changed from \"" + issueTrackers.Single(temp => temp.ID.ToString() == currentDetail.OldValue).Name + "\" to \"" + issueTrackers.Single(temp => temp.ID.ToString() == currentDetail.NewValue).Name + "\"\r\n";
@@ -283,9 +312,23 @@ namespace RedmineClient
                             break;
                         case "assigned_to_id":
                             if (currentDetail.NewValue != null)
-                                result += " » Assignee set to " + memberships.Single(temp => temp.User.ID.ToString() == currentDetail.NewValue).User.Name + "\r\n";
+                                try
+                                {
+                                    result += " » Assignee set to " + memberships.Single(temp => temp.User.ID.ToString() == currentDetail.NewValue).User.Name + "\r\n";
+                                }
+                                catch
+                                {
+                                    result += " » Assignee set to user with ID = \"" + currentDetail.NewValue + "\"\r\n";
+                                }
                             else
-                                result += " » Assignee deleted (last: " + memberships.Single(temp => temp.User.ID.ToString() == currentDetail.OldValue).User.Name + ")\r\n";
+                                try
+                                {
+                                    result += " » Assignee deleted (last: " + memberships.Single(temp => temp.User.ID.ToString() == currentDetail.OldValue).User.Name + ")\r\n";
+                                }
+                                catch
+                                {
+                                    result += " » Assignee deleted (last: user with ID = \"" + currentDetail.OldValue + "\")\r\n";
+                                }
                             break;
                         case "subject":
                             result += " » Subject changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
@@ -294,19 +337,34 @@ namespace RedmineClient
                             result += " » Description updated\r\n";
                             break;
                         case "start_date":
-                            result += " » Start date changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
+                            if (currentDetail.OldValue != null)
+                                result += " » Start date changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
+                            else
+                                result += " » Start date set to \"" + currentDetail.NewValue + "\"\r\n";
                             break;
                         case "due_date":
-                            result += " » Due date changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
+                            if (currentDetail.OldValue != null)
+                                result += " » Due date changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
+                            else
+                                result += " » Due date set to \"" + currentDetail.NewValue + "\"\r\n";
                             break;
                         case "estimated_hours":
-                            result += " » Estimated time changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
+                            if (currentDetail.OldValue != null)
+                                result += " » Estimated time changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
+                            else
+                                result += " » Estimated time set to \"" + currentDetail.NewValue + "\"\r\n";
                             break;
                         case "done_ratio":
-                            result += " » % Done changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
+                            if (currentDetail.OldValue != null)
+                                result += " » % Done changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
+                            else
+                                result += " » % Done set to \"" + currentDetail.NewValue + "\"\r\n";
                             break;
                         case "is_private":
-                            result += " » Private changed from \"" + (currentDetail.OldValue == "1" ? "Yes" : "No") + "\" to \"" + (currentDetail.NewValue == "1" ? "Yes" : "No") + "\"\r\n";
+                            if (currentDetail.OldValue != null)
+                                result += " » Private changed from \"" + (currentDetail.OldValue == "1" ? "Yes" : "No") + "\" to \"" + (currentDetail.NewValue == "1" ? "Yes" : "No") + "\"\r\n";
+                            else
+                                result += " » Private set to \"" + (currentDetail.NewValue == "1" ? "Yes" : "No") + "\"\r\n";
                             break;
                     }
                 }
@@ -321,20 +379,20 @@ namespace RedmineClient
         {
             tabControl.Enabled = isEnabled;
             tbID.Enabled = isEnabled;
-            cbProject.Enabled = isEnabled && projectRoles.Contains("Manager");
-            cbTracker.Enabled = isEnabled && projectRoles.Contains("Manager");
+            cbProject.Enabled = isEnabled && isManager;
+            cbTracker.Enabled = isEnabled && isManager;
             cbStatus.Enabled = isEnabled;
-            cbPriority.Enabled = isEnabled && projectRoles.Contains("Manager");
-            cbAssignedTo.Enabled = isEnabled && projectRoles.Contains("Manager");
+            cbPriority.Enabled = isEnabled && isManager;
+            cbAssignedTo.Enabled = isEnabled && isManager;
             tbAuthor.Enabled = isEnabled;
             cbAddNote.Enabled = isEnabled;
             tbSubject.Enabled = isEnabled;
             tbDescription.Enabled = isEnabled;
-            cbIsPrivate.Enabled = isEnabled && projectRoles.Contains("Manager");
-            dtpStartDate.Enabled = isEnabled && projectRoles.Contains("Manager");
-            dtpDueDate.Enabled = isEnabled && projectRoles.Contains("Manager");
-            nudEstimatedTime.Enabled = isEnabled && projectRoles.Contains("Manager");
-            nudDoneRatio.Enabled = isEnabled && projectRoles.Contains("Manager");
+            cbIsPrivate.Enabled = isEnabled && isManager;
+            dtpStartDate.Enabled = isEnabled && isManager;
+            dtpDueDate.Enabled = isEnabled && isManager;
+            nudEstimatedTime.Enabled = isEnabled && isManager;
+            nudDoneRatio.Enabled = isEnabled && isManager;
             tbCreationDate.Enabled = isEnabled;
             tbLastUpdate.Enabled = isEnabled;
             tbClosedDate.Enabled = isEnabled;

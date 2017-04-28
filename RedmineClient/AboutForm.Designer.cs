@@ -74,9 +74,9 @@
             this.labelPavelTropinov.AutoSize = true;
             this.labelPavelTropinov.Location = new System.Drawing.Point(13, 210);
             this.labelPavelTropinov.Name = "labelPavelTropinov";
-            this.labelPavelTropinov.Size = new System.Drawing.Size(189, 13);
+            this.labelPavelTropinov.Size = new System.Drawing.Size(188, 13);
             this.labelPavelTropinov.TabIndex = 2;
-            this.labelPavelTropinov.Text = "● Pavel Tropinov (Main functionality) - ";
+            this.labelPavelTropinov.Text = "● Pavel Tropinov (main functionality) - ";
             // 
             // linkLabelPavelTropinovVK
             // 
@@ -105,9 +105,9 @@
             this.labelIlyaIlichev.AutoSize = true;
             this.labelIlyaIlichev.Location = new System.Drawing.Point(13, 226);
             this.labelIlyaIlichev.Name = "labelIlyaIlichev";
-            this.labelIlyaIlichev.Size = new System.Drawing.Size(178, 13);
+            this.labelIlyaIlichev.Size = new System.Drawing.Size(176, 13);
             this.labelIlyaIlichev.TabIndex = 4;
-            this.labelIlyaIlichev.Text = "● Ilya Ilichev (Design and security) - ";
+            this.labelIlyaIlichev.Text = "● Ilya Ilichev (design and security) - ";
             // 
             // linkLabelExactProSystemsWeb
             // 
@@ -125,9 +125,9 @@
             this.labelExactProSystems.AutoSize = true;
             this.labelExactProSystems.Location = new System.Drawing.Point(13, 242);
             this.labelExactProSystems.Name = "labelExactProSystems";
-            this.labelExactProSystems.Size = new System.Drawing.Size(165, 13);
+            this.labelExactProSystems.Size = new System.Drawing.Size(163, 13);
             this.labelExactProSystems.TabIndex = 6;
-            this.labelExactProSystems.Text = "● ExactPro Systems (Organizer) - ";
+            this.labelExactProSystems.Text = "● ExactPro Systems (organizer) - ";
             // 
             // AboutForm
             // 

@@ -53,6 +53,6 @@ namespace RedmineClient.Models
         public DateTime CreatedOn { set; get; }
         [JsonProperty("updated_on")]
         public DateTime UpdatedOn { set; get; }
-        public string Roles { set; get; }
+        public List<Role> Roles { set; get; }
     }
 }

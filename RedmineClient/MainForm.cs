@@ -21,31 +21,44 @@ namespace RedmineClient
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
+            if (!Properties.Application.Default.show_status_bar && statusStrip.Visible)
+            {
+                lvIssues.Size = new System.Drawing.Size(lvIssues.Size.Width, lvIssues.Size.Height + statusStrip.Size.Height);
+                statusStrip.Visible = false;
+            }
             cbProjects.SelectedIndex = 0;
             controller = Program.controllerGlobal;
             controller.OnUserAuthenticated += controller_OnUserAuthenticated;
+            controller.OnNeededToReAuthenticate += controller_OnNeededToReAuthenticate;
             controller.OnUpdated += controller_OnUpdated;
             controller.OnIssueCreated += controller_OnIssueCreatedOrUpdated;
             controller.OnIssueUpdated += controller_OnIssueCreatedOrUpdated;
             controller.OnIssueRemoved += controller_OnIssueRemoved;
-            controller.OnNeededToReAuthenticate += controller_OnNeededToReAuthenticate;
+            controller.OnSettingsChanged += controller_OnSettingsChanged;
             toolStripStatusLabel.Text = "Updating..";
             controller.Update();
         }
 
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            if (Properties.Application.Default.minimaze_to_tray && FormWindowState.Minimized == this.WindowState)
+                this.Hide();
+        }
+
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Properties.Settings.Default.api_key.Length != 0 && (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.ApplicationExitCall))
+            if (Properties.User.Default.api_key.Length != 0 && (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.ApplicationExitCall) && Properties.Application.Default.ask_before_exit)
             {
                 var dialogResult = MessageBox.Show("Are you sure you want to exit?", "Exiting", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
                 {
                     controller.OnUserAuthenticated -= controller_OnUserAuthenticated;
+                    controller.OnNeededToReAuthenticate -= controller_OnNeededToReAuthenticate;
                     controller.OnUpdated -= controller_OnUpdated;
                     controller.OnIssueCreated -= controller_OnIssueCreatedOrUpdated;
                     controller.OnIssueUpdated -= controller_OnIssueCreatedOrUpdated;
                     controller.OnIssueRemoved -= controller_OnIssueRemoved;
-                    controller.OnNeededToReAuthenticate -= controller_OnNeededToReAuthenticate;
+                    controller.OnSettingsChanged -= controller_OnSettingsChanged;
                 }
                 else
                     e.Cancel = true;
@@ -53,11 +66,12 @@ namespace RedmineClient
             else
             {
                 controller.OnUserAuthenticated -= controller_OnUserAuthenticated;
+                controller.OnNeededToReAuthenticate -= controller_OnNeededToReAuthenticate;
                 controller.OnUpdated -= controller_OnUpdated;
                 controller.OnIssueCreated -= controller_OnIssueCreatedOrUpdated;
                 controller.OnIssueUpdated -= controller_OnIssueCreatedOrUpdated;
                 controller.OnIssueRemoved -= controller_OnIssueRemoved;
-                controller.OnNeededToReAuthenticate -= controller_OnNeededToReAuthenticate;
+                controller.OnSettingsChanged -= controller_OnSettingsChanged;
             }
         }
 
@@ -79,6 +93,16 @@ namespace RedmineClient
             Application.Exit();
         }
 
+        private void logOutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dialogResult = MessageBox.Show("Do you really want to log out and exit the program?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dialogResult == DialogResult.Yes)
+            {
+                Properties.User.Default.Reset();
+                Application.Exit();
+            }
+        }
+
         private void changeAPITokenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             new AuthorizationForm().ShowDialog();
@@ -89,19 +113,14 @@ namespace RedmineClient
             new UserInformationForm().ShowDialog();
         }
 
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new OptionsForm().ShowDialog();
+        }
+
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             new AboutForm().ShowDialog();
-        }
-
-        private void logOutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var dialogResult = MessageBox.Show("Do you really want to log out and exit the program?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (dialogResult == DialogResult.Yes)
-            {
-                Properties.Settings.Default.Reset();
-                Application.Exit();
-            }
         }
 
         private void exitFromNotifyIconToolStripMenuItem_Click(object sender, EventArgs e)
@@ -116,8 +135,14 @@ namespace RedmineClient
                 btnProjectInfo.Visible = true;
                 lastSelectedProjectID = (long)(cbProjects.SelectedItem as TextAndValueItem).Value;
                 Project currentProject = controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID);
-                newIssueToolStripMenuItem.Enabled = currentProject.Roles.Contains("Manager") && currentProject.Status == 1;
-                labelProjectRoles.Text = "Roles: " + currentProject.Roles;
+                newIssueToolStripMenuItem.Enabled = currentProject.Roles.FindIndex(temp => temp.ID == 3) >= 0 && currentProject.Status == 1;
+                if (currentProject.Status == 1)
+                {
+                    string projectRoles = "";
+                    foreach (Role role in currentProject.Roles)
+                        projectRoles += role.Name + ", ";
+                    labelProjectRoles.Text = "Roles: " + projectRoles.Remove(projectRoles.Length - 2);
+                }
                 lvIssues.Items.Clear();
                 foreach (Issue issue in controller.GetIssues(lastSelectedProjectID))
                 {
@@ -174,12 +199,16 @@ namespace RedmineClient
 
         private void issueInfotoolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID).Roles).ShowDialog();
+            new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID).Roles.FindIndex(temp => temp.ID == 3) >= 0).ShowDialog();
         }
 
         private void notifyIcon_Click(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
+            if (WindowState == FormWindowState.Minimized)
+            {
+                this.Show();
+                this.WindowState = FormWindowState.Normal;
+            }
         }
 
         private void removeIssueToolStripMenuItem_Click(object sender, EventArgs e)
@@ -199,11 +228,26 @@ namespace RedmineClient
                 {
                     if (error == ErrorTypes.NoErrors && isUserChanged)
                     {
+                        this.Text = "Redmine Client";
                         cbProjects.SelectedIndex = 0;
                         toolStripStatusLabel.Text = "Updating..";
                         controller.Update();
                     }
                 };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
+        }
+
+        private void controller_OnNeededToReAuthenticate()
+        {
+            Action action = () =>
+            {
+                this.Text = "Redmine Client";
+                toolStripStatusLabel.Text = "Last request failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
+                new AuthorizationForm().ShowDialog();
+            };
             if (InvokeRequired)
                 Invoke(action);
             else
@@ -217,20 +261,23 @@ namespace RedmineClient
                     switch (error)
                     {
                         case ErrorTypes.NoErrors:
-                            this.Text = "Redmine Client [" + Properties.Settings.Default.login + "]";
+                            this.Text = "Redmine Client" + (Properties.Application.Default.show_account_login ? " [account: " + Properties.User.Default.login + "]" : "");
                             userInformationToolStripMenuItem.Enabled = true;
                             for (int i = cbProjects.Items.Count - 1; i >= 1; i--)
                                 cbProjects.Items.RemoveAt(i);
-                            int indexToSelect = 0;
                             for (int i = 0; i < projects.Count; i++)
-                            {
-                                if (projects[i].Parent == null)
-                                    cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
-                                else
-                                    cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
-                                if (lastSelectedProjectID == projects[i].ID)
-                                    indexToSelect = i + 1;
-                            }
+                                if (Properties.Application.Default.show_closed_projects || (!Properties.Application.Default.show_closed_projects && projects[i].Status != 5))
+                                    if (projects[i].Parent == null)
+                                        cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
+                                    else
+                                        cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
+                            int indexToSelect = 0;
+                            for (int i = 1; i < cbProjects.Items.Count; i++)
+                                if ((long)(cbProjects.Items[i] as TextAndValueItem).Value == lastSelectedProjectID)
+                                {
+                                    indexToSelect = i;
+                                    break;
+                                }
                             toolStripStatusLabel.Text = "Last update was at " + DateTime.Now.ToShortTimeString() + " (success)";
                             cbProjects.SelectedIndex = indexToSelect;
                             break;
@@ -241,10 +288,10 @@ namespace RedmineClient
                         case ErrorTypes.UnathorizedAccess:
                             this.Text = "Redmine Client";
                             toolStripStatusLabel.Text = "Last update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
-                            if (Properties.Settings.Default.api_key.Length != 0)
+                            if (Properties.User.Default.api_key.Length != 0)
                             {
-                                Properties.Settings.Default.api_key = "";
-                                Properties.Settings.Default.Save();
+                                Properties.User.Default.api_key = "";
+                                Properties.User.Default.Save();
                                 MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                             new AuthorizationForm().ShowDialog();
@@ -301,10 +348,10 @@ namespace RedmineClient
                     case ErrorTypes.UnathorizedAccess:
                         this.Text = "Redmine Client";
                         toolStripStatusLabel.Text = "Issue #" + issueID + "removing failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
-                        if (Properties.Settings.Default.api_key.Length != 0)
+                        if (Properties.User.Default.api_key.Length != 0)
                             {
-                                Properties.Settings.Default.api_key = "";
-                                Properties.Settings.Default.Save();
+                                Properties.User.Default.api_key = "";
+                                Properties.User.Default.Save();
                                 MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                             new AuthorizationForm().ShowDialog();
@@ -321,18 +368,55 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnNeededToReAuthenticate()
+        private void controller_OnSettingsChanged(bool[] whatsChanged)
         {
-            Action action = () =>
-                {
-                    this.Text = "Redmine Client";
-                    toolStripStatusLabel.Text = "Last request failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
-                    new AuthorizationForm().ShowDialog();
-                };
-            if (InvokeRequired)
-                Invoke(action);
+            if (whatsChanged[5])
+            {
+                this.Text = "Redmine Client";
+                cbProjects.SelectedIndex = 0;
+                lvIssues.Items.Clear();
+            }
             else
-                action();
+            {
+                if (whatsChanged[0])
+                    this.Text = "Redmine Client" + (Properties.Application.Default.show_account_login ? " [account: " + Properties.User.Default.login + "]" : "");
+                if (whatsChanged[6])
+                {
+                    for (int i = cbProjects.Items.Count - 1; i >= 1; i--)
+                        cbProjects.Items.RemoveAt(i);
+                    List<Project> projects = controller.GetProjects();
+                    for (int i = 0; i < projects.Count; i++)
+                    {
+                        if (Properties.Application.Default.show_closed_projects || (!Properties.Application.Default.show_closed_projects && projects[i].Status != 5))
+                            if (projects[i].Parent == null)
+                                cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
+                            else
+                                cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
+                    }
+                    int indexToSelect = 0;
+                    for (int i = 1; i < cbProjects.Items.Count; i++)
+                        if ((long)(cbProjects.Items[i] as TextAndValueItem).Value == lastSelectedProjectID)
+                        {
+                            indexToSelect = i;
+                            break;
+                        }
+                    cbProjects.SelectedIndex = indexToSelect;
+                }
+            }
+            if (whatsChanged[1])
+                if (Properties.Application.Default.show_status_bar)
+                {
+                    if (!statusStrip.Visible)
+                    {
+                        lvIssues.Size = new System.Drawing.Size(lvIssues.Size.Width, lvIssues.Size.Height - statusStrip.Size.Height);
+                        statusStrip.Visible = true;
+                    }
+                }
+                else if (statusStrip.Visible)
+                {
+                    lvIssues.Size = new System.Drawing.Size(lvIssues.Size.Width, lvIssues.Size.Height + statusStrip.Size.Height);
+                    statusStrip.Visible = false;
+                }
         }
     }
 
