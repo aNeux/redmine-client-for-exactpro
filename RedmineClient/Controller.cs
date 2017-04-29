@@ -34,7 +34,7 @@ namespace RedmineClient
         // Событие, возникающее при авторизации пользователя
         public event Action<ErrorTypes, bool> OnUserAuthenticated;
         // Событие, возникающее при необходимости открытия окна авторизации
-        public event Action OnNeededToReAuthenticate;
+        public event Action<bool> OnNeededToReAuthenticate;
         // Событие, возникающее после обновления списка проектов и задач, в которых участвует текущий пользователь
         public event Action<ErrorTypes, List<Project>> OnUpdated;
         // Событие, информирующее о готовности к созданию новой задачи
@@ -140,14 +140,15 @@ namespace RedmineClient
         /// <summary>
         /// Метод, оповещающий главную форму о необходимости открытия окна авторизации.
         /// </summary>
-        public void NeedToReAuthenticate()
+        /// <param name="isFromOptions">Вызван ли этот метод из настроек программы.</param>
+        public void NeedToReAuthenticate(bool isFromOptions)
         {
             new Thread(
                 delegate()
                 {
                     Properties.User.Default.Reset();
                     if (OnNeededToReAuthenticate != null)
-                        OnNeededToReAuthenticate();
+                        OnNeededToReAuthenticate(isFromOptions);
                 }).Start();
         }
 
@@ -220,8 +221,9 @@ namespace RedmineClient
                                     projects[i].Roles = membership.Roles;
                                 else
                                 {
-                                    projects.RemoveAt(i);
-                                    i--;
+                                    List<Role> noRoles = new List<Role>();
+                                    noRoles.Add(new Role { ID = -1, Name = "< none >"});
+                                    projects[i].Roles = noRoles;
                                 }
                             }
                             // Загружаем список задач
@@ -270,7 +272,7 @@ namespace RedmineClient
                         }
                     }
                     else if (OnNeededToReAuthenticate != null)
-                        OnNeededToReAuthenticate();
+                        OnNeededToReAuthenticate(false);
                 }).Start();
         }
 
@@ -822,7 +824,7 @@ namespace RedmineClient
                 {
                     Properties.Application.Default.ask_before_exiting = newOptions.AskBeforeExiting;
                     Properties.Application.Default.minimaze_to_tray = newOptions.MinimazeToTray;
-                    bool isShowAccountLoginChanged = false, isShowStatusBarChanged = false, isRedmineHostChanged = false, isShowClosedProjectsChanged = false;
+                    bool isShowAccountLoginChanged = false, isShowStatusBarChanged = false, isRedmineHostChanged = false, isShowClosedProjectsChanged = false, isShowProjectsWithoutCurrentUserChanged = false;
                     if (Properties.Application.Default.show_account_login != newOptions.ShowAccountLogin)
                     {
                         isShowAccountLoginChanged = true;
@@ -846,6 +848,11 @@ namespace RedmineClient
                         isShowClosedProjectsChanged = true;
                         Properties.Application.Default.show_closed_projects = newOptions.ShowClodedProjects;
                     }
+                    if (Properties.Application.Default.show_projects_without_current_user != newOptions.ShowProjectsWithoutCurrentUser)
+                    {
+                        isShowProjectsWithoutCurrentUserChanged = true;
+                        Properties.Application.Default.show_projects_without_current_user = newOptions.ShowProjectsWithoutCurrentUser;
+                    }
                     if (Properties.Application.Default.redmine_host != newOptions.RedmineHost)
                     {
                         try
@@ -861,9 +868,9 @@ namespace RedmineClient
                             Properties.Application.Default.Save();
                             Properties.User.Default.Reset();
                             if (OnOptionsApplied != null)
-                                OnOptionsApplied(ErrorTypes.NoErrors, new bool[] { isShowAccountLoginChanged, isShowStatusBarChanged, isRedmineHostChanged, isShowClosedProjectsChanged });
+                                OnOptionsApplied(ErrorTypes.NoErrors, new bool[] { isShowAccountLoginChanged, isShowStatusBarChanged, isRedmineHostChanged, isShowClosedProjectsChanged, isShowProjectsWithoutCurrentUserChanged });
                             if (isRedmineHostChanged && OnNeededToReAuthenticate != null)
-                                OnNeededToReAuthenticate();
+                                OnNeededToReAuthenticate(true);
                         }
                         catch (Exception ex)
                         {
@@ -880,9 +887,9 @@ namespace RedmineClient
                                         Properties.Application.Default.Save();
                                         Properties.User.Default.Reset();
                                         if (OnOptionsApplied != null)
-                                            OnOptionsApplied(ErrorTypes.NoErrors, new bool[] { isShowAccountLoginChanged, isShowStatusBarChanged, isRedmineHostChanged, isShowClosedProjectsChanged });
+                                            OnOptionsApplied(ErrorTypes.NoErrors, new bool[] { isShowAccountLoginChanged, isShowStatusBarChanged, isRedmineHostChanged, isShowClosedProjectsChanged, isShowProjectsWithoutCurrentUserChanged });
                                         if (isRedmineHostChanged && OnNeededToReAuthenticate != null)
-                                            OnNeededToReAuthenticate();
+                                            OnNeededToReAuthenticate(true);
                                     }
                                     else
                                         OnOptionsApplied(ErrorTypes.ConnectionError, null);
@@ -897,7 +904,7 @@ namespace RedmineClient
                         Properties.Application.Default.Save();
                         Properties.User.Default.Save();
                         if (OnOptionsApplied != null)
-                            OnOptionsApplied(ErrorTypes.NoErrors, new bool[] { isShowAccountLoginChanged, isShowStatusBarChanged, isRedmineHostChanged, isShowClosedProjectsChanged });
+                            OnOptionsApplied(ErrorTypes.NoErrors, new bool[] { isShowAccountLoginChanged, isShowStatusBarChanged, isRedmineHostChanged, isShowClosedProjectsChanged, isShowProjectsWithoutCurrentUserChanged });
                     }
                 }).Start();
         }

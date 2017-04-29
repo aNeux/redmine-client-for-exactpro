@@ -130,5 +130,17 @@ namespace RedmineClient.Properties {
                 this["show_closed_projects"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool show_projects_without_current_user {
+            get {
+                return ((bool)(this["show_projects_without_current_user"]));
+            }
+            set {
+                this["show_projects_without_current_user"] = value;
+            }
+        }
     }
 }

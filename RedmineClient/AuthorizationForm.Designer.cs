@@ -39,6 +39,7 @@
             this.tbPassword = new System.Windows.Forms.TextBox();
             this.labelPassword = new System.Windows.Forms.Label();
             this.labelAPIKey = new System.Windows.Forms.Label();
+            this.linkLabelForgotPassword = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // labelInfo
@@ -55,14 +56,14 @@
             this.tbAPIKey.Location = new System.Drawing.Point(12, 182);
             this.tbAPIKey.Name = "tbAPIKey";
             this.tbAPIKey.Size = new System.Drawing.Size(256, 20);
-            this.tbAPIKey.TabIndex = 7;
+            this.tbAPIKey.TabIndex = 8;
             // 
             // btnLogIn
             // 
             this.btnLogIn.Location = new System.Drawing.Point(112, 208);
             this.btnLogIn.Name = "btnLogIn";
             this.btnLogIn.Size = new System.Drawing.Size(75, 23);
-            this.btnLogIn.TabIndex = 8;
+            this.btnLogIn.TabIndex = 9;
             this.btnLogIn.Text = "Log In";
             this.btnLogIn.UseVisualStyleBackColor = true;
             this.btnLogIn.Click += new System.EventHandler(this.btnLogIn_Click);
@@ -72,7 +73,7 @@
             this.btnCancel.Location = new System.Drawing.Point(193, 208);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 9;
+            this.btnCancel.TabIndex = 10;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCacnel_Click);
@@ -83,7 +84,7 @@
             this.cbUseAPIKeyInstead.Location = new System.Drawing.Point(86, 153);
             this.cbUseAPIKeyInstead.Name = "cbUseAPIKeyInstead";
             this.cbUseAPIKeyInstead.Size = new System.Drawing.Size(122, 17);
-            this.cbUseAPIKeyInstead.TabIndex = 5;
+            this.cbUseAPIKeyInstead.TabIndex = 6;
             this.cbUseAPIKeyInstead.Text = "Use API key instead";
             this.cbUseAPIKeyInstead.UseVisualStyleBackColor = true;
             this.cbUseAPIKeyInstead.CheckedChanged += new System.EventHandler(this.cbUseAPIKeyInstead_CheckedChanged);
@@ -109,7 +110,7 @@
             this.tbPassword.Location = new System.Drawing.Point(12, 124);
             this.tbPassword.Name = "tbPassword";
             this.tbPassword.PasswordChar = '*';
-            this.tbPassword.Size = new System.Drawing.Size(256, 20);
+            this.tbPassword.Size = new System.Drawing.Size(206, 20);
             this.tbPassword.TabIndex = 4;
             // 
             // labelPassword
@@ -128,14 +129,26 @@
             this.labelAPIKey.Location = new System.Drawing.Point(12, 166);
             this.labelAPIKey.Name = "labelAPIKey";
             this.labelAPIKey.Size = new System.Drawing.Size(47, 13);
-            this.labelAPIKey.TabIndex = 6;
+            this.labelAPIKey.TabIndex = 7;
             this.labelAPIKey.Text = "API key:";
+            // 
+            // linkLabelForgotPassword
+            // 
+            this.linkLabelForgotPassword.Location = new System.Drawing.Point(224, 124);
+            this.linkLabelForgotPassword.Name = "linkLabelForgotPassword";
+            this.linkLabelForgotPassword.Size = new System.Drawing.Size(44, 20);
+            this.linkLabelForgotPassword.TabIndex = 5;
+            this.linkLabelForgotPassword.TabStop = true;
+            this.linkLabelForgotPassword.Text = "Forgot?";
+            this.linkLabelForgotPassword.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.linkLabelForgotPassword.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelForgotPassword_LinkClicked);
             // 
             // AuthorizationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(280, 239);
+            this.Controls.Add(this.linkLabelForgotPassword);
             this.Controls.Add(this.labelAPIKey);
             this.Controls.Add(this.tbPassword);
             this.Controls.Add(this.labelPassword);
@@ -172,5 +185,6 @@
         private System.Windows.Forms.TextBox tbPassword;
         private System.Windows.Forms.Label labelPassword;
         private System.Windows.Forms.Label labelAPIKey;
+        private System.Windows.Forms.LinkLabel linkLabelForgotPassword;
     }
 }

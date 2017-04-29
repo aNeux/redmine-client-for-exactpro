@@ -11,13 +11,15 @@ namespace RedmineClient
     {
         private Controller controller;
         private long issueID;
+        private List<Role> projectRoles;
         private bool isManager;
 
-        public IssueInformationForm(long issueID, bool isManager)
+        public IssueInformationForm(long issueID, List<Role> projectRoles)
         {
             InitializeComponent();
             this.issueID = issueID;
-            this.isManager = isManager;
+            this.projectRoles = projectRoles;
+            this.isManager = projectRoles.FindIndex(temp => temp.ID == 3) >= 0;
             this.StartPosition = FormStartPosition.CenterParent;
         }
         private void IssueInformationForm_Shown(object sender, EventArgs e)
@@ -210,7 +212,7 @@ namespace RedmineClient
                         tbSubject.ReadOnly = !isManager;
                         tbDescription.ReadOnly = !isManager;
                         FillIssueHistory(issue, issueTrackers, issueStatuses, issuePriorities, memberships);
-                        if (projectForThisIssue.Status != 5)
+                        if (projectRoles[0].ID != -1 && projectForThisIssue.Status != 5)
                         {
                             btnSave.Visible = true;
                             ChangeUIState(true);
@@ -220,7 +222,7 @@ namespace RedmineClient
                         {
                             tabControl.Enabled = true;
                             btnClose.Enabled = true;
-                            this.Text = "Issue information [closed]";
+                            this.Text = "Issue information";
                         }
                         break;
                     case ErrorTypes.ConnectionError:
@@ -231,7 +233,7 @@ namespace RedmineClient
                     case ErrorTypes.UnathorizedAccess:
                         this.Text = "Issue information";
                         MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        controller.NeedToReAuthenticate();
+                        controller.NeedToReAuthenticate(false);
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:
@@ -264,7 +266,7 @@ namespace RedmineClient
                     case ErrorTypes.UnathorizedAccess:
                         this.Text = "Issue information";
                         MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        controller.NeedToReAuthenticate();
+                        controller.NeedToReAuthenticate(false);
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:

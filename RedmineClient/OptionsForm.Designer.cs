@@ -56,6 +56,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnReseToDefaults = new System.Windows.Forms.Button();
+            this.cbShowProjectsWithoutCurrentUser = new System.Windows.Forms.CheckBox();
             this.tabControl.SuspendLayout();
             this.tabPageGeneral.SuspendLayout();
             this.gbSecurity.SuspendLayout();
@@ -104,16 +105,16 @@
             // 
             // labelEncryptionInfo
             // 
-            this.labelEncryptionInfo.Location = new System.Drawing.Point(8, 16);
+            this.labelEncryptionInfo.Location = new System.Drawing.Point(6, 16);
             this.labelEncryptionInfo.Name = "labelEncryptionInfo";
-            this.labelEncryptionInfo.Size = new System.Drawing.Size(374, 40);
+            this.labelEncryptionInfo.Size = new System.Drawing.Size(376, 40);
             this.labelEncryptionInfo.TabIndex = 7;
             this.labelEncryptionInfo.Text = resources.GetString("labelEncryptionInfo.Text");
             // 
             // cbEnableEncryption
             // 
             this.cbEnableEncryption.AutoSize = true;
-            this.cbEnableEncryption.Location = new System.Drawing.Point(11, 59);
+            this.cbEnableEncryption.Location = new System.Drawing.Point(9, 59);
             this.cbEnableEncryption.Name = "cbEnableEncryption";
             this.cbEnableEncryption.Size = new System.Drawing.Size(137, 17);
             this.cbEnableEncryption.TabIndex = 8;
@@ -136,7 +137,7 @@
             // cbShowAccountLogin
             // 
             this.cbShowAccountLogin.AutoSize = true;
-            this.cbShowAccountLogin.Location = new System.Drawing.Point(8, 64);
+            this.cbShowAccountLogin.Location = new System.Drawing.Point(9, 64);
             this.cbShowAccountLogin.Name = "cbShowAccountLogin";
             this.cbShowAccountLogin.Size = new System.Drawing.Size(256, 17);
             this.cbShowAccountLogin.TabIndex = 4;
@@ -146,7 +147,7 @@
             // cbShowStatusBar
             // 
             this.cbShowStatusBar.AutoSize = true;
-            this.cbShowStatusBar.Location = new System.Drawing.Point(8, 87);
+            this.cbShowStatusBar.Location = new System.Drawing.Point(9, 87);
             this.cbShowStatusBar.Name = "cbShowStatusBar";
             this.cbShowStatusBar.Size = new System.Drawing.Size(181, 17);
             this.cbShowStatusBar.TabIndex = 5;
@@ -156,7 +157,7 @@
             // cbMinimazeToTray
             // 
             this.cbMinimazeToTray.AutoSize = true;
-            this.cbMinimazeToTray.Location = new System.Drawing.Point(8, 41);
+            this.cbMinimazeToTray.Location = new System.Drawing.Point(9, 41);
             this.cbMinimazeToTray.Name = "cbMinimazeToTray";
             this.cbMinimazeToTray.Size = new System.Drawing.Size(137, 17);
             this.cbMinimazeToTray.TabIndex = 3;
@@ -166,7 +167,7 @@
             // cbAskBeforeExiting
             // 
             this.cbAskBeforeExiting.AutoSize = true;
-            this.cbAskBeforeExiting.Location = new System.Drawing.Point(8, 18);
+            this.cbAskBeforeExiting.Location = new System.Drawing.Point(9, 18);
             this.cbAskBeforeExiting.Name = "cbAskBeforeExiting";
             this.cbAskBeforeExiting.Size = new System.Drawing.Size(169, 17);
             this.cbAskBeforeExiting.TabIndex = 2;
@@ -194,7 +195,7 @@
             this.gbBackgroundUpdater.Enabled = false;
             this.gbBackgroundUpdater.Location = new System.Drawing.Point(6, 6);
             this.gbBackgroundUpdater.Name = "gbBackgroundUpdater";
-            this.gbBackgroundUpdater.Size = new System.Drawing.Size(388, 109);
+            this.gbBackgroundUpdater.Size = new System.Drawing.Size(388, 106);
             this.gbBackgroundUpdater.TabIndex = 9;
             this.gbBackgroundUpdater.TabStop = false;
             this.gbBackgroundUpdater.Text = "Background updater";
@@ -258,7 +259,7 @@
             // 
             this.labelBackgroundUpdaterInfo.Location = new System.Drawing.Point(6, 16);
             this.labelBackgroundUpdaterInfo.Name = "labelBackgroundUpdaterInfo";
-            this.labelBackgroundUpdaterInfo.Size = new System.Drawing.Size(378, 40);
+            this.labelBackgroundUpdaterInfo.Size = new System.Drawing.Size(376, 40);
             this.labelBackgroundUpdaterInfo.TabIndex = 10;
             this.labelBackgroundUpdaterInfo.Text = resources.GetString("labelBackgroundUpdaterInfo.Text");
             // 
@@ -276,10 +277,11 @@
             // 
             // gbProjects
             // 
+            this.gbProjects.Controls.Add(this.cbShowProjectsWithoutCurrentUser);
             this.gbProjects.Controls.Add(this.cbShowClosedProjects);
             this.gbProjects.Location = new System.Drawing.Point(6, 119);
             this.gbProjects.Name = "gbProjects";
-            this.gbProjects.Size = new System.Drawing.Size(388, 38);
+            this.gbProjects.Size = new System.Drawing.Size(388, 59);
             this.gbProjects.TabIndex = 19;
             this.gbProjects.TabStop = false;
             this.gbProjects.Text = "Projects";
@@ -287,7 +289,7 @@
             // cbShowClosedProjects
             // 
             this.cbShowClosedProjects.AutoSize = true;
-            this.cbShowClosedProjects.Location = new System.Drawing.Point(7, 17);
+            this.cbShowClosedProjects.Location = new System.Drawing.Point(9, 17);
             this.cbShowClosedProjects.Name = "cbShowClosedProjects";
             this.cbShowClosedProjects.Size = new System.Drawing.Size(127, 17);
             this.cbShowClosedProjects.TabIndex = 20;
@@ -338,7 +340,7 @@
             this.btnCancel.Location = new System.Drawing.Point(346, 253);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 22;
+            this.btnCancel.TabIndex = 23;
             this.btnCancel.Text = "Cacnel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -348,7 +350,7 @@
             this.btnApply.Location = new System.Drawing.Point(265, 253);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(75, 23);
-            this.btnApply.TabIndex = 21;
+            this.btnApply.TabIndex = 22;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
@@ -358,10 +360,20 @@
             this.btnReseToDefaults.Location = new System.Drawing.Point(13, 252);
             this.btnReseToDefaults.Name = "btnReseToDefaults";
             this.btnReseToDefaults.Size = new System.Drawing.Size(100, 23);
-            this.btnReseToDefaults.TabIndex = 23;
+            this.btnReseToDefaults.TabIndex = 24;
             this.btnReseToDefaults.Text = "Reset to defaults";
             this.btnReseToDefaults.UseVisualStyleBackColor = true;
             this.btnReseToDefaults.Click += new System.EventHandler(this.btnReseToDefaults_Click);
+            // 
+            // cbShowProjectsWithoutCurrentUser
+            // 
+            this.cbShowProjectsWithoutCurrentUser.AutoSize = true;
+            this.cbShowProjectsWithoutCurrentUser.Location = new System.Drawing.Point(9, 36);
+            this.cbShowProjectsWithoutCurrentUser.Name = "cbShowProjectsWithoutCurrentUser";
+            this.cbShowProjectsWithoutCurrentUser.Size = new System.Drawing.Size(243, 17);
+            this.cbShowProjectsWithoutCurrentUser.TabIndex = 21;
+            this.cbShowProjectsWithoutCurrentUser.Text = "Show projects in which you are not participate";
+            this.cbShowProjectsWithoutCurrentUser.UseVisualStyleBackColor = true;
             // 
             // OptionsForm
             // 
@@ -429,5 +441,6 @@
         private System.Windows.Forms.GroupBox gbProjects;
         private System.Windows.Forms.CheckBox cbShowClosedProjects;
         private System.Windows.Forms.Button btnReseToDefaults;
+        private System.Windows.Forms.CheckBox cbShowProjectsWithoutCurrentUser;
     }
 }

@@ -25,6 +25,7 @@ namespace RedmineClient
             nudBackgroundUpdaterInterval.Value = Properties.Application.Default.background_updater_interval / 60 / 1000;
             tbRedmineHost.Text = Properties.Application.Default.redmine_host;
             cbShowClosedProjects.Checked = Properties.Application.Default.show_closed_projects;
+            cbShowProjectsWithoutCurrentUser.Checked = Properties.Application.Default.show_projects_without_current_user;
             controller = Program.controllerGlobal;
             controller.OnOptionsApplied += controller_OnOptionsApplied;
         }
@@ -53,16 +54,17 @@ namespace RedmineClient
                 MessageBox.Show("Format of URL address you entered is invalid. Please, correct it and try again. Note that required formats is http://<domain & subdomains>/ or https://<domain & subdomains>/.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
             {
-                Models.ApplicationOptions newSettings = new Models.ApplicationOptions(false);
-                newSettings.AskBeforeExiting = cbAskBeforeExiting.Checked;
-                newSettings.MinimazeToTray = cbMinimazeToTray.Checked;
-                newSettings.ShowAccountLogin = cbShowAccountLogin.Checked;
-                newSettings.ShowStatusBar = cbShowStatusBar.Checked;
-                newSettings.EnableEncryption = cbEnableEncryption.Checked;
-                newSettings.EnableBackgroundUpdater = cbEnableBackgroundUpdater.Checked;
-                newSettings.BackgroundUpdaterInterval = (long)nudBackgroundUpdaterInterval.Value * 1000 * 60;
-                newSettings.RedmineHost = tbRedmineHost.Text;
-                newSettings.ShowClodedProjects = cbShowClosedProjects.Checked;
+                Models.ApplicationOptions newOptions = new Models.ApplicationOptions(false);
+                newOptions.AskBeforeExiting = cbAskBeforeExiting.Checked;
+                newOptions.MinimazeToTray = cbMinimazeToTray.Checked;
+                newOptions.ShowAccountLogin = cbShowAccountLogin.Checked;
+                newOptions.ShowStatusBar = cbShowStatusBar.Checked;
+                newOptions.EnableEncryption = cbEnableEncryption.Checked;
+                newOptions.EnableBackgroundUpdater = cbEnableBackgroundUpdater.Checked;
+                newOptions.BackgroundUpdaterInterval = (long)nudBackgroundUpdaterInterval.Value * 1000 * 60;
+                newOptions.RedmineHost = tbRedmineHost.Text;
+                newOptions.ShowClodedProjects = cbShowClosedProjects.Checked;
+                newOptions.ShowProjectsWithoutCurrentUser = cbShowProjectsWithoutCurrentUser.Checked;
                 if (cbEnableEditingRedmineHost.Checked && Properties.Application.Default.redmine_host != tbRedmineHost.Text)
                 {
                     tabControl.Enabled = false;
@@ -70,7 +72,7 @@ namespace RedmineClient
                     btnCancel.Enabled = false;
                     this.Text = "Options [please, wait..]";
                 }
-                controller.ApplyNewOptions(newSettings);
+                controller.ApplyNewOptions(newOptions);
             }
         }
 

@@ -199,7 +199,7 @@ namespace RedmineClient
 
         private void issueInfotoolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID).Roles.FindIndex(temp => temp.ID == 3) >= 0).ShowDialog();
+            new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID).Roles).ShowDialog();
         }
 
         private void notifyIcon_Click(object sender, EventArgs e)
@@ -240,13 +240,13 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnNeededToReAuthenticate()
+        private void controller_OnNeededToReAuthenticate(bool isFromOptions)
         {
             Action action = () =>
             {
                 this.Text = "Redmine Client";
                 userInformationToolStripMenuItem.Enabled = false;
-                toolStripStatusLabel.Text = "Last request failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
+                toolStripStatusLabel.Text = isFromOptions ? "Waiting for authorization.." : "Last request failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                 new AuthorizationForm().ShowDialog();
             };
             if (InvokeRequired)
@@ -268,10 +268,11 @@ namespace RedmineClient
                                 cbProjects.Items.RemoveAt(i);
                             for (int i = 0; i < projects.Count; i++)
                                 if (Properties.Application.Default.show_closed_projects || (!Properties.Application.Default.show_closed_projects && projects[i].Status != 5))
-                                    if (projects[i].Parent == null)
-                                        cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
-                                    else
-                                        cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
+                                    if (Properties.Application.Default.show_projects_without_current_user || (!Properties.Application.Default.show_projects_without_current_user && projects[i].Roles[0].ID != -1))
+                                        if (projects[i].Parent == null)
+                                            cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
+                                        else
+                                            cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
                             int indexToSelect = 0;
                             for (int i = 1; i < cbProjects.Items.Count; i++)
                                 if ((long)(cbProjects.Items[i] as TextAndValueItem).Value == lastSelectedProjectID)
@@ -387,20 +388,19 @@ namespace RedmineClient
                     // Изменилась ли настройка отображения логина текущего пользователя
                     if (whatsChanged[0])
                         this.Text = "Redmine Client" + (Properties.Application.Default.show_account_login ? " [account: " + Properties.User.Default.login + "]" : "");
-                    // Изменилась ли настройка отображения закрытых проектов
-                    if (whatsChanged[3])
+                    // Изменилась ли настройка отображения закрытых проектов или проектов, в которых пользователь не участвует
+                    if (whatsChanged[3] || whatsChanged[4])
                     {
                         for (int i = cbProjects.Items.Count - 1; i >= 1; i--)
                             cbProjects.Items.RemoveAt(i);
                         List<Project> projects = controller.GetProjects();
                         for (int i = 0; i < projects.Count; i++)
-                        {
                             if (Properties.Application.Default.show_closed_projects || (!Properties.Application.Default.show_closed_projects && projects[i].Status != 5))
-                                if (projects[i].Parent == null)
-                                    cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
-                                else
-                                    cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
-                        }
+                                if (Properties.Application.Default.show_projects_without_current_user || (!Properties.Application.Default.show_projects_without_current_user && projects[i].Roles[0].ID != -1))
+                                    if (projects[i].Parent == null)
+                                        cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
+                                    else
+                                        cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
                         int indexToSelect = 0;
                         for (int i = 1; i < cbProjects.Items.Count; i++)
                             if ((long)(cbProjects.Items[i] as TextAndValueItem).Value == lastSelectedProjectID)

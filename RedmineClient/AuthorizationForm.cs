@@ -38,12 +38,18 @@ namespace RedmineClient
                 Application.Exit();
         }
 
+        private void linkLabelForgotPassword_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(Properties.Application.Default.redmine_host + "account/lost_password");
+        }
+
         private void cbUseAPIKeyInstead_CheckedChanged(object sender, EventArgs e)
         {
             labelLogin.Enabled = !cbUseAPIKeyInstead.Checked;
             tbLogin.Enabled = !cbUseAPIKeyInstead.Checked;
             labelPassword.Enabled = !cbUseAPIKeyInstead.Checked;
             tbPassword.Enabled = !cbUseAPIKeyInstead.Checked;
+            linkLabelForgotPassword.Enabled = !cbUseAPIKeyInstead.Checked;
             labelAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
             tbAPIKey.Enabled = cbUseAPIKeyInstead.Checked;
             if (!cbUseAPIKeyInstead.Checked)
@@ -134,6 +140,7 @@ namespace RedmineClient
             tbLogin.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
             labelPassword.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
             tbPassword.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
+            linkLabelForgotPassword.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
             labelAPIKey.Enabled = isEnabled && cbUseAPIKeyInstead.Checked;
             tbAPIKey.Enabled = isEnabled && cbUseAPIKeyInstead.Checked;
             cbUseAPIKeyInstead.Enabled = isEnabled;

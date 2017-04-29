@@ -71,7 +71,7 @@ namespace RedmineClient
                     case ErrorTypes.UnathorizedAccess:
                         this.Text = "Project information";
                         MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        controller.NeedToReAuthenticate();
+                        controller.NeedToReAuthenticate(false);
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:

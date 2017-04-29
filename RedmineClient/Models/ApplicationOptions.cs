@@ -13,6 +13,7 @@ namespace RedmineClient.Models
         public long BackgroundUpdaterInterval { set; get; }
         public string RedmineHost { set; get; }
         public bool ShowClodedProjects { set; get; }
+        public bool ShowProjectsWithoutCurrentUser { set; get; }
 
         public ApplicationOptions(bool setDefaults)
         {
@@ -27,6 +28,7 @@ namespace RedmineClient.Models
                 this.BackgroundUpdaterInterval = 60000;
                 this.RedmineHost = "http://student-rm.exactpro.com/";
                 this.ShowClodedProjects = true;
+                this.ShowProjectsWithoutCurrentUser = false;
             }
         }
     }

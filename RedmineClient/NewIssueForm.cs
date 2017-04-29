@@ -173,7 +173,7 @@ namespace RedmineClient
                         this.Text = "New issue";
                         MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         isCouldCloseForm = true;
-                        controller.NeedToReAuthenticate();
+                        controller.NeedToReAuthenticate(false);
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:
@@ -224,7 +224,7 @@ namespace RedmineClient
                     case ErrorTypes.UnathorizedAccess:
                         this.Text = "New issue";
                         MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        controller.NeedToReAuthenticate();
+                        controller.NeedToReAuthenticate(false);
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:
@@ -264,7 +264,7 @@ namespace RedmineClient
                     case ErrorTypes.UnathorizedAccess:
                         this.Text = "New issue";
                         MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        controller.NeedToReAuthenticate();
+                        controller.NeedToReAuthenticate(false);
                         this.Close();
                         break;
                     case ErrorTypes.UnknownError:
