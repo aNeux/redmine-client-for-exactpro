@@ -123,7 +123,7 @@
   <data name="labelBackgroundUpdaterInfo.Text" xml:space="preserve">
     <value>When application is minimized it could make background updates to notify you about changes with projects and issues if they happened. Notifications will appear in system tray. However, note that it can demand more Internet traffic!</value>
   </data>
-  <data name="labelHostURL.Text" xml:space="preserve">
+  <data name="labelRedmineHostInfo.Text" xml:space="preserve">
     <value>Warning! That program was developed especially for ExactPro Systems. So if you want to change the Redmine's host, please, be very careful: this may produce unknown consequences. But we hope that everything will be okay :)</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />

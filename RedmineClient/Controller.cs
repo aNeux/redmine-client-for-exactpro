@@ -51,14 +51,14 @@ namespace RedmineClient
         public event Action<ErrorTypes, long> OnIssueUpdated;
         // Событие, возникающее после удаления задачи
         public event Action<ErrorTypes, long> OnIssueRemoved;
-        // Событие, возникающее при изменении настроек программы и показывающее, какие из основных пунктов меню изменились
-        public event Action<bool[]> OnSettingsChanged;
+        // Событие, возникающее после проверки новых настроек и их применения
+        public event Action<ErrorTypes, bool[]> OnOptionsApplied;
 
         public Controller()
         {
             REDMINE_HOST = Properties.Application.Default.redmine_host;
             if (Properties.User.Default.api_key.Length != 0)
-                currentAPIKey = Properties.Application.Default.enable_encryption ? Utils.DecodeXOR(Properties.User.Default.api_key) : Properties.User.Default.api_key;
+                currentAPIKey = Properties.Application.Default.encryption_enabled ? Utils.DecodeXOR(Properties.User.Default.api_key) : Properties.User.Default.api_key;
             else
                 currentAPIKey = "";
         }
@@ -96,7 +96,7 @@ namespace RedmineClient
                             Properties.User.Default.last_name = currentUser.LastName;
                             Properties.User.Default.email = currentUser.Email;
                             Properties.User.Default.created_on = currentUser.CreatedOn;
-                            Properties.User.Default.api_key = Properties.Application.Default.enable_encryption ? Utils.EncodeXOR(currentUser.APIKey) : currentUser.APIKey;
+                            Properties.User.Default.api_key = Properties.Application.Default.encryption_enabled ? Utils.EncodeXOR(currentUser.APIKey) : currentUser.APIKey;
                             Properties.User.Default.Save();
                             currentAPIKey = currentUser.APIKey;
                             if (OnUserAuthenticated != null)
@@ -145,8 +145,7 @@ namespace RedmineClient
             new Thread(
                 delegate()
                 {
-                    Properties.User.Default.api_key = "";
-                    Properties.User.Default.Save();
+                    Properties.User.Default.Reset();
                     if (OnNeededToReAuthenticate != null)
                         OnNeededToReAuthenticate();
                 }).Start();
@@ -160,41 +159,21 @@ namespace RedmineClient
             new Thread(
                 delegate()
                 {
-                    try
+                    if (Properties.User.Default.api_key.Length > 0)
                     {
-                        HttpWebRequest request;
-                        HttpWebResponse response;
-                        StreamReader streamReader;
-                        string jsonResponse;
-                        // Загружаем список проектов
-                        projects = new List<Project>();
-                        ProjectsJSONObject projectsJSONObject = new ProjectsJSONObject();
-                        int offset = 0;
-                        do
+                        try
                         {
-                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json?offset=" + offset);
-                            request.Method = "GET";
-                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
-                            request.Accept = "application/json";
-                            request.Timeout = 10000;
-                            response = (HttpWebResponse)request.GetResponse();
-                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                            jsonResponse = streamReader.ReadToEnd();
-                            response.Close();
-                            streamReader.Close();
-                            projectsJSONObject = JsonConvert.DeserializeObject<ProjectsJSONObject>(jsonResponse);
-                            projects.AddRange(projectsJSONObject.Projects);
-                            offset += projectsJSONObject.Limit;
-                        } while (projectsJSONObject.Projects.Count != 0);
-                        // Получаем также список участников каждого проекта для последующего вычисления ролей в них текущего пользователя
-                        for (int i = 0; i < projects.Count; i++)
-                        {
-                            List<Membership> memberships = new List<Membership>();
-                            MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
-                            offset = 0;
+                            HttpWebRequest request;
+                            HttpWebResponse response;
+                            StreamReader streamReader;
+                            string jsonResponse;
+                            // Загружаем список проектов
+                            projects = new List<Project>();
+                            ProjectsJSONObject projectsJSONObject = new ProjectsJSONObject();
+                            int offset = 0;
                             do
                             {
-                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projects[i].ID + "/memberships.json?offset=" + offset);
+                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json?offset=" + offset);
                                 request.Method = "GET";
                                 request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
                                 request.Accept = "application/json";
@@ -204,69 +183,94 @@ namespace RedmineClient
                                 jsonResponse = streamReader.ReadToEnd();
                                 response.Close();
                                 streamReader.Close();
-                                membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
-                                memberships.AddRange(membershipsJSONObject.Memberships);
-                                offset += membershipsJSONObject.Limit;
-                            } while (membershipsJSONObject.Memberships.FindIndex(temp => temp.User.ID == Properties.User.Default.id) < 0 && membershipsJSONObject.Memberships.Count != 0);
-                            Membership membership = null;
-                            foreach (Membership currentMembership in memberships)
-                                if (currentMembership.User.ID == Properties.User.Default.id)
+                                projectsJSONObject = JsonConvert.DeserializeObject<ProjectsJSONObject>(jsonResponse);
+                                projects.AddRange(projectsJSONObject.Projects);
+                                offset += projectsJSONObject.Limit;
+                            } while (projectsJSONObject.Projects.Count != 0);
+                            // Получаем также список участников каждого проекта для последующего вычисления ролей в них текущего пользователя
+                            for (int i = 0; i < projects.Count; i++)
+                            {
+                                List<Membership> memberships = new List<Membership>();
+                                MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
+                                offset = 0;
+                                do
                                 {
-                                    membership = currentMembership;
-                                    break;
+                                    request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projects[i].ID + "/memberships.json?offset=" + offset);
+                                    request.Method = "GET";
+                                    request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                                    request.Accept = "application/json";
+                                    request.Timeout = 10000;
+                                    response = (HttpWebResponse)request.GetResponse();
+                                    streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                                    jsonResponse = streamReader.ReadToEnd();
+                                    response.Close();
+                                    streamReader.Close();
+                                    membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
+                                    memberships.AddRange(membershipsJSONObject.Memberships);
+                                    offset += membershipsJSONObject.Limit;
+                                } while (membershipsJSONObject.Memberships.FindIndex(temp => temp.User.ID == Properties.User.Default.id) < 0 && membershipsJSONObject.Memberships.Count != 0);
+                                Membership membership = null;
+                                foreach (Membership currentMembership in memberships)
+                                    if (currentMembership.User.ID == Properties.User.Default.id)
+                                    {
+                                        membership = currentMembership;
+                                        break;
+                                    }
+                                if (membership != null)
+                                    projects[i].Roles = membership.Roles;
+                                else
+                                {
+                                    projects.RemoveAt(i);
+                                    i--;
                                 }
-                            if (membership != null)
-                                projects[i].Roles = membership.Roles;
-                            else
-                            {
-                                projects.RemoveAt(i);
-                                i--;
                             }
-                        }
-                        // Загружаем список задач
-                        issues = new List<Issue>();
-                        IssuesJSONObject issuesJSONObject = new IssuesJSONObject();
-                        offset = 0;
-                        do
-                        {
-                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?offset=" + offset);
-                            request.Method = "GET";
-                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
-                            request.Accept = "application/json";
-                            request.Timeout = 10000;
-                            response = (HttpWebResponse)request.GetResponse();
-                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                            jsonResponse = streamReader.ReadToEnd();
-                            response.Close();
-                            streamReader.Close();
-                            issuesJSONObject = JsonConvert.DeserializeObject<IssuesJSONObject>(jsonResponse);
-                            issues.AddRange(issuesJSONObject.Issues);
-                            offset += issuesJSONObject.Limit;
-                        } while (issuesJSONObject.Issues.Count != 0);
-                        issues.RemoveAll(temp1 => projects.FindIndex(temp2 => temp2.ID == temp1.Project.ID) < 0);
-                        if (OnUpdated != null)
-                            OnUpdated(ErrorTypes.NoErrors, projects);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (OnUpdated != null)
-                        {
-                            if (ex is WebException)
+                            // Загружаем список задач
+                            issues = new List<Issue>();
+                            IssuesJSONObject issuesJSONObject = new IssuesJSONObject();
+                            offset = 0;
+                            do
                             {
-                                WebException webException = (WebException)ex;
-                                if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
-                                    OnUpdated(ErrorTypes.ConnectionError, null);
-                                else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
+                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?offset=" + offset);
+                                request.Method = "GET";
+                                request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                                request.Accept = "application/json";
+                                request.Timeout = 10000;
+                                response = (HttpWebResponse)request.GetResponse();
+                                streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                                jsonResponse = streamReader.ReadToEnd();
+                                response.Close();
+                                streamReader.Close();
+                                issuesJSONObject = JsonConvert.DeserializeObject<IssuesJSONObject>(jsonResponse);
+                                issues.AddRange(issuesJSONObject.Issues);
+                                offset += issuesJSONObject.Limit;
+                            } while (issuesJSONObject.Issues.Count != 0);
+                            issues.RemoveAll(temp1 => projects.FindIndex(temp2 => temp2.ID == temp1.Project.ID) < 0);
+                            if (OnUpdated != null)
+                                OnUpdated(ErrorTypes.NoErrors, projects);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (OnUpdated != null)
+                            {
+                                if (ex is WebException)
+                                {
+                                    WebException webException = (WebException)ex;
+                                    if (webException.Status == WebExceptionStatus.Timeout || webException.Status == WebExceptionStatus.NameResolutionFailure)
+                                        OnUpdated(ErrorTypes.ConnectionError, null);
+                                    else if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
+                                        OnUpdated(ErrorTypes.UnathorizedAccess, null);
+                                    else
+                                        OnUpdated(ErrorTypes.UnknownError, null);
+                                }
+                                else if (ex is ArgumentException)
                                     OnUpdated(ErrorTypes.UnathorizedAccess, null);
                                 else
                                     OnUpdated(ErrorTypes.UnknownError, null);
                             }
-                            else if (ex is ArgumentException)
-                                OnUpdated(ErrorTypes.UnathorizedAccess, null);
-                            else
-                                OnUpdated(ErrorTypes.UnknownError, null);
                         }
                     }
+                    else if (OnNeededToReAuthenticate != null)
+                        OnNeededToReAuthenticate();
                 }).Start();
         }
 
@@ -808,26 +812,94 @@ namespace RedmineClient
         }
 
         /// <summary>
-        /// Уведомление о изменении настроек программы.
+        /// Применение новых настроек программы, если это возможно.
         /// </summary>
-        /// <param name="whatsChanged">Массив изменений в основных настройках программы.</param>
-        public void NotifyAboutChangedSettings(bool[] whatsChanged)
+        /// <param name="newOptions">Новые настройки программы.</param>
+        public void ApplyNewOptions(ApplicationOptions newOptions)
         {
-            if (whatsChanged[2])
-            {
-                if (Properties.Application.Default.enable_encryption)
-                    Properties.User.Default.api_key = Utils.EncodeXOR(currentAPIKey);
-                else
-                    Properties.User.Default.api_key = currentAPIKey;
-                Properties.User.Default.Save();
-            }
-            if (whatsChanged[5])
-            {
-                REDMINE_HOST = Properties.Application.Default.redmine_host;
-                NeedToReAuthenticate();
-            }
-            if (OnSettingsChanged != null)
-                OnSettingsChanged(whatsChanged);
+            new Thread(
+                delegate()
+                {
+                    Properties.Application.Default.ask_before_exiting = newOptions.AskBeforeExiting;
+                    Properties.Application.Default.minimaze_to_tray = newOptions.MinimazeToTray;
+                    bool isShowAccountLoginChanged = false, isShowStatusBarChanged = false, isRedmineHostChanged = false, isShowClosedProjectsChanged = false;
+                    if (Properties.Application.Default.show_account_login != newOptions.ShowAccountLogin)
+                    {
+                        isShowAccountLoginChanged = true;
+                        Properties.Application.Default.show_account_login = newOptions.ShowAccountLogin;
+                    }
+                    if (Properties.Application.Default.show_status_bar != newOptions.ShowStatusBar)
+                    {
+                        isShowStatusBarChanged = true;
+                        Properties.Application.Default.show_status_bar = newOptions.ShowStatusBar;
+                    }
+                    if (Properties.Application.Default.encryption_enabled != newOptions.EnableEncryption)
+                    {
+                        if (newOptions.EnableEncryption)
+                            Properties.User.Default.api_key = Utils.EncodeXOR(currentAPIKey);
+                        else
+                            Properties.User.Default.api_key = currentAPIKey;
+                        Properties.Application.Default.encryption_enabled = newOptions.EnableEncryption;
+                    }
+                    if (Properties.Application.Default.show_closed_projects != newOptions.ShowClodedProjects)
+                    {
+                        isShowClosedProjectsChanged = true;
+                        Properties.Application.Default.show_closed_projects = newOptions.ShowClodedProjects;
+                    }
+                    if (Properties.Application.Default.redmine_host != newOptions.RedmineHost)
+                    {
+                        try
+                        {
+                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(newOptions.RedmineHost + "projects.json");
+                            request.Method = "GET";
+                            request.Accept = "application/json";
+                            request.Timeout = 10000;
+                            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                            REDMINE_HOST = newOptions.RedmineHost;
+                            Properties.Application.Default.redmine_host = newOptions.RedmineHost;
+                            isRedmineHostChanged = true;
+                            Properties.Application.Default.Save();
+                            Properties.User.Default.Reset();
+                            if (OnOptionsApplied != null)
+                                OnOptionsApplied(ErrorTypes.NoErrors, new bool[] { isShowAccountLoginChanged, isShowStatusBarChanged, isRedmineHostChanged, isShowClosedProjectsChanged });
+                            if (isRedmineHostChanged && OnNeededToReAuthenticate != null)
+                                OnNeededToReAuthenticate();
+                        }
+                        catch (Exception ex)
+                        {
+                            if (OnOptionsApplied != null)
+                            {
+                                if (ex is WebException)
+                                {
+                                    WebException webException = (WebException)ex;
+                                    if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
+                                    {
+                                        REDMINE_HOST = newOptions.RedmineHost;
+                                        Properties.Application.Default.redmine_host = newOptions.RedmineHost;
+                                        isRedmineHostChanged = true;
+                                        Properties.Application.Default.Save();
+                                        Properties.User.Default.Reset();
+                                        if (OnOptionsApplied != null)
+                                            OnOptionsApplied(ErrorTypes.NoErrors, new bool[] { isShowAccountLoginChanged, isShowStatusBarChanged, isRedmineHostChanged, isShowClosedProjectsChanged });
+                                        if (isRedmineHostChanged && OnNeededToReAuthenticate != null)
+                                            OnNeededToReAuthenticate();
+                                    }
+                                    else
+                                        OnOptionsApplied(ErrorTypes.ConnectionError, null);
+                                }
+                                else
+                                    OnOptionsApplied(ErrorTypes.UnknownError, null);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Properties.Application.Default.Save();
+                        Properties.User.Default.Save();
+                        if (OnOptionsApplied != null)
+                            OnOptionsApplied(ErrorTypes.NoErrors, new bool[] { isShowAccountLoginChanged, isShowStatusBarChanged, isRedmineHostChanged, isShowClosedProjectsChanged });
+                    }
+                }).Start();
         }
     }
 }

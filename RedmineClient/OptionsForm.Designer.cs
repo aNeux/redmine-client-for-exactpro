@@ -35,33 +35,34 @@
             this.labelEncryptionInfo = new System.Windows.Forms.Label();
             this.cbEnableEncryption = new System.Windows.Forms.CheckBox();
             this.gbAppearance = new System.Windows.Forms.GroupBox();
-            this.cbShowLogin = new System.Windows.Forms.CheckBox();
+            this.cbShowAccountLogin = new System.Windows.Forms.CheckBox();
             this.cbShowStatusBar = new System.Windows.Forms.CheckBox();
             this.cbMinimazeToTray = new System.Windows.Forms.CheckBox();
-            this.cbAskBeforeExit = new System.Windows.Forms.CheckBox();
+            this.cbAskBeforeExiting = new System.Windows.Forms.CheckBox();
             this.tabPageNotifications = new System.Windows.Forms.TabPage();
             this.gbBackgroundUpdater = new System.Windows.Forms.GroupBox();
             this.labelMinutes = new System.Windows.Forms.Label();
-            this.nudUpdateInterval = new System.Windows.Forms.NumericUpDown();
-            this.labelUpdateInterval = new System.Windows.Forms.Label();
+            this.nudBackgroundUpdaterInterval = new System.Windows.Forms.NumericUpDown();
+            this.labelBackgroundUpdaterInterval = new System.Windows.Forms.Label();
             this.cbEnableBackgroundUpdater = new System.Windows.Forms.CheckBox();
             this.labelBackgroundUpdaterInfo = new System.Windows.Forms.Label();
             this.tabPageRedmine = new System.Windows.Forms.TabPage();
             this.gbProjects = new System.Windows.Forms.GroupBox();
             this.cbShowClosedProjects = new System.Windows.Forms.CheckBox();
             this.gbHostURL = new System.Windows.Forms.GroupBox();
-            this.tbHostURL = new System.Windows.Forms.TextBox();
-            this.cbEnableEditingHostURL = new System.Windows.Forms.CheckBox();
-            this.labelHostURL = new System.Windows.Forms.Label();
+            this.tbRedmineHost = new System.Windows.Forms.TextBox();
+            this.cbEnableEditingRedmineHost = new System.Windows.Forms.CheckBox();
+            this.labelRedmineHostInfo = new System.Windows.Forms.Label();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
+            this.btnReseToDefaults = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabPageGeneral.SuspendLayout();
             this.gbSecurity.SuspendLayout();
             this.gbAppearance.SuspendLayout();
             this.tabPageNotifications.SuspendLayout();
             this.gbBackgroundUpdater.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudUpdateInterval)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudBackgroundUpdaterInterval)).BeginInit();
             this.tabPageRedmine.SuspendLayout();
             this.gbProjects.SuspendLayout();
             this.gbHostURL.SuspendLayout();
@@ -121,10 +122,10 @@
             // 
             // gbAppearance
             // 
-            this.gbAppearance.Controls.Add(this.cbShowLogin);
+            this.gbAppearance.Controls.Add(this.cbShowAccountLogin);
             this.gbAppearance.Controls.Add(this.cbShowStatusBar);
             this.gbAppearance.Controls.Add(this.cbMinimazeToTray);
-            this.gbAppearance.Controls.Add(this.cbAskBeforeExit);
+            this.gbAppearance.Controls.Add(this.cbAskBeforeExiting);
             this.gbAppearance.Location = new System.Drawing.Point(6, 6);
             this.gbAppearance.Name = "gbAppearance";
             this.gbAppearance.Size = new System.Drawing.Size(388, 109);
@@ -132,15 +133,15 @@
             this.gbAppearance.TabStop = false;
             this.gbAppearance.Text = "Appearance";
             // 
-            // cbShowLogin
+            // cbShowAccountLogin
             // 
-            this.cbShowLogin.AutoSize = true;
-            this.cbShowLogin.Location = new System.Drawing.Point(8, 64);
-            this.cbShowLogin.Name = "cbShowLogin";
-            this.cbShowLogin.Size = new System.Drawing.Size(256, 17);
-            this.cbShowLogin.TabIndex = 4;
-            this.cbShowLogin.Text = "Show login of current user at title of main window";
-            this.cbShowLogin.UseVisualStyleBackColor = true;
+            this.cbShowAccountLogin.AutoSize = true;
+            this.cbShowAccountLogin.Location = new System.Drawing.Point(8, 64);
+            this.cbShowAccountLogin.Name = "cbShowAccountLogin";
+            this.cbShowAccountLogin.Size = new System.Drawing.Size(256, 17);
+            this.cbShowAccountLogin.TabIndex = 4;
+            this.cbShowAccountLogin.Text = "Show login of current user at title of main window";
+            this.cbShowAccountLogin.UseVisualStyleBackColor = true;
             // 
             // cbShowStatusBar
             // 
@@ -157,20 +158,20 @@
             this.cbMinimazeToTray.AutoSize = true;
             this.cbMinimazeToTray.Location = new System.Drawing.Point(8, 41);
             this.cbMinimazeToTray.Name = "cbMinimazeToTray";
-            this.cbMinimazeToTray.Size = new System.Drawing.Size(176, 17);
+            this.cbMinimazeToTray.Size = new System.Drawing.Size(137, 17);
             this.cbMinimazeToTray.TabIndex = 3;
-            this.cbMinimazeToTray.Text = "Minimaze window to system tray";
+            this.cbMinimazeToTray.Text = "Minimaze to system tray";
             this.cbMinimazeToTray.UseVisualStyleBackColor = true;
             // 
-            // cbAskBeforeExit
+            // cbAskBeforeExiting
             // 
-            this.cbAskBeforeExit.AutoSize = true;
-            this.cbAskBeforeExit.Location = new System.Drawing.Point(8, 18);
-            this.cbAskBeforeExit.Name = "cbAskBeforeExit";
-            this.cbAskBeforeExit.Size = new System.Drawing.Size(155, 17);
-            this.cbAskBeforeExit.TabIndex = 2;
-            this.cbAskBeforeExit.Text = "Ask before exit the program";
-            this.cbAskBeforeExit.UseVisualStyleBackColor = true;
+            this.cbAskBeforeExiting.AutoSize = true;
+            this.cbAskBeforeExiting.Location = new System.Drawing.Point(8, 18);
+            this.cbAskBeforeExiting.Name = "cbAskBeforeExiting";
+            this.cbAskBeforeExiting.Size = new System.Drawing.Size(169, 17);
+            this.cbAskBeforeExiting.TabIndex = 2;
+            this.cbAskBeforeExiting.Text = "Ask before exiting the program";
+            this.cbAskBeforeExiting.UseVisualStyleBackColor = true;
             // 
             // tabPageNotifications
             // 
@@ -186,10 +187,11 @@
             // gbBackgroundUpdater
             // 
             this.gbBackgroundUpdater.Controls.Add(this.labelMinutes);
-            this.gbBackgroundUpdater.Controls.Add(this.nudUpdateInterval);
-            this.gbBackgroundUpdater.Controls.Add(this.labelUpdateInterval);
+            this.gbBackgroundUpdater.Controls.Add(this.nudBackgroundUpdaterInterval);
+            this.gbBackgroundUpdater.Controls.Add(this.labelBackgroundUpdaterInterval);
             this.gbBackgroundUpdater.Controls.Add(this.cbEnableBackgroundUpdater);
             this.gbBackgroundUpdater.Controls.Add(this.labelBackgroundUpdaterInfo);
+            this.gbBackgroundUpdater.Enabled = false;
             this.gbBackgroundUpdater.Location = new System.Drawing.Point(6, 6);
             this.gbBackgroundUpdater.Name = "gbBackgroundUpdater";
             this.gbBackgroundUpdater.Size = new System.Drawing.Size(388, 109);
@@ -207,39 +209,39 @@
             this.labelMinutes.Text = "minute(-s)";
             this.labelMinutes.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // nudUpdateInterval
+            // nudBackgroundUpdaterInterval
             // 
-            this.nudUpdateInterval.Enabled = false;
-            this.nudUpdateInterval.Location = new System.Drawing.Point(144, 78);
-            this.nudUpdateInterval.Maximum = new decimal(new int[] {
+            this.nudBackgroundUpdaterInterval.Enabled = false;
+            this.nudBackgroundUpdaterInterval.Location = new System.Drawing.Point(144, 78);
+            this.nudBackgroundUpdaterInterval.Maximum = new decimal(new int[] {
             60,
             0,
             0,
             0});
-            this.nudUpdateInterval.Minimum = new decimal(new int[] {
+            this.nudBackgroundUpdaterInterval.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.nudUpdateInterval.Name = "nudUpdateInterval";
-            this.nudUpdateInterval.Size = new System.Drawing.Size(45, 20);
-            this.nudUpdateInterval.TabIndex = 13;
-            this.nudUpdateInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.nudUpdateInterval.Value = new decimal(new int[] {
+            this.nudBackgroundUpdaterInterval.Name = "nudBackgroundUpdaterInterval";
+            this.nudBackgroundUpdaterInterval.Size = new System.Drawing.Size(45, 20);
+            this.nudBackgroundUpdaterInterval.TabIndex = 13;
+            this.nudBackgroundUpdaterInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.nudBackgroundUpdaterInterval.Value = new decimal(new int[] {
             1,
             0,
             0,
             0});
             // 
-            // labelUpdateInterval
+            // labelBackgroundUpdaterInterval
             // 
-            this.labelUpdateInterval.Enabled = false;
-            this.labelUpdateInterval.Location = new System.Drawing.Point(6, 78);
-            this.labelUpdateInterval.Name = "labelUpdateInterval";
-            this.labelUpdateInterval.Size = new System.Drawing.Size(132, 20);
-            this.labelUpdateInterval.TabIndex = 12;
-            this.labelUpdateInterval.Text = "Interval between updates:";
-            this.labelUpdateInterval.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.labelBackgroundUpdaterInterval.Enabled = false;
+            this.labelBackgroundUpdaterInterval.Location = new System.Drawing.Point(6, 78);
+            this.labelBackgroundUpdaterInterval.Name = "labelBackgroundUpdaterInterval";
+            this.labelBackgroundUpdaterInterval.Size = new System.Drawing.Size(132, 20);
+            this.labelBackgroundUpdaterInterval.TabIndex = 12;
+            this.labelBackgroundUpdaterInterval.Text = "Interval between updates:";
+            this.labelBackgroundUpdaterInterval.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // cbEnableBackgroundUpdater
             // 
@@ -294,10 +296,9 @@
             // 
             // gbHostURL
             // 
-            this.gbHostURL.Controls.Add(this.tbHostURL);
-            this.gbHostURL.Controls.Add(this.cbEnableEditingHostURL);
-            this.gbHostURL.Controls.Add(this.labelHostURL);
-            this.gbHostURL.Enabled = false;
+            this.gbHostURL.Controls.Add(this.tbRedmineHost);
+            this.gbHostURL.Controls.Add(this.cbEnableEditingRedmineHost);
+            this.gbHostURL.Controls.Add(this.labelRedmineHostInfo);
             this.gbHostURL.Location = new System.Drawing.Point(6, 6);
             this.gbHostURL.Name = "gbHostURL";
             this.gbHostURL.Size = new System.Drawing.Size(388, 108);
@@ -305,32 +306,32 @@
             this.gbHostURL.TabStop = false;
             this.gbHostURL.Text = "Host URL";
             // 
-            // tbHostURL
+            // tbRedmineHost
             // 
-            this.tbHostURL.Location = new System.Drawing.Point(6, 79);
-            this.tbHostURL.Name = "tbHostURL";
-            this.tbHostURL.ReadOnly = true;
-            this.tbHostURL.Size = new System.Drawing.Size(375, 20);
-            this.tbHostURL.TabIndex = 18;
+            this.tbRedmineHost.Location = new System.Drawing.Point(6, 79);
+            this.tbRedmineHost.Name = "tbRedmineHost";
+            this.tbRedmineHost.ReadOnly = true;
+            this.tbRedmineHost.Size = new System.Drawing.Size(375, 20);
+            this.tbRedmineHost.TabIndex = 18;
             // 
-            // cbEnableEditingHostURL
+            // cbEnableEditingRedmineHost
             // 
-            this.cbEnableEditingHostURL.AutoSize = true;
-            this.cbEnableEditingHostURL.Location = new System.Drawing.Point(9, 60);
-            this.cbEnableEditingHostURL.Name = "cbEnableEditingHostURL";
-            this.cbEnableEditingHostURL.Size = new System.Drawing.Size(93, 17);
-            this.cbEnableEditingHostURL.TabIndex = 17;
-            this.cbEnableEditingHostURL.Text = "Enable editing";
-            this.cbEnableEditingHostURL.UseVisualStyleBackColor = true;
-            this.cbEnableEditingHostURL.CheckedChanged += new System.EventHandler(this.cbEnableEditHostURL_CheckedChanged);
+            this.cbEnableEditingRedmineHost.AutoSize = true;
+            this.cbEnableEditingRedmineHost.Location = new System.Drawing.Point(9, 60);
+            this.cbEnableEditingRedmineHost.Name = "cbEnableEditingRedmineHost";
+            this.cbEnableEditingRedmineHost.Size = new System.Drawing.Size(93, 17);
+            this.cbEnableEditingRedmineHost.TabIndex = 17;
+            this.cbEnableEditingRedmineHost.Text = "Enable editing";
+            this.cbEnableEditingRedmineHost.UseVisualStyleBackColor = true;
+            this.cbEnableEditingRedmineHost.CheckedChanged += new System.EventHandler(this.cbEnableEditHostURL_CheckedChanged);
             // 
-            // labelHostURL
+            // labelRedmineHostInfo
             // 
-            this.labelHostURL.Location = new System.Drawing.Point(6, 16);
-            this.labelHostURL.Name = "labelHostURL";
-            this.labelHostURL.Size = new System.Drawing.Size(375, 41);
-            this.labelHostURL.TabIndex = 16;
-            this.labelHostURL.Text = resources.GetString("labelHostURL.Text");
+            this.labelRedmineHostInfo.Location = new System.Drawing.Point(6, 16);
+            this.labelRedmineHostInfo.Name = "labelRedmineHostInfo";
+            this.labelRedmineHostInfo.Size = new System.Drawing.Size(375, 41);
+            this.labelRedmineHostInfo.TabIndex = 16;
+            this.labelRedmineHostInfo.Text = resources.GetString("labelRedmineHostInfo.Text");
             // 
             // btnCancel
             // 
@@ -352,11 +353,22 @@
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
+            // btnReseToDefaults
+            // 
+            this.btnReseToDefaults.Location = new System.Drawing.Point(13, 252);
+            this.btnReseToDefaults.Name = "btnReseToDefaults";
+            this.btnReseToDefaults.Size = new System.Drawing.Size(100, 23);
+            this.btnReseToDefaults.TabIndex = 23;
+            this.btnReseToDefaults.Text = "Reset to defaults";
+            this.btnReseToDefaults.UseVisualStyleBackColor = true;
+            this.btnReseToDefaults.Click += new System.EventHandler(this.btnReseToDefaults_Click);
+            // 
             // OptionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(433, 283);
+            this.Controls.Add(this.btnReseToDefaults);
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.tabControl);
@@ -367,6 +379,7 @@
             this.Name = "OptionsForm";
             this.ShowInTaskbar = false;
             this.Text = "Options";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OptionsForm_FormClosing);
             this.Shown += new System.EventHandler(this.OptionsForm_Shown);
             this.tabControl.ResumeLayout(false);
             this.tabPageGeneral.ResumeLayout(false);
@@ -377,7 +390,7 @@
             this.tabPageNotifications.ResumeLayout(false);
             this.gbBackgroundUpdater.ResumeLayout(false);
             this.gbBackgroundUpdater.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudUpdateInterval)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudBackgroundUpdaterInterval)).EndInit();
             this.tabPageRedmine.ResumeLayout(false);
             this.gbProjects.ResumeLayout(false);
             this.gbProjects.PerformLayout();
@@ -397,23 +410,24 @@
         private System.Windows.Forms.GroupBox gbSecurity;
         private System.Windows.Forms.Label labelEncryptionInfo;
         private System.Windows.Forms.GroupBox gbAppearance;
-        private System.Windows.Forms.CheckBox cbShowLogin;
+        private System.Windows.Forms.CheckBox cbShowAccountLogin;
         private System.Windows.Forms.CheckBox cbShowStatusBar;
         private System.Windows.Forms.CheckBox cbMinimazeToTray;
-        private System.Windows.Forms.CheckBox cbAskBeforeExit;
+        private System.Windows.Forms.CheckBox cbAskBeforeExiting;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnApply;
         private System.Windows.Forms.GroupBox gbBackgroundUpdater;
         private System.Windows.Forms.Label labelMinutes;
-        private System.Windows.Forms.NumericUpDown nudUpdateInterval;
-        private System.Windows.Forms.Label labelUpdateInterval;
+        private System.Windows.Forms.NumericUpDown nudBackgroundUpdaterInterval;
+        private System.Windows.Forms.Label labelBackgroundUpdaterInterval;
         private System.Windows.Forms.CheckBox cbEnableBackgroundUpdater;
         private System.Windows.Forms.Label labelBackgroundUpdaterInfo;
         private System.Windows.Forms.GroupBox gbHostURL;
-        private System.Windows.Forms.TextBox tbHostURL;
-        private System.Windows.Forms.CheckBox cbEnableEditingHostURL;
-        private System.Windows.Forms.Label labelHostURL;
+        private System.Windows.Forms.TextBox tbRedmineHost;
+        private System.Windows.Forms.CheckBox cbEnableEditingRedmineHost;
+        private System.Windows.Forms.Label labelRedmineHostInfo;
         private System.Windows.Forms.GroupBox gbProjects;
         private System.Windows.Forms.CheckBox cbShowClosedProjects;
+        private System.Windows.Forms.Button btnReseToDefaults;
     }
 }

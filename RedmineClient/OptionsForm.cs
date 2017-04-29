@@ -6,6 +6,8 @@ namespace RedmineClient
 {
     public partial class OptionsForm : Form
     {
+        private Controller controller;
+
         public OptionsForm()
         {
             InitializeComponent();
@@ -14,86 +16,114 @@ namespace RedmineClient
 
         private void OptionsForm_Shown(object sender, EventArgs e)
         {
-            cbAskBeforeExit.Checked = Properties.Application.Default.ask_before_exit;
+            cbAskBeforeExiting.Checked = Properties.Application.Default.ask_before_exiting;
             cbMinimazeToTray.Checked = Properties.Application.Default.minimaze_to_tray;
-            cbShowLogin.Checked = Properties.Application.Default.show_account_login;
+            cbShowAccountLogin.Checked = Properties.Application.Default.show_account_login;
             cbShowStatusBar.Checked = Properties.Application.Default.show_status_bar;
-            cbEnableEncryption.Checked = Properties.Application.Default.enable_encryption;
-            cbEnableBackgroundUpdater.Checked = Properties.Application.Default.background_updater_enable;
-            nudUpdateInterval.Value = Properties.Application.Default.background_updater_interval / 60 / 1000;
-            tbHostURL.Text = Properties.Application.Default.redmine_host;
+            cbEnableEncryption.Checked = Properties.Application.Default.encryption_enabled;
+            cbEnableBackgroundUpdater.Checked = Properties.Application.Default.background_updater_enabled;
+            nudBackgroundUpdaterInterval.Value = Properties.Application.Default.background_updater_interval / 60 / 1000;
+            tbRedmineHost.Text = Properties.Application.Default.redmine_host;
             cbShowClosedProjects.Checked = Properties.Application.Default.show_closed_projects;
+            controller = Program.controllerGlobal;
+            controller.OnOptionsApplied += controller_OnOptionsApplied;
+        }
+
+        private void OptionsForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            controller.OnOptionsApplied -= controller_OnOptionsApplied;
         }
 
         private void cbEnableBackgroundUpdater_CheckedChanged(object sender, EventArgs e)
         {
-            labelUpdateInterval.Enabled = cbEnableBackgroundUpdater.Checked;
-            nudUpdateInterval.Enabled = cbEnableBackgroundUpdater.Checked;
+            labelBackgroundUpdaterInterval.Enabled = cbEnableBackgroundUpdater.Checked;
+            nudBackgroundUpdaterInterval.Enabled = cbEnableBackgroundUpdater.Checked;
             labelMinutes.Enabled = cbEnableBackgroundUpdater.Checked;
         }
 
         private void cbEnableEditHostURL_CheckedChanged(object sender, EventArgs e)
         {
-            tbHostURL.ReadOnly = !cbEnableEditingHostURL.Checked;
-            tbHostURL.Text = Properties.Application.Default.redmine_host;
+            tbRedmineHost.ReadOnly = !cbEnableEditingRedmineHost.Checked;
+            tbRedmineHost.Text = Properties.Application.Default.redmine_host;
         }
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            if (Regex.IsMatch(tbHostURL.Text, @"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/$"))
-            {
-                bool[] whatsChanged = new bool[7];
-                Properties.Application.Default.ask_before_exit = cbAskBeforeExit.Checked;
-                Properties.Application.Default.minimaze_to_tray = cbMinimazeToTray.Checked;
-                if (cbShowLogin.Checked != Properties.Application.Default.show_account_login)
-                {
-                    whatsChanged[0] = true;
-                    Properties.Application.Default.show_account_login = cbShowLogin.Checked;
-                }
-                if (cbShowStatusBar.Checked != Properties.Application.Default.show_status_bar)
-                {
-                    whatsChanged[1] = true;
-                    Properties.Application.Default.show_status_bar = cbShowStatusBar.Checked;
-                }
-                if (cbEnableEncryption.Checked != Properties.Application.Default.enable_encryption)
-                {
-                    whatsChanged[2] = true;
-                    Properties.Application.Default.enable_encryption = cbEnableEncryption.Checked;
-                }
-                if (cbEnableBackgroundUpdater.Checked != Properties.Application.Default.background_updater_enable)
-                {
-                    whatsChanged[3] = true;
-                    Properties.Application.Default.background_updater_enable = cbEnableBackgroundUpdater.Checked;
-                }
-                if ((long)nudUpdateInterval.Value * 1000 * 60 != Properties.Application.Default.background_updater_interval)
-                {
-                    whatsChanged[4] = true;
-                    Properties.Application.Default.background_updater_interval = (long)nudUpdateInterval.Value * 1000 * 60;
-                }
-                if (tbHostURL.Text != Properties.Application.Default.redmine_host)
-                {
-                    whatsChanged[5] = true;
-                    Properties.Application.Default.redmine_host = tbHostURL.Text;
-                }
-                if (cbShowClosedProjects.Checked != Properties.Application.Default.show_closed_projects)
-                {
-                    whatsChanged[6] = true;
-                    Properties.Application.Default.show_closed_projects = cbShowClosedProjects.Checked;
-                }
-                Properties.Application.Default.Save();
-                Program.controllerGlobal.NotifyAboutChangedSettings(whatsChanged);
-                this.Close();
-            }
+            if (cbEnableEditingRedmineHost.Checked && !Regex.IsMatch(tbRedmineHost.Text, @"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/$"))
+                MessageBox.Show("Format of URL address you entered is invalid. Please, correct it and try again. Note that required formats is http://<domain & subdomains>/ or https://<domain & subdomains>/.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
             {
-                MessageBox.Show("URL format for Redmine host is invalid. Please, check it and correct.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                tabControl.SelectedIndex = 2;
+                Models.ApplicationOptions newSettings = new Models.ApplicationOptions(false);
+                newSettings.AskBeforeExiting = cbAskBeforeExiting.Checked;
+                newSettings.MinimazeToTray = cbMinimazeToTray.Checked;
+                newSettings.ShowAccountLogin = cbShowAccountLogin.Checked;
+                newSettings.ShowStatusBar = cbShowStatusBar.Checked;
+                newSettings.EnableEncryption = cbEnableEncryption.Checked;
+                newSettings.EnableBackgroundUpdater = cbEnableBackgroundUpdater.Checked;
+                newSettings.BackgroundUpdaterInterval = (long)nudBackgroundUpdaterInterval.Value * 1000 * 60;
+                newSettings.RedmineHost = tbRedmineHost.Text;
+                newSettings.ShowClodedProjects = cbShowClosedProjects.Checked;
+                if (cbEnableEditingRedmineHost.Checked && Properties.Application.Default.redmine_host != tbRedmineHost.Text)
+                {
+                    tabControl.Enabled = false;
+                    btnApply.Enabled = false;
+                    btnCancel.Enabled = false;
+                    this.Text = "Options [please, wait..]";
+                }
+                controller.ApplyNewOptions(newSettings);
             }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void btnReseToDefaults_Click(object sender, EventArgs e)
+        {
+            var dialogResult = MessageBox.Show("Are you sure that you want to restore options to their default values? Redmine host will be set to http://student-rm.exactpro.com/.", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dialogResult == DialogResult.Yes)
+            {
+                if (Properties.Application.Default.redmine_host != "http://student-rm.exactpro.com/")
+                {
+                    tabControl.Enabled = false;
+                    btnApply.Enabled = false;
+                    btnCancel.Enabled = false;
+                    this.Text = "Options [please, wait..]";
+                }
+                controller.ApplyNewOptions(new Models.ApplicationOptions(true));
+            }
+        }
+
+        private void controller_OnOptionsApplied(ErrorTypes error, bool[] whatsChanged)
+        {
+            Action action = () =>
+                {
+                    switch (error)
+                    {
+                        case ErrorTypes.NoErrors:
+                            this.Close();
+                            break;
+                        case ErrorTypes.ConnectionError:
+                            this.Text = "Options";
+                            MessageBox.Show("Cannot connect to Redmine services. Probably you entered invalid host address, so please, check it out and try again. Also it could be a network error too.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            tabControl.Enabled = true;
+                            btnApply.Enabled = true;
+                            btnCancel.Enabled = true;
+                            break;
+                        case ErrorTypes.UnknownError:
+                            this.Text = "Options";
+                            MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            tabControl.Enabled = true;
+                            btnApply.Enabled = true;
+                            btnCancel.Enabled = true;
+                            break;
+                    }
+                };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
         }
     }
 }

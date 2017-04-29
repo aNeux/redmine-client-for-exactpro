@@ -26,12 +26,12 @@ namespace RedmineClient.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool ask_before_exit {
+        public bool ask_before_exiting {
             get {
-                return ((bool)(this["ask_before_exit"]));
+                return ((bool)(this["ask_before_exiting"]));
             }
             set {
-                this["ask_before_exit"] = value;
+                this["ask_before_exiting"] = value;
             }
         }
         
@@ -74,24 +74,24 @@ namespace RedmineClient.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool enable_encryption {
+        public bool encryption_enabled {
             get {
-                return ((bool)(this["enable_encryption"]));
+                return ((bool)(this["encryption_enabled"]));
             }
             set {
-                this["enable_encryption"] = value;
+                this["encryption_enabled"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool background_updater_enable {
+        public bool background_updater_enabled {
             get {
-                return ((bool)(this["background_updater_enable"]));
+                return ((bool)(this["background_updater_enabled"]));
             }
             set {
-                this["background_updater_enable"] = value;
+                this["background_updater_enabled"] = value;
             }
         }
         

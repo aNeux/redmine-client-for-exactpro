@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RedmineClient.Properties" GeneratedClassName="Application">
   <Profiles />
   <Settings>
-    <Setting Name="ask_before_exit" Type="System.Boolean" Scope="User">
+    <Setting Name="ask_before_exiting" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="minimaze_to_tray" Type="System.Boolean" Scope="User">
@@ -14,10 +14,10 @@
     <Setting Name="show_account_login" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="enable_encryption" Type="System.Boolean" Scope="User">
+    <Setting Name="encryption_enabled" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="background_updater_enable" Type="System.Boolean" Scope="User">
+    <Setting Name="background_updater_enabled" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="background_updater_interval" Type="System.Int64" Scope="User">

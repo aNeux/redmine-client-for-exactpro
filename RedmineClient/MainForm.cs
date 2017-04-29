@@ -34,7 +34,7 @@ namespace RedmineClient
             controller.OnIssueCreated += controller_OnIssueCreatedOrUpdated;
             controller.OnIssueUpdated += controller_OnIssueCreatedOrUpdated;
             controller.OnIssueRemoved += controller_OnIssueRemoved;
-            controller.OnSettingsChanged += controller_OnSettingsChanged;
+            controller.OnOptionsApplied += controller_OnOptionsApplied;
             toolStripStatusLabel.Text = "Updating..";
             controller.Update();
         }
@@ -47,7 +47,7 @@ namespace RedmineClient
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Properties.User.Default.api_key.Length != 0 && (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.ApplicationExitCall) && Properties.Application.Default.ask_before_exit)
+            if (Properties.User.Default.api_key.Length != 0 && (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.ApplicationExitCall) && Properties.Application.Default.ask_before_exiting)
             {
                 var dialogResult = MessageBox.Show("Are you sure you want to exit?", "Exiting", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
@@ -58,7 +58,7 @@ namespace RedmineClient
                     controller.OnIssueCreated -= controller_OnIssueCreatedOrUpdated;
                     controller.OnIssueUpdated -= controller_OnIssueCreatedOrUpdated;
                     controller.OnIssueRemoved -= controller_OnIssueRemoved;
-                    controller.OnSettingsChanged -= controller_OnSettingsChanged;
+                    controller.OnOptionsApplied -= controller_OnOptionsApplied;
                 }
                 else
                     e.Cancel = true;
@@ -71,7 +71,7 @@ namespace RedmineClient
                 controller.OnIssueCreated -= controller_OnIssueCreatedOrUpdated;
                 controller.OnIssueUpdated -= controller_OnIssueCreatedOrUpdated;
                 controller.OnIssueRemoved -= controller_OnIssueRemoved;
-                controller.OnSettingsChanged -= controller_OnSettingsChanged;
+                controller.OnOptionsApplied -= controller_OnOptionsApplied;
             }
         }
 
@@ -245,6 +245,7 @@ namespace RedmineClient
             Action action = () =>
             {
                 this.Text = "Redmine Client";
+                userInformationToolStripMenuItem.Enabled = false;
                 toolStripStatusLabel.Text = "Last request failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                 new AuthorizationForm().ShowDialog();
             };
@@ -368,58 +369,71 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnSettingsChanged(bool[] whatsChanged)
+        private void controller_OnOptionsApplied(ErrorTypes error, bool[] whatsChanged)
         {
-            if (whatsChanged[5])
-            {
-                this.Text = "Redmine Client";
-                cbProjects.SelectedIndex = 0;
-                lvIssues.Items.Clear();
-            }
-            else
-            {
-                if (whatsChanged[0])
-                    this.Text = "Redmine Client" + (Properties.Application.Default.show_account_login ? " [account: " + Properties.User.Default.login + "]" : "");
-                if (whatsChanged[6])
+            Action action = () =>
                 {
-                    for (int i = cbProjects.Items.Count - 1; i >= 1; i--)
-                        cbProjects.Items.RemoveAt(i);
-                    List<Project> projects = controller.GetProjects();
-                    for (int i = 0; i < projects.Count; i++)
+                    if (error == ErrorTypes.NoErrors)
+            {
+                // Изменился ли хост для Redmine
+                if (whatsChanged[2])
+                {
+                    this.Text = "Redmine Client";
+                    cbProjects.SelectedIndex = 0;
+                    lvIssues.Items.Clear();
+                }
+                else
+                {
+                    // Изменилась ли настройка отображения логина текущего пользователя
+                    if (whatsChanged[0])
+                        this.Text = "Redmine Client" + (Properties.Application.Default.show_account_login ? " [account: " + Properties.User.Default.login + "]" : "");
+                    // Изменилась ли настройка отображения закрытых проектов
+                    if (whatsChanged[3])
                     {
-                        if (Properties.Application.Default.show_closed_projects || (!Properties.Application.Default.show_closed_projects && projects[i].Status != 5))
-                            if (projects[i].Parent == null)
-                                cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
-                            else
-                                cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
-                    }
-                    int indexToSelect = 0;
-                    for (int i = 1; i < cbProjects.Items.Count; i++)
-                        if ((long)(cbProjects.Items[i] as TextAndValueItem).Value == lastSelectedProjectID)
+                        for (int i = cbProjects.Items.Count - 1; i >= 1; i--)
+                            cbProjects.Items.RemoveAt(i);
+                        List<Project> projects = controller.GetProjects();
+                        for (int i = 0; i < projects.Count; i++)
                         {
-                            indexToSelect = i;
-                            break;
+                            if (Properties.Application.Default.show_closed_projects || (!Properties.Application.Default.show_closed_projects && projects[i].Status != 5))
+                                if (projects[i].Parent == null)
+                                    cbProjects.Items.Add(new TextAndValueItem { Text = projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
+                                else
+                                    cbProjects.Items.Add(new TextAndValueItem { Text = "    └ " + projects[i].Name + (projects[i].Status == 5 ? " (closed)" : ""), Value = projects[i].ID });
                         }
-                    cbProjects.SelectedIndex = indexToSelect;
-                }
-            }
-            if (whatsChanged[1])
-                if (Properties.Application.Default.show_status_bar)
-                {
-                    if (!statusStrip.Visible)
-                    {
-                        lvIssues.Size = new System.Drawing.Size(lvIssues.Size.Width, lvIssues.Size.Height - statusStrip.Size.Height);
-                        statusStrip.Visible = true;
+                        int indexToSelect = 0;
+                        for (int i = 1; i < cbProjects.Items.Count; i++)
+                            if ((long)(cbProjects.Items[i] as TextAndValueItem).Value == lastSelectedProjectID)
+                            {
+                                indexToSelect = i;
+                                break;
+                            }
+                        cbProjects.SelectedIndex = indexToSelect;
                     }
                 }
-                else if (statusStrip.Visible)
-                {
-                    lvIssues.Size = new System.Drawing.Size(lvIssues.Size.Width, lvIssues.Size.Height + statusStrip.Size.Height);
-                    statusStrip.Visible = false;
-                }
+                // Изменилась ли настройка отображения статус бара на главной форме
+                if (whatsChanged[1])
+                    if (Properties.Application.Default.show_status_bar)
+                    {
+                        if (!statusStrip.Visible)
+                        {
+                            lvIssues.Size = new System.Drawing.Size(lvIssues.Size.Width, lvIssues.Size.Height - statusStrip.Size.Height);
+                            statusStrip.Visible = true;
+                        }
+                    }
+                    else if (statusStrip.Visible)
+                    {
+                        lvIssues.Size = new System.Drawing.Size(lvIssues.Size.Width, lvIssues.Size.Height + statusStrip.Size.Height);
+                        statusStrip.Visible = false;
+                    }
+            }
+                };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
         }
     }
-
 
     class ListViewItemComparer : IComparer
     {
