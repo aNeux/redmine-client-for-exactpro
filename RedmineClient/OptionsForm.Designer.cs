@@ -41,6 +41,9 @@
             this.cbAskBeforeExiting = new System.Windows.Forms.CheckBox();
             this.tabPageNotifications = new System.Windows.Forms.TabPage();
             this.gbBackgroundUpdater = new System.Windows.Forms.GroupBox();
+            this.cbBackgroundUpdaterPlayNotificationSound = new System.Windows.Forms.CheckBox();
+            this.cbBackgroundUpdaterNotifyAboutIssues = new System.Windows.Forms.CheckBox();
+            this.cbBackgroundUpdaterNotifyAboutProjects = new System.Windows.Forms.CheckBox();
             this.labelMinutes = new System.Windows.Forms.Label();
             this.nudBackgroundUpdaterInterval = new System.Windows.Forms.NumericUpDown();
             this.labelBackgroundUpdaterInterval = new System.Windows.Forms.Label();
@@ -48,6 +51,7 @@
             this.labelBackgroundUpdaterInfo = new System.Windows.Forms.Label();
             this.tabPageRedmine = new System.Windows.Forms.TabPage();
             this.gbProjects = new System.Windows.Forms.GroupBox();
+            this.cbShowProjectsWithoutCurrentUser = new System.Windows.Forms.CheckBox();
             this.cbShowClosedProjects = new System.Windows.Forms.CheckBox();
             this.gbHostURL = new System.Windows.Forms.GroupBox();
             this.tbRedmineHost = new System.Windows.Forms.TextBox();
@@ -55,8 +59,7 @@
             this.labelRedmineHostInfo = new System.Windows.Forms.Label();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
-            this.btnReseToDefaults = new System.Windows.Forms.Button();
-            this.cbShowProjectsWithoutCurrentUser = new System.Windows.Forms.CheckBox();
+            this.btnResetToDefaults = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabPageGeneral.SuspendLayout();
             this.gbSecurity.SuspendLayout();
@@ -187,18 +190,55 @@
             // 
             // gbBackgroundUpdater
             // 
+            this.gbBackgroundUpdater.Controls.Add(this.cbBackgroundUpdaterPlayNotificationSound);
+            this.gbBackgroundUpdater.Controls.Add(this.cbBackgroundUpdaterNotifyAboutIssues);
+            this.gbBackgroundUpdater.Controls.Add(this.cbBackgroundUpdaterNotifyAboutProjects);
             this.gbBackgroundUpdater.Controls.Add(this.labelMinutes);
             this.gbBackgroundUpdater.Controls.Add(this.nudBackgroundUpdaterInterval);
             this.gbBackgroundUpdater.Controls.Add(this.labelBackgroundUpdaterInterval);
             this.gbBackgroundUpdater.Controls.Add(this.cbEnableBackgroundUpdater);
             this.gbBackgroundUpdater.Controls.Add(this.labelBackgroundUpdaterInfo);
-            this.gbBackgroundUpdater.Enabled = false;
             this.gbBackgroundUpdater.Location = new System.Drawing.Point(6, 6);
             this.gbBackgroundUpdater.Name = "gbBackgroundUpdater";
-            this.gbBackgroundUpdater.Size = new System.Drawing.Size(388, 106);
+            this.gbBackgroundUpdater.Size = new System.Drawing.Size(388, 170);
             this.gbBackgroundUpdater.TabIndex = 9;
             this.gbBackgroundUpdater.TabStop = false;
             this.gbBackgroundUpdater.Text = "Background updater";
+            // 
+            // cbBackgroundUpdaterPlayNotificationSound
+            // 
+            this.cbBackgroundUpdaterPlayNotificationSound.AutoSize = true;
+            this.cbBackgroundUpdaterPlayNotificationSound.Enabled = false;
+            this.cbBackgroundUpdaterPlayNotificationSound.Location = new System.Drawing.Point(9, 148);
+            this.cbBackgroundUpdaterPlayNotificationSound.Name = "cbBackgroundUpdaterPlayNotificationSound";
+            this.cbBackgroundUpdaterPlayNotificationSound.Size = new System.Drawing.Size(204, 17);
+            this.cbBackgroundUpdaterPlayNotificationSound.TabIndex = 17;
+            this.cbBackgroundUpdaterPlayNotificationSound.Text = "Play sound after notification appeared";
+            this.cbBackgroundUpdaterPlayNotificationSound.UseVisualStyleBackColor = true;
+            // 
+            // cbBackgroundUpdaterNotifyAboutIssues
+            // 
+            this.cbBackgroundUpdaterNotifyAboutIssues.AutoSize = true;
+            this.cbBackgroundUpdaterNotifyAboutIssues.Enabled = false;
+            this.cbBackgroundUpdaterNotifyAboutIssues.Location = new System.Drawing.Point(9, 125);
+            this.cbBackgroundUpdaterNotifyAboutIssues.Name = "cbBackgroundUpdaterNotifyAboutIssues";
+            this.cbBackgroundUpdaterNotifyAboutIssues.Size = new System.Drawing.Size(170, 17);
+            this.cbBackgroundUpdaterNotifyAboutIssues.TabIndex = 16;
+            this.cbBackgroundUpdaterNotifyAboutIssues.Text = "Notify about changes in issues";
+            this.cbBackgroundUpdaterNotifyAboutIssues.UseVisualStyleBackColor = true;
+            this.cbBackgroundUpdaterNotifyAboutIssues.CheckedChanged += new System.EventHandler(this.cbBackgroundUpdaterNotifyAboutProjectsOrIssues_CheckedChanged);
+            // 
+            // cbBackgroundUpdaterNotifyAboutProjects
+            // 
+            this.cbBackgroundUpdaterNotifyAboutProjects.AutoSize = true;
+            this.cbBackgroundUpdaterNotifyAboutProjects.Enabled = false;
+            this.cbBackgroundUpdaterNotifyAboutProjects.Location = new System.Drawing.Point(9, 102);
+            this.cbBackgroundUpdaterNotifyAboutProjects.Name = "cbBackgroundUpdaterNotifyAboutProjects";
+            this.cbBackgroundUpdaterNotifyAboutProjects.Size = new System.Drawing.Size(178, 17);
+            this.cbBackgroundUpdaterNotifyAboutProjects.TabIndex = 15;
+            this.cbBackgroundUpdaterNotifyAboutProjects.Text = "Notify about changes in projects";
+            this.cbBackgroundUpdaterNotifyAboutProjects.UseVisualStyleBackColor = true;
+            this.cbBackgroundUpdaterNotifyAboutProjects.CheckedChanged += new System.EventHandler(this.cbBackgroundUpdaterNotifyAboutProjectsOrIssues_CheckedChanged);
             // 
             // labelMinutes
             // 
@@ -281,10 +321,20 @@
             this.gbProjects.Controls.Add(this.cbShowClosedProjects);
             this.gbProjects.Location = new System.Drawing.Point(6, 119);
             this.gbProjects.Name = "gbProjects";
-            this.gbProjects.Size = new System.Drawing.Size(388, 59);
-            this.gbProjects.TabIndex = 19;
+            this.gbProjects.Size = new System.Drawing.Size(388, 62);
+            this.gbProjects.TabIndex = 22;
             this.gbProjects.TabStop = false;
             this.gbProjects.Text = "Projects";
+            // 
+            // cbShowProjectsWithoutCurrentUser
+            // 
+            this.cbShowProjectsWithoutCurrentUser.AutoSize = true;
+            this.cbShowProjectsWithoutCurrentUser.Location = new System.Drawing.Point(9, 40);
+            this.cbShowProjectsWithoutCurrentUser.Name = "cbShowProjectsWithoutCurrentUser";
+            this.cbShowProjectsWithoutCurrentUser.Size = new System.Drawing.Size(243, 17);
+            this.cbShowProjectsWithoutCurrentUser.TabIndex = 24;
+            this.cbShowProjectsWithoutCurrentUser.Text = "Show projects in which you are not participate";
+            this.cbShowProjectsWithoutCurrentUser.UseVisualStyleBackColor = true;
             // 
             // cbShowClosedProjects
             // 
@@ -292,7 +342,7 @@
             this.cbShowClosedProjects.Location = new System.Drawing.Point(9, 17);
             this.cbShowClosedProjects.Name = "cbShowClosedProjects";
             this.cbShowClosedProjects.Size = new System.Drawing.Size(127, 17);
-            this.cbShowClosedProjects.TabIndex = 20;
+            this.cbShowClosedProjects.TabIndex = 23;
             this.cbShowClosedProjects.Text = "Show closed projects";
             this.cbShowClosedProjects.UseVisualStyleBackColor = true;
             // 
@@ -304,7 +354,7 @@
             this.gbHostURL.Location = new System.Drawing.Point(6, 6);
             this.gbHostURL.Name = "gbHostURL";
             this.gbHostURL.Size = new System.Drawing.Size(388, 108);
-            this.gbHostURL.TabIndex = 15;
+            this.gbHostURL.TabIndex = 18;
             this.gbHostURL.TabStop = false;
             this.gbHostURL.Text = "Host URL";
             // 
@@ -314,7 +364,7 @@
             this.tbRedmineHost.Name = "tbRedmineHost";
             this.tbRedmineHost.ReadOnly = true;
             this.tbRedmineHost.Size = new System.Drawing.Size(375, 20);
-            this.tbRedmineHost.TabIndex = 18;
+            this.tbRedmineHost.TabIndex = 21;
             // 
             // cbEnableEditingRedmineHost
             // 
@@ -322,7 +372,7 @@
             this.cbEnableEditingRedmineHost.Location = new System.Drawing.Point(9, 60);
             this.cbEnableEditingRedmineHost.Name = "cbEnableEditingRedmineHost";
             this.cbEnableEditingRedmineHost.Size = new System.Drawing.Size(93, 17);
-            this.cbEnableEditingRedmineHost.TabIndex = 17;
+            this.cbEnableEditingRedmineHost.TabIndex = 20;
             this.cbEnableEditingRedmineHost.Text = "Enable editing";
             this.cbEnableEditingRedmineHost.UseVisualStyleBackColor = true;
             this.cbEnableEditingRedmineHost.CheckedChanged += new System.EventHandler(this.cbEnableEditHostURL_CheckedChanged);
@@ -332,7 +382,7 @@
             this.labelRedmineHostInfo.Location = new System.Drawing.Point(6, 16);
             this.labelRedmineHostInfo.Name = "labelRedmineHostInfo";
             this.labelRedmineHostInfo.Size = new System.Drawing.Size(375, 41);
-            this.labelRedmineHostInfo.TabIndex = 16;
+            this.labelRedmineHostInfo.TabIndex = 19;
             this.labelRedmineHostInfo.Text = resources.GetString("labelRedmineHostInfo.Text");
             // 
             // btnCancel
@@ -340,7 +390,7 @@
             this.btnCancel.Location = new System.Drawing.Point(346, 253);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 23;
+            this.btnCancel.TabIndex = 26;
             this.btnCancel.Text = "Cacnel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -350,37 +400,27 @@
             this.btnApply.Location = new System.Drawing.Point(265, 253);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(75, 23);
-            this.btnApply.TabIndex = 22;
+            this.btnApply.TabIndex = 25;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
-            // btnReseToDefaults
+            // btnResetToDefaults
             // 
-            this.btnReseToDefaults.Location = new System.Drawing.Point(13, 252);
-            this.btnReseToDefaults.Name = "btnReseToDefaults";
-            this.btnReseToDefaults.Size = new System.Drawing.Size(100, 23);
-            this.btnReseToDefaults.TabIndex = 24;
-            this.btnReseToDefaults.Text = "Reset to defaults";
-            this.btnReseToDefaults.UseVisualStyleBackColor = true;
-            this.btnReseToDefaults.Click += new System.EventHandler(this.btnReseToDefaults_Click);
-            // 
-            // cbShowProjectsWithoutCurrentUser
-            // 
-            this.cbShowProjectsWithoutCurrentUser.AutoSize = true;
-            this.cbShowProjectsWithoutCurrentUser.Location = new System.Drawing.Point(9, 36);
-            this.cbShowProjectsWithoutCurrentUser.Name = "cbShowProjectsWithoutCurrentUser";
-            this.cbShowProjectsWithoutCurrentUser.Size = new System.Drawing.Size(243, 17);
-            this.cbShowProjectsWithoutCurrentUser.TabIndex = 21;
-            this.cbShowProjectsWithoutCurrentUser.Text = "Show projects in which you are not participate";
-            this.cbShowProjectsWithoutCurrentUser.UseVisualStyleBackColor = true;
+            this.btnResetToDefaults.Location = new System.Drawing.Point(13, 252);
+            this.btnResetToDefaults.Name = "btnResetToDefaults";
+            this.btnResetToDefaults.Size = new System.Drawing.Size(100, 23);
+            this.btnResetToDefaults.TabIndex = 27;
+            this.btnResetToDefaults.Text = "Reset to defaults";
+            this.btnResetToDefaults.UseVisualStyleBackColor = true;
+            this.btnResetToDefaults.Click += new System.EventHandler(this.btnResetToDefaults_Click);
             // 
             // OptionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(433, 283);
-            this.Controls.Add(this.btnReseToDefaults);
+            this.Controls.Add(this.btnResetToDefaults);
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.tabControl);
@@ -440,7 +480,10 @@
         private System.Windows.Forms.Label labelRedmineHostInfo;
         private System.Windows.Forms.GroupBox gbProjects;
         private System.Windows.Forms.CheckBox cbShowClosedProjects;
-        private System.Windows.Forms.Button btnReseToDefaults;
+        private System.Windows.Forms.Button btnResetToDefaults;
         private System.Windows.Forms.CheckBox cbShowProjectsWithoutCurrentUser;
+        private System.Windows.Forms.CheckBox cbBackgroundUpdaterNotifyAboutIssues;
+        private System.Windows.Forms.CheckBox cbBackgroundUpdaterNotifyAboutProjects;
+        private System.Windows.Forms.CheckBox cbBackgroundUpdaterPlayNotificationSound;
     }
 }

@@ -11,8 +11,11 @@ namespace RedmineClient.Models
         public bool EnableEncryption { set; get; }
         public bool EnableBackgroundUpdater { set; get; }
         public long BackgroundUpdaterInterval { set; get; }
+        public bool BackgroundUpdaterNotifyAboutProjects { set; get; }
+        public bool BackgroundUpdaterNotifyAboutIssues { set; get; }
+        public bool BackgroundUpdaterPlayNotificationSound { set; get; }
         public string RedmineHost { set; get; }
-        public bool ShowClodedProjects { set; get; }
+        public bool ShowClosedProjects { set; get; }
         public bool ShowProjectsWithoutCurrentUser { set; get; }
 
         public ApplicationOptions(bool setDefaults)
@@ -26,8 +29,11 @@ namespace RedmineClient.Models
                 this.EnableEncryption = true;
                 this.EnableBackgroundUpdater = true;
                 this.BackgroundUpdaterInterval = 60000;
+                this.BackgroundUpdaterNotifyAboutProjects = true;
+                this.BackgroundUpdaterNotifyAboutIssues = true;
+                this.BackgroundUpdaterPlayNotificationSound = true;
                 this.RedmineHost = "http://student-rm.exactpro.com/";
-                this.ShowClodedProjects = true;
+                this.ShowClosedProjects = false;
                 this.ShowProjectsWithoutCurrentUser = false;
             }
         }

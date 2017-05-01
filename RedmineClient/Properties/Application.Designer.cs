@@ -50,24 +50,24 @@ namespace RedmineClient.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool show_status_bar {
-            get {
-                return ((bool)(this["show_status_bar"]));
-            }
-            set {
-                this["show_status_bar"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool show_account_login {
             get {
                 return ((bool)(this["show_account_login"]));
             }
             set {
                 this["show_account_login"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool show_status_bar {
+            get {
+                return ((bool)(this["show_status_bar"]));
+            }
+            set {
+                this["show_status_bar"] = value;
             }
         }
         
@@ -109,6 +109,42 @@ namespace RedmineClient.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool background_updater_notify_about_projects {
+            get {
+                return ((bool)(this["background_updater_notify_about_projects"]));
+            }
+            set {
+                this["background_updater_notify_about_projects"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool background_updater_notify_about_issues {
+            get {
+                return ((bool)(this["background_updater_notify_about_issues"]));
+            }
+            set {
+                this["background_updater_notify_about_issues"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool background_updater_play_notification_sound {
+            get {
+                return ((bool)(this["background_updater_play_notification_sound"]));
+            }
+            set {
+                this["background_updater_play_notification_sound"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("http://student-rm.exactpro.com/")]
         public string redmine_host {
             get {
@@ -121,7 +157,7 @@ namespace RedmineClient.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool show_closed_projects {
             get {
                 return ((bool)(this["show_closed_projects"]));

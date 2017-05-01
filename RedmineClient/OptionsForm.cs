@@ -18,11 +18,14 @@ namespace RedmineClient
         {
             cbAskBeforeExiting.Checked = Properties.Application.Default.ask_before_exiting;
             cbMinimazeToTray.Checked = Properties.Application.Default.minimaze_to_tray;
-            cbShowAccountLogin.Checked = Properties.Application.Default.show_account_login;
-            cbShowStatusBar.Checked = Properties.Application.Default.show_status_bar;
+            cbShowAccountLogin.Checked = Properties.Application.Default.show_status_bar;
+            cbShowStatusBar.Checked = Properties.Application.Default.show_account_login;
             cbEnableEncryption.Checked = Properties.Application.Default.encryption_enabled;
             cbEnableBackgroundUpdater.Checked = Properties.Application.Default.background_updater_enabled;
             nudBackgroundUpdaterInterval.Value = Properties.Application.Default.background_updater_interval / 60 / 1000;
+            cbBackgroundUpdaterNotifyAboutProjects.Checked = Properties.Application.Default.background_updater_notify_about_projects;
+            cbBackgroundUpdaterNotifyAboutIssues.Checked = Properties.Application.Default.background_updater_notify_about_issues;
+            cbBackgroundUpdaterPlayNotificationSound.Checked = Properties.Application.Default.background_updater_play_notification_sound;
             tbRedmineHost.Text = Properties.Application.Default.redmine_host;
             cbShowClosedProjects.Checked = Properties.Application.Default.show_closed_projects;
             cbShowProjectsWithoutCurrentUser.Checked = Properties.Application.Default.show_projects_without_current_user;
@@ -40,6 +43,14 @@ namespace RedmineClient
             labelBackgroundUpdaterInterval.Enabled = cbEnableBackgroundUpdater.Checked;
             nudBackgroundUpdaterInterval.Enabled = cbEnableBackgroundUpdater.Checked;
             labelMinutes.Enabled = cbEnableBackgroundUpdater.Checked;
+            cbBackgroundUpdaterNotifyAboutProjects.Enabled = cbEnableBackgroundUpdater.Checked;
+            cbBackgroundUpdaterNotifyAboutIssues.Enabled = cbEnableBackgroundUpdater.Checked;
+            cbBackgroundUpdaterPlayNotificationSound.Enabled = cbEnableBackgroundUpdater.Checked && (cbBackgroundUpdaterNotifyAboutProjects.Checked || cbBackgroundUpdaterNotifyAboutIssues.Checked);
+        }
+
+        private void cbBackgroundUpdaterNotifyAboutProjectsOrIssues_CheckedChanged(object sender, EventArgs e)
+        {
+            cbBackgroundUpdaterPlayNotificationSound.Enabled = cbEnableBackgroundUpdater.Checked && (cbBackgroundUpdaterNotifyAboutProjects.Checked || cbBackgroundUpdaterNotifyAboutIssues.Checked);
         }
 
         private void cbEnableEditHostURL_CheckedChanged(object sender, EventArgs e)
@@ -62,8 +73,11 @@ namespace RedmineClient
                 newOptions.EnableEncryption = cbEnableEncryption.Checked;
                 newOptions.EnableBackgroundUpdater = cbEnableBackgroundUpdater.Checked;
                 newOptions.BackgroundUpdaterInterval = (long)nudBackgroundUpdaterInterval.Value * 1000 * 60;
+                newOptions.BackgroundUpdaterNotifyAboutProjects = cbBackgroundUpdaterNotifyAboutProjects.Checked;
+                newOptions.BackgroundUpdaterNotifyAboutIssues = cbBackgroundUpdaterNotifyAboutIssues.Checked;
+                newOptions.BackgroundUpdaterPlayNotificationSound = cbBackgroundUpdaterPlayNotificationSound.Checked;
                 newOptions.RedmineHost = tbRedmineHost.Text;
-                newOptions.ShowClodedProjects = cbShowClosedProjects.Checked;
+                newOptions.ShowClosedProjects = cbShowClosedProjects.Checked;
                 newOptions.ShowProjectsWithoutCurrentUser = cbShowProjectsWithoutCurrentUser.Checked;
                 if (cbEnableEditingRedmineHost.Checked && Properties.Application.Default.redmine_host != tbRedmineHost.Text)
                 {
@@ -81,7 +95,7 @@ namespace RedmineClient
             this.Close();
         }
 
-        private void btnReseToDefaults_Click(object sender, EventArgs e)
+        private void btnResetToDefaults_Click(object sender, EventArgs e)
         {
             var dialogResult = MessageBox.Show("Are you sure that you want to restore options to their default values? Redmine host will be set to http://student-rm.exactpro.com/.", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (dialogResult == DialogResult.Yes)

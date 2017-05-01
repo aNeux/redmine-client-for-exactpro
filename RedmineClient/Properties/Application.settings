@@ -8,10 +8,10 @@
     <Setting Name="minimaze_to_tray" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="show_status_bar" Type="System.Boolean" Scope="User">
+    <Setting Name="show_account_login" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="show_account_login" Type="System.Boolean" Scope="User">
+    <Setting Name="show_status_bar" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="encryption_enabled" Type="System.Boolean" Scope="User">
@@ -23,11 +23,20 @@
     <Setting Name="background_updater_interval" Type="System.Int64" Scope="User">
       <Value Profile="(Default)">60000</Value>
     </Setting>
+    <Setting Name="background_updater_notify_about_projects" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="background_updater_notify_about_issues" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="background_updater_play_notification_sound" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
     <Setting Name="redmine_host" Type="System.String" Scope="User">
       <Value Profile="(Default)">http://student-rm.exactpro.com/</Value>
     </Setting>
     <Setting Name="show_closed_projects" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="show_projects_without_current_user" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

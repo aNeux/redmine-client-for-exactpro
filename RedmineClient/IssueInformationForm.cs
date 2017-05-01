@@ -199,7 +199,7 @@ namespace RedmineClient
                             dtpStartDate.Value = issue.StartDate;
                         if (issue.DueDate != new DateTime())
                             dtpDueDate.Value = issue.DueDate;
-                        nudEstimatedTime.Value = issue.EstimatedHours != null && issue.EstimatedHours.Length > 0 ? (int)double.Parse(issue.EstimatedHours, System.Globalization.CultureInfo.InvariantCulture) : 0;
+                        nudEstimatedTime.Value = (int)issue.EstimatedHours;
                         nudDoneRatio.Value = issue.DoneRatio;
                         tbCreationDate.Text = issue.CreatedOn.ToShortTimeString() + ", " + issue.CreatedOn.ToShortDateString();
                         tbLastUpdate.Text = issue.UpdatedOn.ToShortTimeString() + ", " + issue.UpdatedOn.ToShortDateString();
@@ -339,28 +339,34 @@ namespace RedmineClient
                             result += " » Description updated\r\n";
                             break;
                         case "start_date":
-                            if (currentDetail.OldValue != null)
-                                result += " » Start date changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
-                            else
+                            if (currentDetail.OldValue == null && currentDetail.NewValue != null)
                                 result += " » Start date set to \"" + currentDetail.NewValue + "\"\r\n";
+                            else if (currentDetail.OldValue != null && currentDetail.NewValue == null)
+                                result += " » Start date deleted (last: \"" + currentDetail.OldValue + "\")\r\n";
+                            else
+                                result += " » Start date changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
                             break;
                         case "due_date":
-                            if (currentDetail.OldValue != null)
-                                result += " » Due date changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
-                            else
+                            if (currentDetail.OldValue == null && currentDetail.NewValue != null)
                                 result += " » Due date set to \"" + currentDetail.NewValue + "\"\r\n";
+                            else if (currentDetail.OldValue != null && currentDetail.NewValue == null)
+                                result += " » Due date deleted (last: \"" + currentDetail.OldValue + "\")\r\n";
+                            else
+                                result += " » Due date changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
                             break;
                         case "estimated_hours":
-                            if (currentDetail.OldValue != null)
-                                result += " » Estimated time changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
-                            else
+                            if (currentDetail.OldValue == null && currentDetail.NewValue != null)
                                 result += " » Estimated time set to \"" + currentDetail.NewValue + "\"\r\n";
+                            else if (currentDetail.OldValue != null && currentDetail.NewValue == null)
+                                result += " » Estimated time deleted (last: \"" + currentDetail.OldValue + "\")\r\n";
+                            else
+                                result += " » Estimated time changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
                             break;
                         case "done_ratio":
                             if (currentDetail.OldValue != null)
-                                result += " » % Done changed from \"" + currentDetail.OldValue + "\" to \"" + currentDetail.NewValue + "\"\r\n";
+                                result += " » Done ratio changed from " + currentDetail.OldValue + "% to " + currentDetail.NewValue + "%\r\n";
                             else
-                                result += " » % Done set to \"" + currentDetail.NewValue + "\"\r\n";
+                                result += " » Done ratio set to " + currentDetail.NewValue + "%\r\n";
                             break;
                         case "is_private":
                             if (currentDetail.OldValue != null)
@@ -385,7 +391,7 @@ namespace RedmineClient
             cbTracker.Enabled = isEnabled && isManager;
             cbStatus.Enabled = isEnabled;
             cbPriority.Enabled = isEnabled && isManager;
-            cbAssignedTo.Enabled = isEnabled && isManager;
+            cbAssignedTo.Enabled = isEnabled;
             tbAuthor.Enabled = isEnabled;
             cbAddNote.Enabled = isEnabled;
             tbSubject.Enabled = isEnabled;

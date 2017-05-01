@@ -58,7 +58,7 @@ namespace RedmineClient.Models
         [JsonProperty("due_date")]
         public DateTime DueDate { set; get; }
         [JsonProperty("estimated_hours")]
-        public string EstimatedHours { set; get; }
+        public double EstimatedHours { set; get; }
         [JsonProperty("done_ratio")]
         public int DoneRatio { set; get; }
         [JsonProperty("created_on")]

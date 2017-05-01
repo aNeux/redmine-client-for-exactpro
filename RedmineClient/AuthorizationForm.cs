@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.IO;
 using System.Net;
 using System.Windows.Forms;
@@ -18,10 +18,11 @@ namespace RedmineClient
 
         private void APITokenForm_Shown(object sender, EventArgs e)
         {
+            tbRedmineHost.Text = Properties.Application.Default.redmine_host;
             if (Properties.User.Default.api_key.Length != 0)
             {
                 cbUseAPIKeyInstead.Checked = true;
-                tbAPIKey.Text = Utils.DecodeXOR(Properties.User.Default.api_key);
+                tbAPIKey.Text = Properties.Application.Default.encryption_enabled ? Utils.DecodeXOR(Properties.User.Default.api_key) : Properties.User.Default.api_key;
                 tbAPIKey.Select();
                 tbAPIKey.SelectAll();
             }
@@ -36,6 +37,25 @@ namespace RedmineClient
             controller.OnUserAuthenticated -= controller_OnUserAuthenticated;
             if (Properties.User.Default.api_key.Length == 0)
                 Application.Exit();
+        }
+
+        private void tbRedmineHost_TextChanged(object sender, EventArgs e)
+        {
+            if (Properties.User.Default.api_key.Length > 0)
+            {
+                if (tbRedmineHost.Text != Properties.Application.Default.redmine_host)
+                {
+                    tbAPIKey.Text = "";
+                    cbUseAPIKeyInstead.Checked = false;
+                }
+                else
+                {
+                    tbAPIKey.Text = Properties.Application.Default.encryption_enabled ? Utils.DecodeXOR(Properties.User.Default.api_key) : Properties.User.Default.api_key;
+                    cbUseAPIKeyInstead.Checked = true;
+                }
+                tbRedmineHost.Select();
+                tbRedmineHost.SelectionStart = tbRedmineHost.Text.Length;
+            }
         }
 
         private void linkLabelForgotPassword_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -69,7 +89,9 @@ namespace RedmineClient
 
         private void btnLogIn_Click(object sender, EventArgs e)
         {
-            if (!cbUseAPIKeyInstead.Checked)
+            if (!Regex.IsMatch(tbRedmineHost.Text, @"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/$"))
+                MessageBox.Show("Format of URL address you entered is invalid. Please, correct it and try again. Note that required formats is http://<domain & subdomains>/ or https://<domain & subdomains>/.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            else if (!cbUseAPIKeyInstead.Checked)
                 if (tbLogin.Text.Length == 0)
                     MessageBox.Show("Please, enter your login (user name)!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else if (tbPassword.Text.Length == 0)
@@ -78,7 +100,7 @@ namespace RedmineClient
                 {
                     ChangeUIState(false);
                     this.Text = "Authorization [please, wait..]";
-                    controller.Authorize(true, Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(tbLogin.Text + ":" + tbPassword.Text)));
+                    controller.Authorize(tbRedmineHost.Text, true, Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(tbLogin.Text + ":" + tbPassword.Text)));
                 }
             else
                 if (tbAPIKey.Text.Length == 0)
@@ -87,7 +109,7 @@ namespace RedmineClient
                 {
                     ChangeUIState(false);
                     this.Text = "Authorization [please, wait..]";
-                    controller.Authorize(false, tbAPIKey.Text);
+                    controller.Authorize(tbRedmineHost.Text, false, tbAPIKey.Text);
                 }
         }
 
@@ -114,7 +136,7 @@ namespace RedmineClient
                             break;
                         case ErrorTypes.ConnectionError:
                             this.Text = "Authorization";
-                            MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Cannot connect to Redmine services. Probably you entered invalid host address, so please, check it out and try again. Also it could be a network error too.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             ChangeUIState(true);
                             break;
                         case ErrorTypes.UnathorizedAccess:
@@ -136,6 +158,8 @@ namespace RedmineClient
 
         private void ChangeUIState(bool isEnabled)
         {
+            labelRedmineHost.Enabled = isEnabled;
+            tbRedmineHost.Enabled = isEnabled;
             labelLogin.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
             tbLogin.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
             labelPassword.Enabled = isEnabled && !cbUseAPIKeyInstead.Checked;
