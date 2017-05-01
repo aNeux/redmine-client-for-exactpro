@@ -60,7 +60,10 @@ namespace RedmineClient
 
         private void linkLabelForgotPassword_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start(Properties.Application.Default.redmine_host + "account/lost_password");
+            if (!Regex.IsMatch(tbRedmineHost.Text, @"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/$"))
+                MessageBox.Show("Format of URL address you entered is invalid. Please, correct it and try again. Note that required formats is http://<domain & subdomains>/ or https://<domain & subdomains>/.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            else
+                System.Diagnostics.Process.Start(tbRedmineHost.Text + "account/lost_password");
         }
 
         private void cbUseAPIKeyInstead_CheckedChanged(object sender, EventArgs e)
@@ -141,7 +144,7 @@ namespace RedmineClient
                             break;
                         case ErrorTypes.UnathorizedAccess:
                             this.Text = "Authorization";
-                            MessageBox.Show("You have entered the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("You have entered the wrong authorization data. Please change it and try again. It's also possible that manager of entered Redmine service doesn't enable REST API function.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             ChangeUIState(true);
                             break;
                         case ErrorTypes.UnknownError:

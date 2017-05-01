@@ -84,6 +84,7 @@ namespace RedmineClient
                     tabControl.Enabled = false;
                     btnApply.Enabled = false;
                     btnCancel.Enabled = false;
+                    btnResetToDefaults.Enabled = false;
                     this.Text = "Options [please, wait..]";
                 }
                 controller.ApplyNewOptions(newOptions);
@@ -105,6 +106,7 @@ namespace RedmineClient
                     tabControl.Enabled = false;
                     btnApply.Enabled = false;
                     btnCancel.Enabled = false;
+                    btnResetToDefaults.Enabled = false;
                     this.Text = "Options [please, wait..]";
                 }
                 controller.ApplyNewOptions(new Models.ApplicationOptions(true));
@@ -126,6 +128,7 @@ namespace RedmineClient
                             tabControl.Enabled = true;
                             btnApply.Enabled = true;
                             btnCancel.Enabled = true;
+                            btnResetToDefaults.Enabled = true;
                             break;
                         case ErrorTypes.UnknownError:
                             this.Text = "Options";
@@ -133,6 +136,7 @@ namespace RedmineClient
                             tabControl.Enabled = true;
                             btnApply.Enabled = true;
                             btnCancel.Enabled = true;
+                            btnResetToDefaults.Enabled = true;
                             break;
                     }
                 };

@@ -150,15 +150,15 @@ namespace RedmineClient
         /// <summary>
         /// Метод, оповещающий главную форму о необходимости открытия окна авторизации.
         /// </summary>
-        /// <param name="isFromOptions">Вызван ли этот метод из настроек программы.</param>
-        public void NeedToReAuthenticate(bool isFromOptions)
+        /// <param name="showWaitingInStatusBar">Показывать ли в статус баре главного окна "Waiting for authorization..".</param>
+        public void NeedToReAuthenticate(bool showWaitingInStatusBar)
         {
             new Thread(
                 delegate()
                 {
                     Properties.User.Default.Reset();
                     if (OnNeededToReAuthenticate != null)
-                        OnNeededToReAuthenticate(isFromOptions);
+                        OnNeededToReAuthenticate(showWaitingInStatusBar);
                 }).Start();
         }
 
@@ -1024,7 +1024,7 @@ namespace RedmineClient
         /// </summary>
         public void StopBackgroundUpdater()
         {
-            if (timer != null && timer.Enabled)
+            if (IsBackgroundUpdaterWorking())
             {
                 timer.Stop();
                 timer.Dispose();

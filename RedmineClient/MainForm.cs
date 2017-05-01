@@ -12,11 +12,13 @@ namespace RedmineClient
         private Controller controller;
         private long lastSelectedProjectID = -1;
         private int lastSortedColumn = -1;
+        private FormWindowState lastWindowStateBeforeMinimazing;
 
         public MainForm()
         {
             InitializeComponent();
             this.CenterToScreen();
+            lastWindowStateBeforeMinimazing = this.WindowState;
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
@@ -35,8 +37,13 @@ namespace RedmineClient
             controller.OnIssueUpdated += controller_OnIssueCreatedOrUpdated;
             controller.OnIssueRemoved += controller_OnIssueRemoved;
             controller.OnOptionsApplied += controller_OnOptionsApplied;
-            toolStripStatusLabel.Text = "Updating..";
-            controller.Update();
+            if (Properties.User.Default.api_key.Length > 0)
+            {
+                toolStripStatusLabel.Text = "Updating..";
+                controller.Update();
+            }
+            else
+                controller_OnNeededToReAuthenticate(true);
         }
 
         private void MainForm_Resize(object sender, EventArgs e)
@@ -51,10 +58,14 @@ namespace RedmineClient
                     controller.StartBackgroundUpdater(false);
                 }
             }
-            else if (this.WindowState == FormWindowState.Normal && controller.IsBackgroundUpdaterWorking())
+            else
             {
-                controller.OnBackgroundUpdated -= controller_OnBackgroundUpdated;
-                controller.StopBackgroundUpdater();
+                lastWindowStateBeforeMinimazing = this.WindowState;
+                if (controller.IsBackgroundUpdaterWorking())
+                {
+                    controller.OnBackgroundUpdated -= controller_OnBackgroundUpdated;
+                    controller.StopBackgroundUpdater();
+                }
             }
         }
 
@@ -106,15 +117,15 @@ namespace RedmineClient
         {
             refreshToolStripMenuItem.Enabled = false;
             refreshNIToolStripMenuItem.Enabled = false;
-            if (this.WindowState == FormWindowState.Normal)
-            {
-                toolStripStatusLabel.Text = "Updating..";
-                controller.Update();
-            }
-            else
+            if (this.WindowState == FormWindowState.Minimized && Properties.Application.Default.background_updater_enabled)
             {
                 controller.StopBackgroundUpdater();
                 controller.StartBackgroundUpdater(true);
+            }
+            else
+            {
+                toolStripStatusLabel.Text = "Updating..";
+                controller.Update();
             }
         }
 
@@ -220,12 +231,12 @@ namespace RedmineClient
             lvIssues.Sort();
         }
 
-        private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
+        private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            if (e.Button == System.Windows.Forms.MouseButtons.Left && this.WindowState == FormWindowState.Minimized)
             {
                 this.Show();
-                this.WindowState = FormWindowState.Normal;
+                this.WindowState = lastWindowStateBeforeMinimazing;
             }
         }
 
@@ -249,7 +260,7 @@ namespace RedmineClient
                 action();
         }
 
-        private void controller_OnNeededToReAuthenticate(bool isFromOptions)
+        private void controller_OnNeededToReAuthenticate(bool showWaitingInStatusBar)
         {
             Action action = () =>
             {
@@ -257,7 +268,7 @@ namespace RedmineClient
                 findIssuesForUserToolStripMenuItem.Enabled = false;
                 refreshToolStripMenuItem.Enabled = false;
                 userInformationToolStripMenuItem.Enabled = false;
-                toolStripStatusLabel.Text = isFromOptions ? "Waiting for authorization.." : "Last request failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
+                toolStripStatusLabel.Text = showWaitingInStatusBar ? "Waiting for authorization.." : "Last request failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                 accountNIToolStripMenuItem.Visible = false;
                 logOutNIToolStripMenuItem.Visible = false;
                 NIToolStripSeparator.Visible = false;
@@ -305,7 +316,10 @@ namespace RedmineClient
                             refreshToolStripMenuItem.Enabled = true;
                             refreshNIToolStripMenuItem.Enabled = true;
                             if (this.WindowState == FormWindowState.Minimized && Properties.Application.Default.background_updater_enabled && !controller.IsBackgroundUpdaterWorking())
+                            {
+                                controller.OnBackgroundUpdated += controller_OnBackgroundUpdated;
                                 controller.StartBackgroundUpdater(false);
+                            }
                             break;
                         case ErrorTypes.ConnectionError:
                             toolStripStatusLabel.Text = "Last update failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
@@ -497,7 +511,7 @@ namespace RedmineClient
         private void notifyIcon_BalloonTipClicked(object sender, EventArgs e)
         {
             this.Show();
-            this.WindowState = FormWindowState.Normal;
+            this.WindowState = lastWindowStateBeforeMinimazing;
             controller.NeedToReAuthenticate(false);
         }
     }

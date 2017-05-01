@@ -83,7 +83,7 @@ namespace RedmineClient
 
         private void timer_TickFormShowing(object sender, EventArgs e)
         {
-            startPositionY -= 6;
+            startPositionY -= 5;
             if (startPositionY < Screen.PrimaryScreen.WorkingArea.Height - this.Height)
             {
                 isFormAvailable = true;
@@ -112,7 +112,7 @@ namespace RedmineClient
 
         private void timer_TickFormClosing(object sender, EventArgs e)
         {
-            startPositionY += 6;
+            startPositionY += 5;
             if (startPositionY >= Screen.PrimaryScreen.Bounds.Height)
                 this.Close();
             else
