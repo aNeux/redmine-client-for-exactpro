@@ -25,3 +25,4 @@ C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\Re
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\Redmine Client.exe
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\Redmine Client.pdb
 C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.csprojResolveAssemblyReference.cache
+C:\Users\6727149\Desktop\Проекты\RedmineClient\RedmineClient\obj\Debug\RedmineClient.IssuesForCertainUserForm.resources

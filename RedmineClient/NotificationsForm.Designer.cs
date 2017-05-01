@@ -35,12 +35,15 @@
             // 
             // tbChanges
             // 
+            this.tbChanges.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tbChanges.Location = new System.Drawing.Point(12, 12);
             this.tbChanges.Multiline = true;
             this.tbChanges.Name = "tbChanges";
             this.tbChanges.ReadOnly = true;
             this.tbChanges.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tbChanges.Size = new System.Drawing.Size(263, 80);
+            this.tbChanges.Size = new System.Drawing.Size(263, 93);
             this.tbChanges.TabIndex = 0;
             this.tbChanges.Click += new System.EventHandler(this.tbChanges_Click);
             // 
@@ -57,7 +60,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(287, 104);
+            this.ClientSize = new System.Drawing.Size(287, 117);
             this.Controls.Add(this.labelHack);
             this.Controls.Add(this.tbChanges);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -67,6 +70,7 @@
             this.Name = "NotificationsForm";
             this.ShowInTaskbar = false;
             this.Text = "Redmine Client [notification]";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NotificationsForm_FormClosing);
             this.Shown += new System.EventHandler(this.NotificationsForm_Shown);
             this.MouseLeave += new System.EventHandler(this.NotificationsForm_MouseLeave);
             this.ResumeLayout(false);

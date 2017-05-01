@@ -74,6 +74,7 @@
             this.labelID = new System.Windows.Forms.Label();
             this.tabPageHistory = new System.Windows.Forms.TabPage();
             this.tbHistory = new System.Windows.Forms.TextBox();
+            this.btnRemoveIssue = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabPageInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudEstimatedTime)).BeginInit();
@@ -572,11 +573,23 @@
             this.tbHistory.Size = new System.Drawing.Size(437, 292);
             this.tbHistory.TabIndex = 1;
             // 
+            // btnRemoveIssue
+            // 
+            this.btnRemoveIssue.Location = new System.Drawing.Point(13, 341);
+            this.btnRemoveIssue.Name = "btnRemoveIssue";
+            this.btnRemoveIssue.Size = new System.Drawing.Size(85, 23);
+            this.btnRemoveIssue.TabIndex = 42;
+            this.btnRemoveIssue.Text = "Remove issue";
+            this.btnRemoveIssue.UseVisualStyleBackColor = true;
+            this.btnRemoveIssue.Visible = false;
+            this.btnRemoveIssue.Click += new System.EventHandler(this.btnRemoveIssue_Click);
+            // 
             // IssueInformationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(482, 371);
+            this.Controls.Add(this.btnRemoveIssue);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.btnSave);
@@ -647,6 +660,7 @@
         private System.Windows.Forms.TextBox tbID;
         private System.Windows.Forms.Label labelID;
         private System.Windows.Forms.CheckBox cbIsPrivate;
+        private System.Windows.Forms.Button btnRemoveIssue;
 
     }
 }

@@ -41,6 +41,25 @@ namespace RedmineClient
             labelHack.Select();
         }
 
+        private void NotificationsForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (isFormAvailable)
+            {
+                if (timer != null && timer.Enabled)
+                {
+                    timer.Stop();
+                    timer.Dispose();
+                }
+                startPositionY = this.Location.Y;
+                isFormAvailable = false;
+                timer = new Timer();
+                timer.Interval = 1;
+                timer.Tick += timer_TickFormClosing;
+                timer.Start();
+                e.Cancel = true;
+            }
+        }
+
         private void NotificationsForm_MouseLeave(object sender, EventArgs e)
         {
             if (isFormAvailable && (timer == null || !timer.Enabled))
@@ -64,7 +83,7 @@ namespace RedmineClient
 
         private void timer_TickFormShowing(object sender, EventArgs e)
         {
-            startPositionY -= 5;
+            startPositionY -= 6;
             if (startPositionY < Screen.PrimaryScreen.WorkingArea.Height - this.Height)
             {
                 isFormAvailable = true;
@@ -93,7 +112,7 @@ namespace RedmineClient
 
         private void timer_TickFormClosing(object sender, EventArgs e)
         {
-            startPositionY += 5;
+            startPositionY += 6;
             if (startPositionY >= Screen.PrimaryScreen.Bounds.Height)
                 this.Close();
             else

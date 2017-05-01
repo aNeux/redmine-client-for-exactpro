@@ -21,7 +21,6 @@ namespace RedmineClient
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            logOutToolStripMenuItem.Enabled = Properties.User.Default.api_key.Length > 0;
             cbProjects.SelectedIndex = 0;
             if (!Properties.Application.Default.show_account_login && statusStrip.Visible)
             {
@@ -98,10 +97,15 @@ namespace RedmineClient
             new NewIssueForm(projectID, projectName).ShowDialog();
         }
 
+        private void findIssuesForUserToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new IssuesForCertainUserForm(-1).ShowDialog();
+        }
+
         private void refreshStripMenuItem_Click(object sender, EventArgs e)
         {
             refreshToolStripMenuItem.Enabled = false;
-            refreshFromNIToolStripMenuItem.Enabled = false;
+            refreshNIToolStripMenuItem.Enabled = false;
             if (this.WindowState == FormWindowState.Normal)
             {
                 toolStripStatusLabel.Text = "Updating..";
@@ -117,16 +121,6 @@ namespace RedmineClient
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        private void logOutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var dialogResult = MessageBox.Show("Do you really want to log out and exit the program?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (dialogResult == DialogResult.Yes)
-            {
-                Properties.User.Default.Reset();
-                Application.Exit();
-            }
         }
 
         private void changeAPITokenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -149,6 +143,16 @@ namespace RedmineClient
             new AboutForm().ShowDialog();
         }
 
+        private void logOutIOToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dialogResult = MessageBox.Show("Do you really want to log out and exit the program?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dialogResult == DialogResult.Yes)
+            {
+                Properties.User.Default.Reset();
+                Application.Exit();
+            }
+        }
+
         private void cbSelectProject_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbProjects.SelectedIndex != 0)
@@ -165,18 +169,17 @@ namespace RedmineClient
                     labelProjectRoles.Text = "Roles: " + projectRoles.Remove(projectRoles.Length - 2);
                 }
                 lvIssues.Items.Clear();
-                foreach (Issue issue in controller.GetIssues(lastSelectedProjectID))
+                foreach (Issue currentIssue in controller.GetIssues(lastSelectedProjectID))
                 {
-                    ListViewItem lvi = new ListViewItem(issue.ID + "");
-                    lvi.SubItems.Add(issue.Subject);
-                    lvi.SubItems.Add(issue.Tracker.Name);
-                    lvi.SubItems.Add(issue.Status.Name);
-                    lvi.SubItems.Add(issue.Priority.Name);
-                    lvi.SubItems.Add(issue.AssignedTo != null && issue.AssignedTo.Name.Length > 0 ? issue.AssignedTo.Name : "< none >");
-                    lvi.SubItems.Add(issue.UpdatedOn.ToShortTimeString() + ", " + issue.UpdatedOn.ToShortDateString());
+                    ListViewItem lvi = new ListViewItem(currentIssue.ID + "");
+                    lvi.SubItems.Add(currentIssue.Subject);
+                    lvi.SubItems.Add(currentIssue.Tracker.Name);
+                    lvi.SubItems.Add(currentIssue.Status.Name);
+                    lvi.SubItems.Add(currentIssue.Priority.Name);
+                    lvi.SubItems.Add(currentIssue.AssignedTo != null && currentIssue.AssignedTo.Name.Length > 0 ? currentIssue.AssignedTo.Name : "< none >");
+                    lvi.SubItems.Add(currentIssue.UpdatedOn.ToShortTimeString() + ", " + currentIssue.UpdatedOn.ToShortDateString());
                     lvIssues.Items.Add(lvi);
                 }
-                removeIssueToolStripMenuItem.Visible = newIssueToolStripMenuItem.Enabled;
             }
             else
             {
@@ -184,7 +187,6 @@ namespace RedmineClient
                 newIssueToolStripMenuItem.Enabled = false;
                 btnProjectInfo.Visible = false;
                 labelProjectRoles.Text = "";
-                removeIssueToolStripMenuItem.Visible = false;
                 lvIssues.Items.Clear();
             }
         }
@@ -192,6 +194,12 @@ namespace RedmineClient
         private void btnProjectInfo_Click(object sender, EventArgs e)
         {
             new ProjectInformation(lastSelectedProjectID).ShowDialog();
+        }
+
+        private void lvIssues_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+                new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID).Roles).ShowDialog();
         }
 
         private void lvIssues_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -212,34 +220,12 @@ namespace RedmineClient
             lvIssues.Sort();
         }
 
-        private void lvIssues_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right && lvIssues.FocusedItem.Bounds.Contains(e.Location))
-                contextMenuIssue.Show(Cursor.Position);
-        }
-
-        private void issueInfoToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID).Roles).ShowDialog();
-        }
-
         private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
                 this.Show();
                 this.WindowState = FormWindowState.Normal;
-            }
-        }
-
-        private void removeIssueToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            long issueID = long.Parse(lvIssues.FocusedItem.SubItems[0].Text);
-            var dialogResult = MessageBox.Show("Are you really sure you want to remove issue #" + issueID + "?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (dialogResult == DialogResult.Yes)
-            {
-                toolStripStatusLabel.Text = "Removing issue #" + issueID + "..";
-                controller.RemoveIssue(issueID);
             }
         }
 
@@ -251,8 +237,7 @@ namespace RedmineClient
                     {
                         this.Text = "Redmine Client";
                         refreshToolStripMenuItem.Enabled = false;
-                        logOutToolStripMenuItem.Enabled = true;
-                        refreshFromNIToolStripMenuItem.Enabled = false;
+                        refreshNIToolStripMenuItem.Enabled = false;
                         cbProjects.SelectedIndex = 0;
                         toolStripStatusLabel.Text = "Updating..";
                         controller.Update();
@@ -269,14 +254,14 @@ namespace RedmineClient
             Action action = () =>
             {
                 this.Text = "Redmine Client";
+                findIssuesForUserToolStripMenuItem.Enabled = false;
                 refreshToolStripMenuItem.Enabled = false;
                 userInformationToolStripMenuItem.Enabled = false;
-                logOutToolStripMenuItem.Enabled = false;
                 toolStripStatusLabel.Text = isFromOptions ? "Waiting for authorization.." : "Last request failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                 accountNIToolStripMenuItem.Visible = false;
                 logOutNIToolStripMenuItem.Visible = false;
                 NIToolStripSeparator.Visible = false;
-                refreshFromNIToolStripMenuItem.Enabled = false;
+                refreshNIToolStripMenuItem.Enabled = false;
                 new AuthorizationForm().ShowDialog();
             };
             if (InvokeRequired)
@@ -293,6 +278,7 @@ namespace RedmineClient
                     {
                         case ErrorTypes.NoErrors:
                             this.Text = "Redmine Client" + (Properties.Application.Default.show_status_bar ? " [account: " + Properties.User.Default.login + "]" : "");
+                            findIssuesForUserToolStripMenuItem.Enabled = true;
                             userInformationToolStripMenuItem.Enabled = true;
                             accountNIToolStripMenuItem.Text = "Account: " + Properties.User.Default.login;
                             accountNIToolStripMenuItem.Visible = true;
@@ -317,25 +303,24 @@ namespace RedmineClient
                             cbProjects.SelectedIndex = indexToSelect;
                             toolStripStatusLabel.Text = "Last update was at " + DateTime.Now.ToShortTimeString() + " (success)";
                             refreshToolStripMenuItem.Enabled = true;
-                            refreshFromNIToolStripMenuItem.Enabled = true;
+                            refreshNIToolStripMenuItem.Enabled = true;
                             if (this.WindowState == FormWindowState.Minimized && Properties.Application.Default.background_updater_enabled && !controller.IsBackgroundUpdaterWorking())
                                 controller.StartBackgroundUpdater(false);
                             break;
                         case ErrorTypes.ConnectionError:
                             toolStripStatusLabel.Text = "Last update failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
                             refreshToolStripMenuItem.Enabled = true;
-                            refreshFromNIToolStripMenuItem.Enabled = true;
+                            refreshNIToolStripMenuItem.Enabled = true;
                             MessageBox.Show("Cannot connect to Redmine services and load projects. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         case ErrorTypes.UnathorizedAccess:
                             this.Text = "Redmine Client";
                             refreshToolStripMenuItem.Enabled = false;
-                            logOutToolStripMenuItem.Enabled = false;
                             toolStripStatusLabel.Text = "Last update failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
                             accountNIToolStripMenuItem.Visible = false;
                             logOutNIToolStripMenuItem.Visible = false;
                             NIToolStripSeparator.Visible = false;
-                            refreshFromNIToolStripMenuItem.Enabled = false;
+                            refreshNIToolStripMenuItem.Enabled = false;
                             if (Properties.User.Default.api_key.Length != 0)
                             {
                                 Properties.User.Default.api_key = "";
@@ -347,7 +332,7 @@ namespace RedmineClient
                         case ErrorTypes.UnknownError:
                             toolStripStatusLabel.Text = "Last update failed at " + DateTime.Now.ToShortTimeString() + " (unknown error)";
                             refreshToolStripMenuItem.Enabled = true;
-                            refreshFromNIToolStripMenuItem.Enabled = true;
+                            refreshNIToolStripMenuItem.Enabled = true;
                             MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                     }
@@ -385,38 +370,8 @@ namespace RedmineClient
         {
             Action action = () =>
             {
-                switch (error)
-                {
-                    case ErrorTypes.NoErrors:
-                        cbSelectProject_SelectedIndexChanged(null, null);
-                        toolStripStatusLabel.Text = "Issue #" + issueID + " removed at " + DateTime.Now.ToShortTimeString() + " (success)";
-                        break;
-                    case ErrorTypes.ConnectionError:
-                        toolStripStatusLabel.Text = "Issue #" + issueID + "removing failed at " + DateTime.Now.ToShortTimeString() + " (network error)";
-                        MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        break;
-                    case ErrorTypes.UnathorizedAccess:
-                        this.Text = "Redmine Client";
-                        refreshToolStripMenuItem.Enabled = false;
-                        logOutToolStripMenuItem.Enabled = false;
-                        toolStripStatusLabel.Text = "Issue #" + issueID + "removing failed at " + DateTime.Now.ToShortTimeString() + " (wrong authorization data)";
-                        accountNIToolStripMenuItem.Visible = false;
-                        logOutNIToolStripMenuItem.Visible = false;
-                        NIToolStripSeparator.Visible = false;
-                        refreshFromNIToolStripMenuItem.Enabled = false;
-                        if (Properties.User.Default.api_key.Length != 0)
-                        {
-                            Properties.User.Default.api_key = "";
-                            Properties.User.Default.Save();
-                            MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                        new AuthorizationForm().ShowDialog();
-                        break;
-                    case ErrorTypes.UnknownError:
-                        toolStripStatusLabel.Text = "Issue #" + issueID + "removing failed at " + DateTime.Now.ToShortTimeString() + " (unknown error)";
-                        MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        break;
-                }
+                if (error == ErrorTypes.NoErrors)
+                    cbSelectProject_SelectedIndexChanged(null, null);
             };
             if (InvokeRequired)
                 Invoke(action);
@@ -514,7 +469,7 @@ namespace RedmineClient
                             cbProjects.SelectedIndex = indexToSelect;
                             toolStripStatusLabel.Text = "Last update was at " + DateTime.Now.ToShortTimeString() + " (success)";
                             refreshToolStripMenuItem.Enabled = true;
-                            refreshFromNIToolStripMenuItem.Enabled = true;
+                            refreshNIToolStripMenuItem.Enabled = true;
                             if (this.WindowState == FormWindowState.Minimized && resultInfo.Length > 0)
                                 new NotificationsForm(resultInfo, 15000).Show();
                             break;

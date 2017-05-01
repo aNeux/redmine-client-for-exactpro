@@ -45,6 +45,7 @@
             this.tbID = new System.Windows.Forms.TextBox();
             this.labelID = new System.Windows.Forms.Label();
             this.labelInfo = new System.Windows.Forms.Label();
+            this.btnLogOut = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // labelLogin
@@ -185,11 +186,22 @@
             this.labelInfo.Text = "You could edit personal info at your own Redmine page.";
             this.labelInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // btnLogOut
+            // 
+            this.btnLogOut.Location = new System.Drawing.Point(144, 213);
+            this.btnLogOut.Name = "btnLogOut";
+            this.btnLogOut.Size = new System.Drawing.Size(75, 23);
+            this.btnLogOut.TabIndex = 16;
+            this.btnLogOut.Text = "Log out";
+            this.btnLogOut.UseVisualStyleBackColor = true;
+            this.btnLogOut.Click += new System.EventHandler(this.btnLogOut_Click);
+            // 
             // UserInformationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(312, 244);
+            this.Controls.Add(this.btnLogOut);
             this.Controls.Add(this.tbID);
             this.Controls.Add(this.labelID);
             this.Controls.Add(this.labelInfo);
@@ -237,5 +249,6 @@
         private System.Windows.Forms.TextBox tbID;
         private System.Windows.Forms.Label labelID;
         private System.Windows.Forms.Label labelInfo;
+        private System.Windows.Forms.Button btnLogOut;
     }
 }

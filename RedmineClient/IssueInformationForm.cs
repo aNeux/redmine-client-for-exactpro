@@ -29,6 +29,7 @@ namespace RedmineClient
             controller = Program.controllerGlobal;
             controller.OnIssueInformationLoaded += controller_OnIssueInformationLoaded;
             controller.OnIssueUpdated += controller_OnIssueUpdated;
+            controller.OnIssueRemoved += controller_OnIssueRemoved;
             controller.LoadIssueInformation(issueID);
         }
 
@@ -36,6 +37,7 @@ namespace RedmineClient
         {
             controller.OnIssueInformationLoaded -= controller_OnIssueInformationLoaded;
             controller.OnIssueUpdated -= controller_OnIssueUpdated;
+            controller.OnIssueRemoved -= controller_OnIssueRemoved;
         }
 
         private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
@@ -119,6 +121,17 @@ namespace RedmineClient
         private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void btnRemoveIssue_Click(object sender, EventArgs e)
+        {
+            var dialogResult = MessageBox.Show("Are you really sure you want to remove issue #" + issueID + "?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dialogResult == DialogResult.Yes)
+            {
+                ChangeUIState(false);
+                this.Text = "Issue information [please, wait..]";
+                controller.RemoveIssue(issueID);
+            }
         }
 
         private void controller_OnIssueInformationLoaded(ErrorTypes error, Issue issue, List<IssueTracker> issueTrackers, List<IssueStatus> issueStatuses, List<IssuePriority> issuePriorities, List<Membership> memberships)
@@ -215,6 +228,8 @@ namespace RedmineClient
                         if (projectRoles[0].ID != -1 && projectForThisIssue.Status != 5)
                         {
                             btnSave.Visible = true;
+                            if(isManager)
+                                btnRemoveIssue.Visible = true;
                             ChangeUIState(true);
                             this.Text = "Issue information";
                         }
@@ -276,6 +291,39 @@ namespace RedmineClient
                         break;
                 }
             };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
+        }
+
+        private void controller_OnIssueRemoved(ErrorTypes error, long issueID)
+        {
+            Action action = () =>
+                {
+                    switch (error)
+                    {
+                        case ErrorTypes.NoErrors:
+                            this.Close();
+                            break;
+                        case ErrorTypes.ConnectionError:
+                            this.Text = "Issue information";
+                            MessageBox.Show("Cannot connect to Redmine services. Please check your Internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ChangeUIState(true);
+                            break;
+                        case ErrorTypes.UnathorizedAccess:
+                            this.Text = "Issue information";
+                            MessageBox.Show("You have the wrong authorization data. Please change it and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            controller.NeedToReAuthenticate(false);
+                            this.Close();
+                            break;
+                        case ErrorTypes.UnknownError:
+                            this.Text = "Issue information";
+                            MessageBox.Show("An unknown error occurred. Please, try again one more time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ChangeUIState(true);
+                            break;
+                    }
+                };
             if (InvokeRequired)
                 Invoke(action);
             else
@@ -406,6 +454,7 @@ namespace RedmineClient
             tbClosedDate.Enabled = isEnabled;
             btnSave.Enabled = isEnabled;
             btnClose.Enabled = isEnabled;
+            btnRemoveIssue.Enabled = isEnabled;
         }
     }
 }

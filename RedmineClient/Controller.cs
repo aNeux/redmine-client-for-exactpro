@@ -39,14 +39,16 @@ namespace RedmineClient
         public event Action<bool> OnNeededToReAuthenticate;
         // Событие, возникающее после обновления списка проектов и задач, в которых участвует текущий пользователь
         public event Action<ErrorTypes, List<Project>> OnUpdated;
+        // Собитие, возникающее после загрузки информации о выбранном проекте
+        public event Action<ErrorTypes, Project, List<Membership>> OnProjectInformationLoaded;
+        // Событие, возникающее после загрузки информации о задачах для каждого пользователя
+        public event Action<ErrorTypes, List<User>, List<Issue>> OnIssuesForEveryUserLoaded;
         // Событие, информирующее о готовности к созданию новой задачи
         public event Action<ErrorTypes, List<IssueTracker>, List<IssuePriority>, List<Membership>> OnPreparedToCreateNewIssue;
         // Событие, возникающее после загрузки списка участников указанного проекта
         public event Action<ErrorTypes, List<Membership>> OnMembershipsLoaded;
         // Событие, возникающее после создания новой задачи
         public event Action<ErrorTypes, long> OnIssueCreated;
-        // Собитие, возникающее после загрузки информации о выбранном проекте
-        public event Action<ErrorTypes, Project, List<Membership>> OnProjectInformationLoaded;
         // Событие, возникающее после загрузки информации о выбранной задаче
         public event Action<ErrorTypes, Issue, List<IssueTracker>, List<IssueStatus>, List<IssuePriority>, List<Membership>> OnIssueInformationLoaded;
         // Событие, возникающее после изменения информации о задаче
@@ -301,6 +303,177 @@ namespace RedmineClient
         }
 
         /// <summary>
+        /// Получение полной информации об определенном проекте.
+        /// </summary>
+        /// <param name="projectID">Идентификатор проекта.</param>
+        public void LoadProjectInformation(long projectID)
+        {
+            new Thread(
+                delegate()
+                {
+                    try
+                    {
+                        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects/" + projectID + ".json");
+                        request.Method = "GET";
+                        request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                        request.Accept = "application/json";
+                        request.Timeout = 10000;
+                        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                        StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                        string jsonResponse = streamReader.ReadToEnd();
+                        response.Close();
+                        streamReader.Close();
+                        Project project = JsonConvert.DeserializeObject<ProjectJSONObject>(jsonResponse).Project;
+                        // Получаем также список участников проекта
+                        List<Membership> memberships = new List<Membership>();
+                        MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
+                        int offset = 0;
+                        do
+                        {
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                            request.Accept = "application/json";
+                            request.Timeout = 10000;
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
+                            memberships.AddRange(membershipsJSONObject.Memberships);
+                            offset += membershipsJSONObject.Limit;
+                        } while (membershipsJSONObject.Memberships.Count != 0);
+                        memberships.RemoveAll(temp => temp.User == null);
+                        if (OnProjectInformationLoaded != null)
+                            OnProjectInformationLoaded(ErrorTypes.NoErrors, project, memberships);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (OnProjectInformationLoaded != null)
+                        {
+                            if (ex is WebException)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
+                                    OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
+                                else
+                                    OnProjectInformationLoaded(ErrorTypes.ConnectionError, null, null);
+                            }
+                            else if (ex is ArgumentException)
+                                OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
+                            else
+                                OnProjectInformationLoaded(ErrorTypes.UnknownError, null, null);
+                        }
+                    }
+                }).Start();
+        }
+
+        /// <summary>
+        /// Загрузка списка пользователей и задач для каждого из них.
+        /// </summary>
+        public void LoadIssuesForEveryUser()
+        {
+            new Thread(
+                delegate()
+                {
+                    try
+                    {
+                        HttpWebRequest request;
+                        HttpWebResponse response;
+                        StreamReader streamReader;
+                        string jsonResponse;
+                        // Загружаем список ID всех проектов
+                        List<long> projectsIDs = new List<long>();
+                        ProjectsJSONObject projectsJSONObject = new ProjectsJSONObject();
+                        int offset = 0;
+                        do
+                        {
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects.json?offset=" + offset);
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                            request.Accept = "application/json";
+                            request.Timeout = 10000;
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            projectsJSONObject = JsonConvert.DeserializeObject<ProjectsJSONObject>(jsonResponse);
+                            foreach (Project currentProject in projectsJSONObject.Projects)
+                                projectsIDs.Add(currentProject.ID);
+                            offset += projectsJSONObject.Limit;
+                        } while (projectsJSONObject.Projects.Count != 0);
+                        // Загружаем список всех пользователей, задействованных в каких-либо проектах
+                        List<User> users = new List<User>();
+                        for (int i = 0; i < projectsIDs.Count; i++)
+                        {
+                            MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
+                            offset = 0;
+                            do
+                            {
+                                request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectsIDs[i] + "/memberships.json?offset=" + offset);
+                                request.Method = "GET";
+                                request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                                request.Accept = "application/json";
+                                request.Timeout = 10000;
+                                response = (HttpWebResponse)request.GetResponse();
+                                streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                                jsonResponse = streamReader.ReadToEnd();
+                                response.Close();
+                                streamReader.Close();
+                                membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
+                                foreach (Membership currentMembership in membershipsJSONObject.Memberships)
+                                    if (currentMembership.User != null && users.FindIndex(temp => temp.ID == currentMembership.User.ID) < 0)
+                                        users.Add(currentMembership.User);
+                                offset += membershipsJSONObject.Limit;
+                            } while (membershipsJSONObject.Memberships.Count != 0);
+                        }
+                        // Загружаем список всех задач
+                        List<Issue> issuesForUsers = new List<Issue>();
+                        IssuesJSONObject issuesJSONObject = new IssuesJSONObject();
+                        offset = 0;
+                        do
+                        {
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issues.json?offset=" + offset);
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                            request.Accept = "application/json";
+                            request.Timeout = 10000;
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            issuesJSONObject = JsonConvert.DeserializeObject<IssuesJSONObject>(jsonResponse);
+                            issuesForUsers.AddRange(issuesJSONObject.Issues);
+                            offset += issuesJSONObject.Limit;
+                        } while (issuesJSONObject.Issues.Count != 0);
+                        if (OnIssuesForEveryUserLoaded != null)
+                            OnIssuesForEveryUserLoaded(ErrorTypes.NoErrors, users, issuesForUsers);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (OnIssuesForEveryUserLoaded != null)
+                        {
+                            if (ex is WebException)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
+                                    OnIssuesForEveryUserLoaded(ErrorTypes.UnathorizedAccess, null, null);
+                                else
+                                    OnIssuesForEveryUserLoaded(ErrorTypes.ConnectionError, null, null);
+                            }
+                            else if (ex is ArgumentException)
+                                OnIssuesForEveryUserLoaded(ErrorTypes.UnathorizedAccess, null, null);
+                            else
+                                OnIssuesForEveryUserLoaded(ErrorTypes.UnknownError, null, null);
+                        }
+                    }
+                }).Start();
+        }
+
+        /// <summary>
         /// Загрузка необходимой информации для подготовки к созданию новой задачи.
         /// </summary>
         /// <param name="projectID">Идентификатор проекта.</param>
@@ -505,73 +678,6 @@ namespace RedmineClient
                                 OnIssueCreated(ErrorTypes.UnathorizedAccess, newIssue.ProjectID);
                             else
                                 OnIssueCreated(ErrorTypes.UnknownError, newIssue.ProjectID);
-                        }
-                    }
-                }).Start();
-        }
-
-        /// <summary>
-        /// Получение полной информации об определенном проекте.
-        /// </summary>
-        /// <param name="projectID">Идентификатор проекта.</param>
-        public void LoadProjectInformation(long projectID)
-        {
-            new Thread(
-                delegate()
-                {
-                    try
-                    {
-                        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "projects/" + projectID + ".json");
-                        request.Method = "GET";
-                        request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
-                        request.Accept = "application/json";
-                        request.Timeout = 10000;
-                        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                        StreamReader streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                        string jsonResponse = streamReader.ReadToEnd();
-                        response.Close();
-                        streamReader.Close();
-                        Project project = JsonConvert.DeserializeObject<ProjectJSONObject>(jsonResponse).Project;
-                        // Получаем также список участников проекта
-                        List<Membership> memberships = new List<Membership>();
-                        MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
-                        int offset = 0;
-                        do
-                        {
-                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
-                            request.Method = "GET";
-                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
-                            request.Accept = "application/json";
-                            request.Timeout = 10000;
-                            response = (HttpWebResponse)request.GetResponse();
-                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                            jsonResponse = streamReader.ReadToEnd();
-                            response.Close();
-                            streamReader.Close();
-                            membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
-                            memberships.AddRange(membershipsJSONObject.Memberships);
-                            offset += membershipsJSONObject.Limit;
-                        } while (membershipsJSONObject.Memberships.Count != 0);
-                        memberships.RemoveAll(temp => temp.User == null);
-                        if (OnProjectInformationLoaded != null)
-                            OnProjectInformationLoaded(ErrorTypes.NoErrors, project, memberships);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (OnProjectInformationLoaded != null)
-                        {
-                            if (ex is WebException)
-                            {
-                                WebException webException = (WebException)ex;
-                                if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
-                                    OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
-                                else
-                                    OnProjectInformationLoaded(ErrorTypes.ConnectionError, null, null);
-                            }
-                            else if (ex is ArgumentException)
-                                OnProjectInformationLoaded(ErrorTypes.UnathorizedAccess, null, null);
-                            else
-                                OnProjectInformationLoaded(ErrorTypes.UnknownError, null, null);
                         }
                     }
                 }).Start();
@@ -1146,8 +1252,7 @@ namespace RedmineClient
                     resultInfo = "Changes in showing projects:\r\n" + resultInfoForProjects + "\r\n";
                 if (resultInfoForIssues.Length > 0)
                     resultInfo += "Changes in issues:\r\n" + resultInfoForIssues;
-                if(resultInfo.Length > 0)
-                    resultInfo = resultInfo.Remove(resultInfo.Length - 1);
+                resultInfo = resultInfo.Trim();
                 if (OnBackgroundUpdated != null)
                     OnBackgroundUpdated(ErrorTypes.NoErrors, projects, resultInfo);
                 StartBackgroundUpdater(false);

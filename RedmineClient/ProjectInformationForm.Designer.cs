@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProjectInformation));
             this.labelID = new System.Windows.Forms.Label();
             this.tbID = new System.Windows.Forms.TextBox();
@@ -49,6 +50,9 @@
             this.labelHomepage = new System.Windows.Forms.Label();
             this.cbIsPublic = new System.Windows.Forms.CheckBox();
             this.btnClose = new System.Windows.Forms.Button();
+            this.contextMenuMembers = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.showIssuesForThatUserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuMembers.SuspendLayout();
             this.SuspendLayout();
             // 
             // labelID
@@ -189,6 +193,7 @@
             this.lbMembers.Name = "lbMembers";
             this.lbMembers.Size = new System.Drawing.Size(167, 56);
             this.lbMembers.TabIndex = 17;
+            this.lbMembers.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbMembers_MouseDown);
             // 
             // tbHomepage
             // 
@@ -229,6 +234,20 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
+            // contextMenuMembers
+            // 
+            this.contextMenuMembers.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showIssuesForThatUserToolStripMenuItem});
+            this.contextMenuMembers.Name = "contextMenuMembers";
+            this.contextMenuMembers.Size = new System.Drawing.Size(205, 26);
+            // 
+            // showIssuesForThatUserToolStripMenuItem
+            // 
+            this.showIssuesForThatUserToolStripMenuItem.Name = "showIssuesForThatUserToolStripMenuItem";
+            this.showIssuesForThatUserToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.showIssuesForThatUserToolStripMenuItem.Text = "Show issues for that user";
+            this.showIssuesForThatUserToolStripMenuItem.Click += new System.EventHandler(this.showIssuesForThatUserToolStripMenuItem_Click);
+            // 
             // ProjectInformation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -263,6 +282,7 @@
             this.Text = "Project Information [please, wait..]";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ProjectInformation_FormClosing);
             this.Shown += new System.EventHandler(this.ProjectInformation_Shown);
+            this.contextMenuMembers.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -290,5 +310,7 @@
         private System.Windows.Forms.Label labelHomepage;
         private System.Windows.Forms.CheckBox cbIsPublic;
         private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.ContextMenuStrip contextMenuMembers;
+        private System.Windows.Forms.ToolStripMenuItem showIssuesForThatUserToolStripMenuItem;
     }
 }

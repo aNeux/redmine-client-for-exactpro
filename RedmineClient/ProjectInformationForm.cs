@@ -30,6 +30,20 @@ namespace RedmineClient
             controller.OnProjectInformationLoaded -= controller_OnProjectInformationLoaded;
         }
 
+        private void lbMembers_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                lbMembers.SelectedIndex = lbMembers.IndexFromPoint(e.X, e.Y);
+                contextMenuMembers.Show(Cursor.Position);
+            }
+        }
+
+        private void showIssuesForThatUserToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new IssuesForCertainUserForm((long)(lbMembers.SelectedItem as TextAndValueItem).Value).ShowDialog();
+        }
+
         private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -56,7 +70,7 @@ namespace RedmineClient
                             foreach (Role role in membership.Roles)
                                 memberRoles += role.Name + ", ";
                             memberRoles = memberRoles.Remove(memberRoles.Length - 2);
-                            lbMembers.Items.Add(membership.User.Name + " (" + memberRoles + ")");
+                            lbMembers.Items.Add(new TextAndValueItem { Text = membership.User.Name + " (" + memberRoles + ")", Value = membership.User.ID });
                         }
                         cbIsPublic.Checked = project.IsPublic;
                         lbMembers.Enabled = true;

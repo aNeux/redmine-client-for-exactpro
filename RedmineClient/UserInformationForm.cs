@@ -27,5 +27,15 @@ namespace RedmineClient
         {
             this.Close();
         }
+
+        private void btnLogOut_Click(object sender, EventArgs e)
+        {
+            var dialogResult = MessageBox.Show("Do you really want to log out and exit the program?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dialogResult == DialogResult.Yes)
+            {
+                Properties.User.Default.Reset();
+                Application.Exit();
+            }
+        }
     }
 }
