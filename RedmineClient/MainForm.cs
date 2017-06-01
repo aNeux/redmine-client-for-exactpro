@@ -12,6 +12,7 @@ namespace RedmineClient
         private Controller controller;
         private long lastSelectedProjectID = -1;
         private int lastSortedColumn = -1;
+        private List<Filter> filterSettings = null;
         private FormWindowState lastWindowStateBeforeMinimazing;
 
         public MainForm()
@@ -169,6 +170,7 @@ namespace RedmineClient
             if (cbProjects.SelectedIndex != 0)
             {
                 btnProjectInfo.Visible = true;
+                cbFilterSettings.Visible = true;
                 lastSelectedProjectID = (long)(cbProjects.SelectedItem as TextAndValueItem).Value;
                 Project currentProject = controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID);
                 newIssueToolStripMenuItem.Enabled = currentProject.Roles.FindIndex(temp => temp.ID == 3) >= 0 && currentProject.Status == 1;
@@ -179,8 +181,11 @@ namespace RedmineClient
                         projectRoles += role.Name + ", ";
                     labelProjectRoles.Text = "Roles: " + projectRoles.Remove(projectRoles.Length - 2);
                 }
+                List<Issue> issuesToShow = controller.GetIssues(lastSelectedProjectID);
+                if (filterSettings != null)
+                    Utils.ApplyFilterSettings(ref issuesToShow, filterSettings);
                 lvIssues.Items.Clear();
-                foreach (Issue currentIssue in controller.GetIssues(lastSelectedProjectID))
+                foreach (Issue currentIssue in issuesToShow)
                 {
                     ListViewItem lvi = new ListViewItem(currentIssue.ID + "");
                     lvi.SubItems.Add(currentIssue.Subject);
@@ -197,6 +202,7 @@ namespace RedmineClient
                 lastSelectedProjectID = -1;
                 newIssueToolStripMenuItem.Enabled = false;
                 btnProjectInfo.Visible = false;
+                cbFilterSettings.Visible = false;
                 labelProjectRoles.Text = "";
                 lvIssues.Items.Clear();
             }
@@ -207,10 +213,42 @@ namespace RedmineClient
             new ProjectInformation(lastSelectedProjectID).ShowDialog();
         }
 
-        private void lvIssues_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void cbFilterSettings_Click(object sender, EventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
-                new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID).Roles).ShowDialog();
+            cbFilterSettings.Checked = !cbFilterSettings.Checked;
+            DialogResult result;
+            using (var filterSettingsForm = new FilterSettingsForm(lastSelectedProjectID, filterSettings))
+            {
+                result = filterSettingsForm.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    filterSettings = filterSettingsForm.FilterSettings;
+                    cbFilterSettings.Checked = true;
+                }
+                else if (result == DialogResult.Abort)
+                {
+                    filterSettings = null;
+                    cbFilterSettings.Checked = false;
+                }
+            }
+            if (result != DialogResult.Cancel)
+            {
+                List<Issue> issuesToShow = controller.GetIssues(lastSelectedProjectID);
+                if (filterSettings != null)
+                    Utils.ApplyFilterSettings(ref issuesToShow, filterSettings);
+                lvIssues.Items.Clear();
+                foreach (Issue currentIssue in issuesToShow)
+                {
+                    ListViewItem lvi = new ListViewItem(currentIssue.ID + "");
+                    lvi.SubItems.Add(currentIssue.Subject);
+                    lvi.SubItems.Add(currentIssue.Tracker.Name);
+                    lvi.SubItems.Add(currentIssue.Status.Name);
+                    lvi.SubItems.Add(currentIssue.Priority.Name);
+                    lvi.SubItems.Add(currentIssue.AssignedTo != null && currentIssue.AssignedTo.Name.Length > 0 ? currentIssue.AssignedTo.Name : "< none >");
+                    lvi.SubItems.Add(currentIssue.UpdatedOn.ToShortTimeString() + ", " + currentIssue.UpdatedOn.ToShortDateString());
+                    lvIssues.Items.Add(lvi);
+                }
+            }
         }
 
         private void lvIssues_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -227,8 +265,14 @@ namespace RedmineClient
                 else
                     lvIssues.Sorting = SortOrder.Ascending;
             }
-            this.lvIssues.ListViewItemSorter = new ListViewItemComparer(e.Column, lvIssues.Sorting);
+            this.lvIssues.ListViewItemSorter = new ListViewIssuesItemComparer(e.Column, lvIssues.Sorting);
             lvIssues.Sort();
+        }
+
+        private void lvIssues_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+                new IssueInformationForm(long.Parse(lvIssues.FocusedItem.SubItems[0].Text), controller.GetProjects().Single(temp => temp.ID == lastSelectedProjectID).Roles).ShowDialog();
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -516,18 +560,18 @@ namespace RedmineClient
         }
     }
 
-    class ListViewItemComparer : IComparer
+    class ListViewIssuesItemComparer : IComparer
     {
         private int column;
         private SortOrder sortOrder;
 
-        public ListViewItemComparer()
+        public ListViewIssuesItemComparer()
         {
             column = 0;
             sortOrder = SortOrder.Ascending;
         }
 
-        public ListViewItemComparer(int column, SortOrder sortOrder)
+        public ListViewIssuesItemComparer(int column, SortOrder sortOrder)
         {
             this.column = column;
             this.sortOrder = sortOrder;

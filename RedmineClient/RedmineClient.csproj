@@ -85,12 +85,19 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FilterSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FilterSettingsForm.Designer.cs">
+      <DependentUpon>FilterSettingsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="IssuesForCertainUserForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="IssuesForCertainUserForm.Designer.cs">
       <DependentUpon>IssuesForCertainUserForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\Filter.cs" />
     <Compile Include="NotificationsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -164,6 +171,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AuthorizationForm.resx">
       <DependentUpon>AuthorizationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FilterSettingsForm.resx">
+      <DependentUpon>FilterSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="IssuesForCertainUserForm.resx">
       <DependentUpon>IssuesForCertainUserForm.cs</DependentUpon>

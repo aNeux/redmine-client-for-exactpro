@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using RedmineClient.Models;
+using System.Collections;
 
 namespace RedmineClient
 {
@@ -11,6 +12,7 @@ namespace RedmineClient
         private Controller controller;
         private long userID = -1;
         private List<Issue> issuesForEveryUser;
+        private int lastSortedColumn = -1;
 
         public IssuesForCertainUserForm(long userID)
         {
@@ -48,6 +50,24 @@ namespace RedmineClient
                 lvi.SubItems.Add(currentIssue.Priority.Name);
                 lvIssues.Items.Add(lvi);
             }
+        }
+
+        private void lvIssues_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            if (e.Column != lastSortedColumn)
+            {
+                lastSortedColumn = e.Column;
+                lvIssues.Sorting = SortOrder.Ascending;
+            }
+            else
+            {
+                if (lvIssues.Sorting == SortOrder.Ascending)
+                    lvIssues.Sorting = SortOrder.Descending;
+                else
+                    lvIssues.Sorting = SortOrder.Ascending;
+            }
+            this.lvIssues.ListViewItemSorter = new ListViewIssuesForUserItemComparer(e.Column, lvIssues.Sorting);
+            lvIssues.Sort();
         }
 
         private void lvIssues_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -117,6 +137,44 @@ namespace RedmineClient
                 Invoke(action);
             else
                 action();
+        }
+    }
+
+    class ListViewIssuesForUserItemComparer : IComparer
+    {
+        private int column;
+        private SortOrder sortOrder;
+
+        public ListViewIssuesForUserItemComparer()
+        {
+            column = 0;
+            sortOrder = SortOrder.Ascending;
+        }
+
+        public ListViewIssuesForUserItemComparer(int column, SortOrder sortOrder)
+        {
+            this.column = column;
+            this.sortOrder = sortOrder;
+        }
+
+        public int Compare(object x, object y)
+        {
+            int returnValue = -1;
+            if (column == 2)
+            {
+                string firstProjectName = ((ListViewItem)x).SubItems[column].Text;
+                firstProjectName = firstProjectName.Substring(firstProjectName.LastIndexOf(":") + 2);
+                firstProjectName = firstProjectName.Remove(firstProjectName.Length - 1);
+                string secondProjectName = ((ListViewItem)y).SubItems[column].Text;
+                secondProjectName = secondProjectName.Substring(secondProjectName.LastIndexOf(":") + 2);
+                secondProjectName = secondProjectName.Remove(secondProjectName.Length - 1);
+                returnValue = String.Compare(firstProjectName, secondProjectName);
+            }
+            else
+                returnValue = String.Compare(((ListViewItem)x).SubItems[column].Text, ((ListViewItem)y).SubItems[column].Text);
+            if (sortOrder == SortOrder.Descending)
+                returnValue *= -1;
+            return returnValue;
         }
     }
 }

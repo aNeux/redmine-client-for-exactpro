@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Management;
+using RedmineClient.Models;
 
 namespace RedmineClient
 {
@@ -54,6 +56,105 @@ namespace RedmineClient
             foreach (ManagementObject mObject in moSearcher.Get())
                 result += ((string[])mObject["BIOSVersion"])[0];
             return result.Replace(" ", "");
+        }
+
+        /// <summary>
+        /// Применение настроек фильтрации к указанному списку задач.
+        /// </summary>
+        /// <param name="issues">Список задач для фильтрации.</param>
+        /// <param name="filterSettings">Набор настроек фильрации.</param>
+        public static void ApplyFilterSettings(ref List<Issue> issues, List<Filter> filterSettings)
+        {
+            foreach (Filter currentFilter in filterSettings)
+            {
+                switch (currentFilter.Obj)
+                {
+                    case FilterObjects.Status:
+                        if (currentFilter.Condition == FilterConditions.IS)
+                            issues.RemoveAll(temp => temp.Status.ID != (int)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.ISNOT)
+                            issues.RemoveAll(temp => temp.Status.ID == (int)currentFilter.Value);
+                        break;
+                    case FilterObjects.Tracker:
+                        if (currentFilter.Condition == FilterConditions.IS)
+                            issues.RemoveAll(temp => temp.Tracker.ID != (int)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.ISNOT)
+                            issues.RemoveAll(temp => temp.Tracker.ID == (int)currentFilter.Value);
+                        break;
+                    case FilterObjects.Priority:
+                        if (currentFilter.Condition == FilterConditions.IS)
+                            issues.RemoveAll(temp => temp.Priority.ID != (int)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.ISNOT)
+                            issues.RemoveAll(temp => temp.Priority.ID == (int)currentFilter.Value);
+                        break;
+                    case FilterObjects.Privacy:
+                        if (currentFilter.Condition == FilterConditions.IS)
+                            issues.RemoveAll(temp => temp.IsPrivate != (bool)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.ISNOT)
+                            issues.RemoveAll(temp => temp.IsPrivate == (bool)currentFilter.Value);
+                        break;
+                    case FilterObjects.StartDate:
+                        if (currentFilter.Condition == FilterConditions.IS)
+                            issues.RemoveAll(temp => temp.StartDate != (DateTime)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.ISNOT)
+                            issues.RemoveAll(temp => temp.StartDate == (DateTime)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.MORE_OR_EQUAL)
+                            issues.RemoveAll(temp => temp.StartDate < (DateTime)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.LESS_OR_EQUAL)
+                            issues.RemoveAll(temp => temp.StartDate > (DateTime)currentFilter.Value);
+                        break;
+                    case FilterObjects.Subject:
+                        if (currentFilter.Condition == FilterConditions.CONTAINS)
+                            issues.RemoveAll(temp => !temp.Subject.Contains((string)currentFilter.Value));
+                        else if (currentFilter.Condition == FilterConditions.DOESNT_CONTAIN)
+                            issues.RemoveAll(temp => temp.Subject.Contains((string)currentFilter.Value));
+                        break;
+                    case FilterObjects.EstimatedTime:
+                        if (currentFilter.Condition == FilterConditions.IS)
+                            issues.RemoveAll(temp => temp.EstimatedHours != (double)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.ISNOT)
+                            issues.RemoveAll(temp => temp.EstimatedHours == (double)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.MORE_OR_EQUAL)
+                            issues.RemoveAll(temp => temp.EstimatedHours < (double)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.LESS_OR_EQUAL)
+                            issues.RemoveAll(temp => temp.EstimatedHours > (double)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.BEETWEN)
+                            issues.RemoveAll(temp => temp.EstimatedHours < ((double[])currentFilter.Value)[0] || temp.EstimatedHours > ((double[])currentFilter.Value)[1]);
+                        break;
+                    case FilterObjects.DoneRatio:
+                        if (currentFilter.Condition == FilterConditions.IS)
+                            issues.RemoveAll(temp => temp.DoneRatio != (int)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.ISNOT)
+                            issues.RemoveAll(temp => temp.DoneRatio == (int)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.MORE_OR_EQUAL)
+                            issues.RemoveAll(temp => temp.DoneRatio < (int)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.LESS_OR_EQUAL)
+                            issues.RemoveAll(temp => temp.DoneRatio > (int)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.BEETWEN)
+                            issues.RemoveAll(temp => temp.DoneRatio < ((int[])currentFilter.Value)[0] || temp.DoneRatio > ((int[])currentFilter.Value)[1]);
+                        break;
+                    case FilterObjects.Author:
+                        if (currentFilter.Condition == FilterConditions.IS)
+                            issues.RemoveAll(temp => temp.Author.ID != (long)currentFilter.Value);
+                        else if (currentFilter.Condition == FilterConditions.ISNOT)
+                            issues.RemoveAll(temp => temp.Author.ID == (long)currentFilter.Value);
+                        break;
+                    case FilterObjects.Assignee:
+                        if (currentFilter.Condition == FilterConditions.IS)
+                            if ((long)currentFilter.Value == -1)
+                                issues.RemoveAll(temp => temp.AssignedTo != null);
+                            else
+                                issues.RemoveAll(temp => temp.AssignedTo == null || (temp.AssignedTo != null && temp.AssignedTo.ID != (long)currentFilter.Value));
+                        else if (currentFilter.Condition == FilterConditions.ISNOT)
+                            if ((long)currentFilter.Value == -1)
+                                issues.RemoveAll(temp => temp.AssignedTo == null);
+                            else
+                                issues.RemoveAll(temp => temp.AssignedTo != null && temp.AssignedTo.ID == (long)currentFilter.Value);
+                        break;
+                }
+                if (issues.Count == 0)
+                    break;
+            }
         }
     }
 }

@@ -60,6 +60,7 @@
             this.lvIssues.TabIndex = 3;
             this.lvIssues.UseCompatibleStateImageBehavior = false;
             this.lvIssues.View = System.Windows.Forms.View.Details;
+            this.lvIssues.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvIssues_ColumnClick);
             this.lvIssues.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lvIssues_MouseDoubleClick);
             // 
             // columnHeaderID

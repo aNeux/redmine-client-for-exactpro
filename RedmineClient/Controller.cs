@@ -59,6 +59,8 @@ namespace RedmineClient
         public event Action<ErrorTypes, bool[]> OnOptionsApplied;
         // Событие, возникающее после фонового обновления
         public event Action<ErrorTypes, List<Project>, string> OnBackgroundUpdated;
+        // Событие, информирующее о готовности задания фильтров для задач
+        public event Action<ErrorTypes, List<IssueStatus>, List<IssueTracker>, List<IssuePriority>, List<Membership>> OnPreparedToSetFilters;
 
         public Controller()
         {
@@ -1281,6 +1283,102 @@ namespace RedmineClient
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Загрузка информации о возможных статусах, трекерах, приоритетах задачи и участниках указанного проекта.
+        /// </summary>
+        /// <param name="projectID">Идентификатор проекта.</param>
+        public void LoadDataToSetFilters(long projectID)
+        {
+            new Thread(
+                delegate()
+                {
+                    try
+                    {
+                        HttpWebRequest request;
+                        HttpWebResponse response;
+                        StreamReader streamReader;
+                        string jsonResponse;
+                        // Получаем список возможных статусов задачи
+                        request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "issue_statuses.json");
+                        request.Method = "GET";
+                        request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                        request.Accept = "application/json";
+                        request.Timeout = 10000;
+                        response = (HttpWebResponse)request.GetResponse();
+                        streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                        jsonResponse = streamReader.ReadToEnd();
+                        response.Close();
+                        streamReader.Close();
+                        List<IssueStatus> issueStatuses = JsonConvert.DeserializeObject<IssueStatusesJSONObject>(jsonResponse).IssueStatuses;
+                        // Получаем список всевозможных типов задачи
+                        request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "trackers.json");
+                        request.Method = "GET";
+                        request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                        request.Accept = "application/json";
+                        request.Timeout = 10000;
+                        response = (HttpWebResponse)request.GetResponse();
+                        streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                        jsonResponse = streamReader.ReadToEnd();
+                        response.Close();
+                        streamReader.Close();
+                        List<IssueTracker> issueTrackers = JsonConvert.DeserializeObject<IssueTrackersJSONObject>(jsonResponse).IssueTrackers;
+                        // Получаем список возможных приоритетов задачи
+                        request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "enumerations/issue_priorities.json");
+                        request.Method = "GET";
+                        request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                        request.Accept = "application/json";
+                        request.Timeout = 10000;
+                        response = (HttpWebResponse)request.GetResponse();
+                        streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                        jsonResponse = streamReader.ReadToEnd();
+                        response.Close();
+                        streamReader.Close();
+                        List<IssuePriority> issuePriorities = JsonConvert.DeserializeObject<IssuePrioritiesJSONObject>(jsonResponse).IssuePriorities;
+                        // Получаем список всех участников проекта
+                        List<Membership> memberships = new List<Membership>();
+                        MembershipsJSONObject membershipsJSONObject = new MembershipsJSONObject();
+                        int offset = 0;
+                        do
+                        {
+                            request = (HttpWebRequest)WebRequest.Create(REDMINE_HOST + "/projects/" + projectID + "/memberships.json?offset=" + offset);
+                            request.Method = "GET";
+                            request.Headers.Add("X-Redmine-API-Key", currentAPIKey);
+                            request.Accept = "application/json";
+                            request.Timeout = 10000;
+                            response = (HttpWebResponse)request.GetResponse();
+                            streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            jsonResponse = streamReader.ReadToEnd();
+                            response.Close();
+                            streamReader.Close();
+                            membershipsJSONObject = JsonConvert.DeserializeObject<MembershipsJSONObject>(jsonResponse);
+                            memberships.AddRange(membershipsJSONObject.Memberships);
+                            offset += membershipsJSONObject.Limit;
+                        } while (membershipsJSONObject.Memberships.Count != 0);
+                        memberships.RemoveAll(temp => temp.User == null);
+                        if (OnPreparedToSetFilters != null)
+                            OnPreparedToSetFilters(ErrorTypes.NoErrors, issueStatuses, issueTrackers, issuePriorities, memberships);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (OnPreparedToSetFilters != null)
+                        {
+                            if (ex is WebException)
+                            {
+                                WebException webException = (WebException)ex;
+                                if (webException.Status == WebExceptionStatus.ProtocolError && ((HttpWebResponse)webException.Response).StatusCode == HttpStatusCode.Unauthorized)
+                                    OnPreparedToSetFilters(ErrorTypes.UnathorizedAccess, null, null, null, null);
+                                else
+                                    OnPreparedToSetFilters(ErrorTypes.ConnectionError, null, null, null, null);
+                            }
+                            else if (ex is ArgumentException)
+                                OnPreparedToSetFilters(ErrorTypes.UnathorizedAccess, null, null, null, null);
+                            else
+                                OnPreparedToSetFilters(ErrorTypes.UnknownError, null, null, null, null);
+                        }
+                    }
+                }).Start();
         }
     }
 }

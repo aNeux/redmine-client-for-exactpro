@@ -62,6 +62,7 @@
             this.NIToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.refreshNIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitNIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cbFilterSettings = new System.Windows.Forms.CheckBox();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.contextMenuNotifyIcon.SuspendLayout();
@@ -200,7 +201,7 @@
             this.lvIssues.MultiSelect = false;
             this.lvIssues.Name = "lvIssues";
             this.lvIssues.Size = new System.Drawing.Size(620, 255);
-            this.lvIssues.TabIndex = 5;
+            this.lvIssues.TabIndex = 6;
             this.lvIssues.UseCompatibleStateImageBehavior = false;
             this.lvIssues.View = System.Windows.Forms.View.Details;
             this.lvIssues.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvIssues_ColumnClick);
@@ -259,7 +260,7 @@
             this.statusStrip.Location = new System.Drawing.Point(0, 339);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(644, 22);
-            this.statusStrip.TabIndex = 6;
+            this.statusStrip.TabIndex = 7;
             // 
             // toolStripStatusLabel
             // 
@@ -270,10 +271,10 @@
             // 
             this.labelProjectRoles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelProjectRoles.Location = new System.Drawing.Point(341, 45);
+            this.labelProjectRoles.Location = new System.Drawing.Point(395, 45);
             this.labelProjectRoles.Name = "labelProjectRoles";
-            this.labelProjectRoles.Size = new System.Drawing.Size(291, 21);
-            this.labelProjectRoles.TabIndex = 4;
+            this.labelProjectRoles.Size = new System.Drawing.Size(237, 21);
+            this.labelProjectRoles.TabIndex = 5;
             this.labelProjectRoles.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // notifyIcon
@@ -332,11 +333,24 @@
             this.exitNIToolStripMenuItem.Text = "Exit";
             this.exitNIToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
+            // cbFilterSettings
+            // 
+            this.cbFilterSettings.AutoSize = true;
+            this.cbFilterSettings.Location = new System.Drawing.Point(341, 48);
+            this.cbFilterSettings.Name = "cbFilterSettings";
+            this.cbFilterSettings.Size = new System.Drawing.Size(48, 17);
+            this.cbFilterSettings.TabIndex = 4;
+            this.cbFilterSettings.Text = "Filter";
+            this.cbFilterSettings.UseVisualStyleBackColor = true;
+            this.cbFilterSettings.Visible = false;
+            this.cbFilterSettings.Click += new System.EventHandler(this.cbFilterSettings_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(644, 361);
+            this.Controls.Add(this.cbFilterSettings);
             this.Controls.Add(this.labelProjectRoles);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.btnProjectInfo);
@@ -396,6 +410,7 @@
         private System.Windows.Forms.ToolStripMenuItem accountNIToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem logOutNIToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem findIssuesForUserToolStripMenuItem;
+        private System.Windows.Forms.CheckBox cbFilterSettings;
     }
 }
 
